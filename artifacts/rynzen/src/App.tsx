@@ -182,7 +182,13 @@ export default function App() {
 
         <div className="search-section">
           <div className="search-bar-row" ref={dropdownRef}>
-            <div className="search-input-box">
+            <div
+              className="search-input-box"
+              style={{
+                borderColor: selectedEngine.color,
+                boxShadow: `0 0 0 3px ${selectedEngine.color}22, 0 2px 8px rgba(0,0,0,0.07)`,
+              }}
+            >
               <div
                 className="engine-pill"
                 onClick={() => setShowDropdown(!showDropdown)}
