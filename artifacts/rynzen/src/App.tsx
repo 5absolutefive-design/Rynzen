@@ -253,6 +253,13 @@ export default function App() {
     return now.toLocaleTimeString([], opts);
   }
 
+  function getTimeParts() {
+    const full = getTimeStr();
+    const match = full.match(/^(.*?)\s*(AM|PM)$/i);
+    if (match) return { digits: match[1].trim(), ampm: match[2].toUpperCase() };
+    return { digits: full, ampm: null };
+  }
+
   function getDateStr() {
     const opts: Intl.DateTimeFormatOptions =
       dateFormat === "month-day-year" ? { year: "numeric", month: "long", day: "numeric", ...(tz ? { timeZone: tz } : {}) }
@@ -293,8 +300,21 @@ export default function App() {
                 borderOpacity={clockBorderOpacity}
               />
             ) : (clockShow === "both" || clockShow === "clock") ? (
-              <div className="clock-time" style={{ fontSize: clockFontSize, color: isDark ? "#e8e8f0" : "#1a1a2e" }}>
-                {getTimeStr()}
+              <div className="clock-time" style={{ fontSize: clockFontSize, color: isDark ? "#e8e8f0" : "#1a1a2e", position: "relative", display: "inline-flex", alignItems: "flex-start" }}>
+                <span>{getTimeParts().digits}</span>
+                {getTimeParts().ampm && (
+                  <span style={{
+                    fontSize: `calc(${clockFontSize} * 0.22)`,
+                    fontWeight: 400,
+                    lineHeight: 1,
+                    marginTop: `calc(${clockFontSize} * 0.08)`,
+                    marginLeft: "4px",
+                    opacity: 0.7,
+                    letterSpacing: "0.5px",
+                  }}>
+                    {getTimeParts().ampm}
+                  </span>
+                )}
               </div>
             ) : null}
             {(clockShow === "both" || clockShow === "date") && (
