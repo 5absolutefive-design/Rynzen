@@ -463,7 +463,7 @@ body {
 }
 
 .settings-sidebar.open {
-  width: 220px;
+  width: 300px;
   box-shadow: -4px 0 24px rgba(0,0,0,0.10);
   border-left-width: 1px;
 }
@@ -506,12 +506,17 @@ body {
 .settings-body {
   flex: 1;
   overflow-y: auto;
-  padding: 8px 12px 40px;
+  padding: 8px 12px 40px 8px;
   display: flex;
   flex-direction: column;
   gap: 6px;
   scrollbar-width: thin;
-  scrollbar-color: rgba(128,128,128,0.2) transparent;
+  scrollbar-color: rgba(128,128,128,0.3) transparent;
+  direction: rtl;
+}
+
+.settings-body > * {
+  direction: ltr;
 }
 
 .settings-body::-webkit-scrollbar {
