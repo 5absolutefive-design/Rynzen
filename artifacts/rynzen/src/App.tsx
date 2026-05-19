@@ -274,6 +274,7 @@ export default function App() {
 
   const fontSizePx = 12 + Math.round((fontSizeNum / 100) * 16);
   const textColor = fontColor || (isDark ? "#e8e8f0" : "#1a1a2e");
+  const themeColor = isDark ? "#e8e8f0" : "#1a1a2e";
 
   useEffect(() => {
     const weightMap: Record<string, string> = { light: "300", normal: "400", "semi-bold": "600", bold: "700" };
@@ -430,7 +431,7 @@ export default function App() {
   const cardBg = isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.035)";
   const rowBorder = isDark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.07)";
   const selectBg = isDark ? "#252540" : "#f0f0f5";
-  const selectColor = textColor;
+  const selectColor = themeColor;
   const selectBorder = isDark ? "#3a3a5c" : "#dde0e8";
 
   return (
@@ -607,7 +608,7 @@ export default function App() {
 
     {/* Settings Sidebar */}
     <div ref={settingsRef} className={`settings-sidebar${showSettings ? " open" : ""}`}
-      style={{ background: isDark ? "#1e1e38" : "#ffffff", color: textColor, borderLeftColor: isDark ? "#2a2a44" : "#e8e8e4" }}>
+      style={{ background: isDark ? "#1e1e38" : "#ffffff", color: themeColor, borderLeftColor: isDark ? "#2a2a44" : "#e8e8e4" }}>
     <div className="settings-scroll-wrapper">
       <div className="settings-header">
         <span className="settings-title">{t.customize}</span>
@@ -820,7 +821,7 @@ export default function App() {
                 value={newLinkTitle}
                 onChange={(e) => setNewLinkTitle(e.target.value)}
                 disabled={!showShortcuts}
-                style={{ background: isDark ? "#252540" : "#f0f0f5", color: textColor, borderColor: isDark ? "#3a3a5c" : "#dde0e8" }}
+                style={{ background: isDark ? "#252540" : "#f0f0f5", color: themeColor, borderColor: isDark ? "#3a3a5c" : "#dde0e8" }}
               />
               <input
                 className="ql-input"
@@ -830,7 +831,7 @@ export default function App() {
                 onChange={(e) => setNewLinkUrl(e.target.value)}
                 onKeyDown={(e) => { if (e.key === "Enter") handleAddLink(); }}
                 disabled={!showShortcuts}
-                style={{ background: isDark ? "#252540" : "#f0f0f5", color: textColor, borderColor: isDark ? "#3a3a5c" : "#dde0e8" }}
+                style={{ background: isDark ? "#252540" : "#f0f0f5", color: themeColor, borderColor: isDark ? "#3a3a5c" : "#dde0e8" }}
               />
               <button className="ql-add-btn" onClick={handleAddLink} disabled={!showShortcuts}
                 style={{ background: isDark ? "#3a3a6a" : "#e0e2ef", color: isDark ? "#c8cce0" : "#444" }}>
@@ -887,7 +888,7 @@ export default function App() {
                 className={`ql-style-btn${quickLinksStyle === "icon" ? " active" : ""}`}
                 onClick={() => setQuickLinksStyle("icon")} disabled={!showShortcuts}
                 title="Icon only"
-                style={{ background: quickLinksStyle === "icon" ? (isDark ? "#4a4a8a" : "#d0d4f0") : (isDark ? "#2a2a44" : "#e8eaf0"), color: textColor }}
+                style={{ background: quickLinksStyle === "icon" ? (isDark ? "#4a4a8a" : "#d0d4f0") : (isDark ? "#2a2a44" : "#e8eaf0"), color: themeColor }}
               >
                 <svg viewBox="0 0 20 20" fill="currentColor" width="14" height="14"><rect x="2" y="2" width="16" height="16" rx="4"/></svg>
               </button>
@@ -895,7 +896,7 @@ export default function App() {
                 className={`ql-style-btn${quickLinksStyle === "text" ? " active" : ""}`}
                 onClick={() => setQuickLinksStyle("text")} disabled={!showShortcuts}
                 title="Icon + label"
-                style={{ background: quickLinksStyle === "text" ? (isDark ? "#4a4a8a" : "#d0d4f0") : (isDark ? "#2a2a44" : "#e8eaf0"), color: textColor }}
+                style={{ background: quickLinksStyle === "text" ? (isDark ? "#4a4a8a" : "#d0d4f0") : (isDark ? "#2a2a44" : "#e8eaf0"), color: themeColor }}
               >
                 T
               </button>
@@ -909,7 +910,7 @@ export default function App() {
               {(["small", "medium", "large"] as const).map((s) => (
                 <button key={s} onClick={() => setQuickLinksSize(s)} disabled={!showShortcuts}
                   className={`ql-size-btn${quickLinksSize === s ? " active" : ""}`}
-                  style={{ background: quickLinksSize === s ? (isDark ? "#4a4a8a" : "#d0d4f0") : (isDark ? "#2a2a44" : "#e8eaf0"), color: textColor }}>
+                  style={{ background: quickLinksSize === s ? (isDark ? "#4a4a8a" : "#d0d4f0") : (isDark ? "#2a2a44" : "#e8eaf0"), color: themeColor }}>
                   {t[s]}
                 </button>
               ))}
@@ -1007,7 +1008,7 @@ export default function App() {
                   if (e.key === "Enter") { setAppliedFontFamily(fontFamilyInput.trim()); setFontDropdownOpen(false); }
                   if (e.key === "Escape") setFontDropdownOpen(false);
                 }}
-                style={{ background: isDark ? "#252540" : "#f0f0f5", color: textColor, borderColor: isDark ? "#3a3a5c" : "#dde0e8" }}
+                style={{ background: isDark ? "#252540" : "#f0f0f5", color: themeColor, borderColor: isDark ? "#3a3a5c" : "#dde0e8" }}
               />
               <button className="font-apply-btn"
                 onClick={() => { setAppliedFontFamily(fontFamilyInput.trim()); setFontDropdownOpen(false); }}
