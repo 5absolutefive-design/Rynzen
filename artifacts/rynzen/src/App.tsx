@@ -205,11 +205,12 @@ export default function App() {
     document.body.style.color = isDark ? "#e8e8f0" : "#1a1a2e";
   }, [isDark, bgColor]);
 
-  const fontSizePx = 14 + Math.round((fontSizeNum / 100) * 10);
+  const fontSizePx = 12 + Math.round((fontSizeNum / 100) * 16);
 
   useEffect(() => {
     const weightMap: Record<string, string> = { light: "300", normal: "400", "semi-bold": "600", bold: "700" };
     const root = document.documentElement;
+    root.style.fontSize = `${fontSizePx}px`;
     root.style.setProperty("--app-font", appliedFontFamily ? `'${appliedFontFamily}', sans-serif` : "");
     root.style.setProperty("--app-font-weight", weightMap[fontWeightSetting]);
     root.style.setProperty("--app-font-size", `${fontSizePx}px`);

@@ -45,7 +45,7 @@ body {
 }
 
 .top-link {
-  font-size: 14px;
+  font-size: 0.875rem;
   color: #444;
   cursor: pointer;
   opacity: 0.8;
@@ -188,7 +188,7 @@ body {
   background: transparent;
   border: none;
   outline: none;
-  font-size: 16px;
+  font-size: 1rem;
   color: #1a1a2e;
   height: 100%;
   letter-spacing: 0.2px;
@@ -196,7 +196,7 @@ body {
 
 .search-input::placeholder {
   color: #9aa0b2;
-  font-size: 15px;
+  font-size: 0.9375rem;
 }
 
 /* Right-side action icons inside input */
@@ -251,7 +251,7 @@ body {
 }
 
 .dropdown-label {
-  font-size: 11px;
+  font-size: 0.6875rem;
   text-transform: uppercase;
   letter-spacing: 1px;
   color: #9aa0b2;
@@ -265,7 +265,7 @@ body {
   padding: 10px 12px;
   border-radius: 10px;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 0.875rem;
   color: #1a1a2e;
   transition: background 0.15s;
 }
@@ -288,7 +288,7 @@ body {
 .check {
   margin-left: auto;
   color: #4285F4;
-  font-size: 14px;
+  font-size: 0.875rem;
 }
 
 /* Suggestions dropdown — glassmorphism */
@@ -314,7 +314,7 @@ body {
   padding: 11px 16px;
   border-radius: 12px;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 0.875rem;
   color: #1a1a2e;
   transition: background 0.15s;
 }
@@ -330,7 +330,7 @@ body {
 }
 
 .shortcuts-title {
-  font-size: 12px;
+  font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 1px;
   color: #9aa0b2;
@@ -384,7 +384,7 @@ body {
 .footer {
   padding: 16px;
   text-align: center;
-  font-size: 12px;
+  font-size: 0.75rem;
   color: #aaa;
   border-top: 1px solid #e8e8e4;
 }
