@@ -171,6 +171,7 @@ export default function App() {
 
   const [appliedFontFamily, setAppliedFontFamily] = useState("");
   const [fontFamilyInput, setFontFamilyInput] = useState("");
+  const [fontDropdownOpen, setFontDropdownOpen] = useState(false);
   const [fontWeightSetting, setFontWeightSetting] = useState<"light" | "normal" | "semi-bold" | "bold">("normal");
   const [fontSizeNum, setFontSizeNum] = useState(50);
 
@@ -864,41 +865,47 @@ export default function App() {
         <div className="settings-card" style={{ background: cardBg }}>
 
           {/* Font family row */}
-          <div className="settings-row settings-row-col">
-            <span className="settings-row-label" style={{ display: "flex", alignItems: "center", gap: 5 }}>
-              {t.fontFamily}
-              <span className="font-help-icon" title="Enter any Google Fonts name, e.g. Nunito, Roboto, Inter">?</span>
-            </span>
-            <div className="font-family-row">
+          <div className="settings-row" style={{ position: "relative" }}>
+            <span className="settings-row-label">{t.fontFamily}</span>
+            <div className="font-family-row" style={{ position: "relative" }}>
               <input
                 className="ql-input font-family-input"
                 type="text"
-                placeholder="e.g. Nunito"
+                placeholder="Search font..."
                 value={fontFamilyInput}
-                onChange={(e) => setFontFamilyInput(e.target.value)}
-                onKeyDown={(e) => { if (e.key === "Enter") setAppliedFontFamily(fontFamilyInput.trim()); }}
+                onChange={(e) => { setFontFamilyInput(e.target.value); setFontDropdownOpen(true); }}
+                onFocus={() => setFontDropdownOpen(true)}
+                onBlur={() => setTimeout(() => setFontDropdownOpen(false), 150)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") { setAppliedFontFamily(fontFamilyInput.trim()); setFontDropdownOpen(false); }
+                  if (e.key === "Escape") setFontDropdownOpen(false);
+                }}
                 style={{ background: isDark ? "#252540" : "#f0f0f5", color: isDark ? "#e8e8f0" : "#1a1a2e", borderColor: isDark ? "#3a3a5c" : "#dde0e8" }}
               />
               <button className="font-apply-btn"
-                onClick={() => setAppliedFontFamily(fontFamilyInput.trim())}
+                onClick={() => { setAppliedFontFamily(fontFamilyInput.trim()); setFontDropdownOpen(false); }}
                 title="Apply font"
                 style={{ background: isDark ? "#3a3a6a" : "#e0e2ef", color: isDark ? "#c8cce0" : "#444" }}>
                 ✓
               </button>
-            </div>
-            <div className="font-presets">
-              {["Inter", "Poppins", "Roboto", "Montserrat", "Open Sans", "Lato", "Playfair Display", "Oswald", "Merriweather", "DM Sans", "Manrope", "Urbanist", "Raleway", "Lora", "Work Sans"].map(f => (
-                <button
-                  key={f}
-                  className={`font-preset-chip${appliedFontFamily === f ? " active" : ""}`}
-                  onClick={() => { setFontFamilyInput(f); setAppliedFontFamily(f); }}
-                  style={{
-                    background: appliedFontFamily === f ? (isDark ? "#5a5aaa" : "#4a4aaa") : (isDark ? "#252540" : "#f0f0f5"),
-                    color: appliedFontFamily === f ? "#fff" : (isDark ? "#c8cce0" : "#444"),
-                    borderColor: appliedFontFamily === f ? (isDark ? "#7a7acc" : "#4a4aaa") : (isDark ? "#3a3a5c" : "#dde0e8"),
-                  }}
-                >{f}</button>
-              ))}
+              {fontDropdownOpen && (
+                <div className="font-dropdown" style={{ background: isDark ? "#1e1e38" : "#fff", borderColor: isDark ? "#3a3a5c" : "#dde0e8", boxShadow: isDark ? "0 8px 24px rgba(0,0,0,0.5)" : "0 8px 24px rgba(0,0,0,0.12)" }}>
+                  {["Inter", "Poppins", "Roboto", "Montserrat", "Open Sans", "Lato", "Playfair Display", "Oswald", "Merriweather", "DM Sans", "Manrope", "Urbanist", "Raleway", "Lora", "Work Sans"]
+                    .filter(f => f.toLowerCase().includes(fontFamilyInput.toLowerCase()))
+                    .map(f => (
+                      <div
+                        key={f}
+                        className={`font-dropdown-item${appliedFontFamily === f ? " active" : ""}`}
+                        onMouseDown={() => { setFontFamilyInput(f); setAppliedFontFamily(f); setFontDropdownOpen(false); }}
+                        style={{
+                          background: appliedFontFamily === f ? (isDark ? "#5a5aaa" : "#4a4aaa") : "transparent",
+                          color: appliedFontFamily === f ? "#fff" : (isDark ? "#c8cce0" : "#333"),
+                        }}
+                      >{f}</div>
+                    ))
+                  }
+                </div>
+              )}
             </div>
           </div>
 

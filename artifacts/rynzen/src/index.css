@@ -870,25 +870,29 @@ body {
 
 .font-apply-btn:hover { filter: brightness(0.9); }
 
-.font-presets {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 5px;
-  margin-top: 6px;
-  width: 100%;
-}
-
-.font-preset-chip {
-  padding: 3px 9px;
-  border-radius: 20px;
+.font-dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  z-index: 999;
   border: 1px solid;
-  font-size: 11px;
-  cursor: pointer;
-  transition: background 0.15s, color 0.15s, border-color 0.15s;
-  white-space: nowrap;
+  border-radius: 10px;
+  overflow: hidden;
+  max-height: 220px;
+  overflow-y: auto;
 }
 
-.font-preset-chip:hover { filter: brightness(0.9); }
+.font-dropdown-item {
+  padding: 8px 12px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background 0.12s;
+}
+
+.font-dropdown-item:hover {
+  filter: brightness(0.88);
+}
 
 /* ── Quick Links settings UI ── */
 .ql-add-form {
