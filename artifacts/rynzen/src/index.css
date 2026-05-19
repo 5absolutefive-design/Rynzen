@@ -17,13 +17,16 @@ body {
 .app-shell {
   display: flex;
   flex-direction: row;
-  min-height: 100vh;
+  height: 100vh;
+  max-height: 100vh;
   overflow: hidden;
 }
 
 .app-root {
   flex: 1;
-  min-height: 100vh;
+  height: 100vh;
+  max-height: 100vh;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   transition: flex 0.32s cubic-bezier(0.4, 0, 0.2, 1);
@@ -458,7 +461,8 @@ body {
               border-color 0.32s ease;
   margin-top: 10px;
   margin-bottom: 10px;
-  min-height: calc(100vh - 20px);
+  height: calc(100vh - 20px);
+  max-height: calc(100vh - 20px);
   border-radius: 10px 0 0 10px;
 }
 
