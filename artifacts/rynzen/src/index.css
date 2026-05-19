@@ -456,10 +456,13 @@ body {
   transition: width 0.32s cubic-bezier(0.4, 0, 0.2, 1),
               box-shadow 0.32s ease,
               border-color 0.32s ease;
+  margin-top: 10px;
+  min-height: calc(100vh - 10px);
+  border-radius: 10px 0 0 0;
 }
 
 .settings-sidebar.open {
-  width: 320px;
+  width: 220px;
   box-shadow: -4px 0 24px rgba(0,0,0,0.10);
   border-left-width: 1px;
 }
