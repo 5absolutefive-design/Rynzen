@@ -402,6 +402,9 @@ body {
 }
 
 /* When settings sidebar is open: FAB completely gone, no hover at all */
+.fab-zone.fab-invisible {
+  pointer-events: none !important;
+}
 .fab-zone.fab-invisible .settings-fab,
 .fab-zone.fab-invisible:hover .settings-fab {
   opacity: 0 !important;
