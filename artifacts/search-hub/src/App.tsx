@@ -142,16 +142,14 @@ export default function App() {
 
         <div className="search-section">
           <div className="search-bar-wrapper" ref={dropdownRef}>
-            <div className="engine-selector" onClick={() => setShowDropdown(!showDropdown)}>
+            <div className="engine-selector" onClick={() => setShowDropdown(!showDropdown)} title={selectedEngine.name}>
               <span className="engine-icon" style={{ color: selectedEngine.color }}>
                 {selectedEngine.icon}
               </span>
-              <span className="engine-name">{selectedEngine.name}</span>
               <span className="chevron">▾</span>
             </div>
 
             <div className="search-input-area">
-              <span className="search-icon">🔍</span>
               <input
                 ref={inputRef}
                 type="text"
@@ -180,13 +178,30 @@ export default function App() {
               )}
             </div>
 
-            <button
-              className="search-btn"
-              onClick={() => handleSearch()}
-              style={{ background: selectedEngine.color }}
-            >
-              Search
-            </button>
+            <div className="search-actions">
+              <button className="action-icon-btn" title="Voice Search" onClick={() => alert("Voice search coming soon!")}>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+                  <path d="M12 15c1.66 0 3-1.34 3-3V6c0-1.66-1.34-3-3-3S9 4.34 9 6v6c0 1.66 1.34 3 3 3z"/>
+                  <path d="M17 12c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-2.08c3.39-.49 6-3.39 6-6.92h-2z"/>
+                </svg>
+              </button>
+              <button className="action-icon-btn" title="Image Search" onClick={() => window.open("https://images.google.com", "_blank")}>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+                  <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5.04 15.96L10 15l-4 5H5.12l4.96-6.22 3.96 4.96 2.1-2.63 3.86 4.85h-1.5l-3.54-4z"/>
+                  <circle cx="8" cy="8" r="2"/>
+                </svg>
+              </button>
+              <button
+                className="search-go-btn"
+                onClick={() => handleSearch()}
+                style={{ background: selectedEngine.color }}
+                title={`Search on ${selectedEngine.name}`}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="18" height="18">
+                  <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+                </svg>
+              </button>
+            </div>
 
             {showDropdown && (
               <div className="engine-dropdown">
