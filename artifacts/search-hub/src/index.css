@@ -65,19 +65,30 @@ body {
   gap: 40px;
 }
 
-/* Logo */
-.logo-area {
-  font-size: 72px;
-  font-weight: 700;
-  letter-spacing: -2px;
-  line-height: 1;
+/* Clock */
+.clock-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
   user-select: none;
 }
 
-.logo-blue { color: #4285F4; }
-.logo-red { color: #EA4335; }
-.logo-yellow { color: #FBBC05; }
-.logo-green { color: #34A853; }
+.clock-time {
+  font-size: 72px;
+  font-weight: 200;
+  letter-spacing: -2px;
+  line-height: 1;
+  color: #1a1a2e;
+  font-variant-numeric: tabular-nums;
+}
+
+.clock-date {
+  font-size: 16px;
+  font-weight: 400;
+  color: #666;
+  letter-spacing: 0.3px;
+}
 
 /* Search section */
 .search-section {

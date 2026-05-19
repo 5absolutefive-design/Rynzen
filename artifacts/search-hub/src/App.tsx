@@ -81,8 +81,14 @@ export default function App() {
   const [selectedEngine, setSelectedEngine] = useState<SearchEngine>(engines[0]);
   const [showDropdown, setShowDropdown] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [now, setNow] = useState(new Date());
   const inputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const timer = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
 
   const suggestions = query.length > 0
     ? [
@@ -128,16 +134,13 @@ export default function App() {
       </div>
 
       <main className="main-content">
-        <div className="logo-area">
-          <span className="logo-blue">S</span>
-          <span className="logo-red">e</span>
-          <span className="logo-yellow">a</span>
-          <span className="logo-blue">r</span>
-          <span className="logo-green">c</span>
-          <span className="logo-red">h</span>
-          <span className="logo-yellow">H</span>
-          <span className="logo-blue">u</span>
-          <span className="logo-green">b</span>
+        <div className="clock-area">
+          <div className="clock-time">
+            {now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" })}
+          </div>
+          <div className="clock-date">
+            {now.toLocaleDateString([], { weekday: "long", year: "numeric", month: "long", day: "numeric" })}
+          </div>
         </div>
 
         <div className="search-section">
