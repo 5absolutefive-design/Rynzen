@@ -68,6 +68,49 @@ const T: Record<string, Record<string, string>> = {
   ko: { searchPlaceholder: "검색", quickAccess: "빠른 접근", customize: "사용자 정의", gmail: "Gmail", images: "이미지", footer: "SearchHub — 어디서나 검색, 한 곳에서 모두", showAllSettings: "모든 설정 표시", language: "언어", darkMode: "다크 모드", tabAppearance: "탭 모양", hideSettingsIcon: "설정 아이콘 숨기기", general: "일반", system: "시스템", light: "밝게", dark: "어둡게", timeAndDate: "시간 및 날짜", enable: "활성화", showSeconds: "초 표시", analogClock: "아날로그 시계", clockShape: "시계 모양", clockFace: "시계 면", clockHands: "시계 바늘", clockBackground: "시계 배경", clockBorder: "시계 테두리", dateFormat: "날짜 형식", clockSize: "시계 크기", worldClocks: "세계 시계", timeZone: "시간대", show: "표시", clockAndDate: "시계 및 날짜", clockOnly: "시계만", dateOnly: "날짜만", automatic: "자동", dayMonthDate: "요일, 월 일", monthDayYear: "월 일, 년", ddmmyyyy: "일/월/년" },
 };
 
+function AnalogClock({ now, tz, size, shape, face, hands, isDark }: {
+  now: Date; tz: string | undefined; size: number; shape: string; face: string; hands: string; isDark: boolean;
+}) {
+  const d = tz ? new Date(now.toLocaleString("en-US", { timeZone: tz })) : now;
+  const h = d.getHours() % 12, m = d.getMinutes(), s = d.getSeconds();
+  const hDeg = (h / 12) * 360 + (m / 60) * 30;
+  const mDeg = (m / 60) * 360 + (s / 60) * 6;
+  const sDeg = (s / 60) * 360;
+  const r = size / 2;
+  const cx = r, cy = r;
+  const faceColor = isDark ? "#1e1e38" : "#f8f8f4";
+  const strokeColor = isDark ? "#e8e8f0" : "#1a1a2e";
+  const thinStroke = hands === "thin" ? 1.5 : hands === "classic" ? 3 : 2;
+  const hourLen = r * 0.55, minLen = r * 0.75, secLen = r * 0.85;
+  const borderR = shape === "square" ? "12%" : shape === "rectangle" ? "8%" : "50%";
+
+  function hand(deg: number, len: number, width: number, color: string) {
+    const rad = (deg - 90) * (Math.PI / 180);
+    const x2 = cx + len * Math.cos(rad);
+    const y2 = cy + len * Math.sin(rad);
+    return <line x1={cx} y1={cy} x2={x2} y2={y2} stroke={color} strokeWidth={width} strokeLinecap="round" />;
+  }
+
+  return (
+    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{ borderRadius: borderR, display: "block" }}>
+      <rect x={0} y={0} width={size} height={size} rx={shape === "round" ? r : shape === "square" ? r * 0.24 : r * 0.16}
+        fill={faceColor} stroke={strokeColor} strokeOpacity={0.15} strokeWidth={1.5} />
+      {face !== "none" && Array.from({ length: 12 }, (_, i) => {
+        const a = (i / 12) * 2 * Math.PI - Math.PI / 2;
+        const inner = face === "classic" ? r * 0.82 : r * 0.85;
+        const outer = r * 0.92;
+        return <line key={i} x1={cx + inner * Math.cos(a)} y1={cy + inner * Math.sin(a)}
+          x2={cx + outer * Math.cos(a)} y2={cy + outer * Math.sin(a)}
+          stroke={strokeColor} strokeOpacity={0.5} strokeWidth={i % 3 === 0 ? 2 : 1} />;
+      })}
+      {hand(hDeg, hourLen, thinStroke + 1.5, strokeColor)}
+      {hand(mDeg, minLen, thinStroke, strokeColor)}
+      {hand(sDeg, secLen, 1.5, "#e74c3c")}
+      <circle cx={cx} cy={cy} r={r * 0.04} fill={strokeColor} />
+    </svg>
+  );
+}
+
 export default function App() {
   const [query, setQuery] = useState("");
   const [selectedEngine, setSelectedEngine] = useState<SearchEngine>(engines[0]);
@@ -90,9 +133,15 @@ export default function App() {
   // Time & Date settings
   const [clockEnabled, setClockEnabled] = useState(true);
   const [showSeconds, setShowSeconds] = useState(true);
+  const [analogClock, setAnalogClock] = useState(false);
+  const [clockShape, setClockShape] = useState("round");
+  const [clockFace, setClockFace] = useState("none");
+  const [clockHands, setClockHands] = useState("modern");
   const [clockBgOpacity, setClockBgOpacity] = useState(0);
+  const [clockBorderOpacity, setClockBorderOpacity] = useState(0);
   const [dateFormat, setDateFormat] = useState("day-month-date");
   const [clockSizeNum, setClockSizeNum] = useState(65);
+  const [worldClocks, setWorldClocks] = useState(false);
   const [timezone, setTimezone] = useState("Automatic");
   const [clockShow, setClockShow] = useState<"both" | "clock" | "date">("both");
 
@@ -230,14 +279,27 @@ export default function App() {
                 : "transparent",
               borderRadius: clockBgOpacity > 0 ? "20px" : undefined,
               padding: clockBgOpacity > 0 ? "20px 32px" : undefined,
-              transition: "background 0.3s, padding 0.3s",
+              border: clockBorderOpacity > 0
+                ? `2px solid rgba(${isDark ? "255,255,255" : "0,0,0"},${(clockBorderOpacity / 100) * 0.3})`
+                : undefined,
+              transition: "background 0.3s, padding 0.3s, border 0.3s",
             }}
           >
-            {(clockShow === "both" || clockShow === "clock") && (
+            {(clockShow === "both" || clockShow === "clock") && analogClock ? (
+              <AnalogClock
+                now={now}
+                tz={tz}
+                size={40 + (clockSizeNum / 100) * 80}
+                shape={clockShape}
+                face={clockFace}
+                hands={clockHands}
+                isDark={isDark}
+              />
+            ) : (clockShow === "both" || clockShow === "clock") ? (
               <div className="clock-time" style={{ fontSize: clockFontSize, color: isDark ? "#e8e8f0" : "#1a1a2e" }}>
                 {getTimeStr()}
               </div>
-            )}
+            ) : null}
             {(clockShow === "both" || clockShow === "date") && (
               <div className="clock-date" style={{ color: isDark ? "#8899aa" : "#666" }}>
                 {getDateStr()}
@@ -396,7 +458,123 @@ export default function App() {
           </div>
         </div>
 
-      </div>
+        {/* ── Time & Date Card ── */}
+        <p className="settings-section-label" style={{ marginTop: 12 }}>{t.timeAndDate}</p>
+        <div className="settings-card" style={{ background: cardBg }}>
+
+          <div className="settings-row">
+            <span className="settings-row-label">{t.enable}</span>
+            <button className={`toggle${clockEnabled ? " on" : ""}`} onClick={() => setClockEnabled(!clockEnabled)} aria-label="Enable clock" />
+          </div>
+
+          <div className={`settings-row${!clockEnabled ? " settings-row-dimmed" : ""}`} style={{ borderTop: `1px solid ${rowBorder}` }}>
+            <span className="settings-row-label">{t.showSeconds}</span>
+            <button className={`toggle${showSeconds ? " on" : ""}`} onClick={() => setShowSeconds(!showSeconds)} disabled={!clockEnabled} aria-label="Show seconds" />
+          </div>
+
+          <div className={`settings-row${!clockEnabled ? " settings-row-dimmed" : ""}`} style={{ borderTop: `1px solid ${rowBorder}` }}>
+            <span className="settings-row-label">{t.analogClock}</span>
+            <button className={`toggle${analogClock ? " on" : ""}`} onClick={() => setAnalogClock(!analogClock)} disabled={!clockEnabled} aria-label="Analog clock" />
+          </div>
+
+          <div className={`settings-row${(!clockEnabled || !analogClock) ? " settings-row-dimmed" : ""}`} style={{ borderTop: `1px solid ${rowBorder}` }}>
+            <span className="settings-row-label">{t.clockShape}</span>
+            <select className="settings-select" value={clockShape} onChange={(e) => setClockShape(e.target.value)}
+              disabled={!clockEnabled || !analogClock} style={{ background: selectBg, color: selectColor, borderColor: selectBorder }}>
+              <option value="round">Round</option>
+              <option value="square">Square</option>
+              <option value="rectangle">Rectangle</option>
+            </select>
+          </div>
+
+          <div className={`settings-row${(!clockEnabled || !analogClock) ? " settings-row-dimmed" : ""}`} style={{ borderTop: `1px solid ${rowBorder}` }}>
+            <span className="settings-row-label">{t.clockFace}</span>
+            <select className="settings-select" value={clockFace} onChange={(e) => setClockFace(e.target.value)}
+              disabled={!clockEnabled || !analogClock} style={{ background: selectBg, color: selectColor, borderColor: selectBorder }}>
+              <option value="none">None</option>
+              <option value="classic">Classic</option>
+              <option value="minimal">Minimal</option>
+            </select>
+          </div>
+
+          <div className={`settings-row${(!clockEnabled || !analogClock) ? " settings-row-dimmed" : ""}`} style={{ borderTop: `1px solid ${rowBorder}` }}>
+            <span className="settings-row-label">{t.clockHands}</span>
+            <select className="settings-select" value={clockHands} onChange={(e) => setClockHands(e.target.value)}
+              disabled={!clockEnabled || !analogClock} style={{ background: selectBg, color: selectColor, borderColor: selectBorder }}>
+              <option value="modern">Modern</option>
+              <option value="classic">Classic</option>
+              <option value="thin">Thin</option>
+            </select>
+          </div>
+
+          <div className={`settings-row settings-row-col${!clockEnabled ? " settings-row-dimmed" : ""}`} style={{ borderTop: `1px solid ${rowBorder}` }}>
+            <span className="settings-row-label">{t.clockBackground}</span>
+            <div className="settings-slider-row">
+              <input type="range" className="settings-slider" min={0} max={100} value={clockBgOpacity}
+                onChange={(e) => setClockBgOpacity(Number(e.target.value))} disabled={!clockEnabled} />
+              <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16" style={{ opacity: 0.5, flexShrink: 0 }}>
+                <path d="M6.76 4.84l-1.8-1.79-1.41 1.41 1.79 1.79 1.42-1.41zM4 10.5H1v2h3v-2zm9-9.95h-2V3.5h2V.55zm7.45 3.91l-1.41-1.41-1.79 1.79 1.41 1.41 1.79-1.79zm-3.21 13.7l1.79 1.8 1.41-1.41-1.8-1.79-1.4 1.4zM20 10.5v2h3v-2h-3zm-8-5c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm-1 16.95h2V19.5h-2v2.95zm-7.45-3.91l1.41 1.41 1.79-1.8-1.41-1.41-1.79 1.8z"/>
+              </svg>
+            </div>
+          </div>
+
+          <div className={`settings-row settings-row-col${!clockEnabled ? " settings-row-dimmed" : ""}`} style={{ borderTop: `1px solid ${rowBorder}` }}>
+            <span className="settings-row-label">{t.clockBorder}</span>
+            <div className="settings-slider-row">
+              <input type="range" className="settings-slider" min={0} max={100} value={clockBorderOpacity}
+                onChange={(e) => setClockBorderOpacity(Number(e.target.value))} disabled={!clockEnabled} />
+              <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16" style={{ opacity: 0.5, flexShrink: 0 }}>
+                <path d="M3 3h18v18H3V3zm2 2v14h14V5H5z"/>
+              </svg>
+            </div>
+          </div>
+
+          <div className={`settings-row${!clockEnabled ? " settings-row-dimmed" : ""}`} style={{ borderTop: `1px solid ${rowBorder}` }}>
+            <span className="settings-row-label">{t.dateFormat}</span>
+            <select className="settings-select" value={dateFormat} onChange={(e) => setDateFormat(e.target.value)}
+              disabled={!clockEnabled} style={{ background: selectBg, color: selectColor, borderColor: selectBorder }}>
+              <option value="day-month-date">{t.dayMonthDate}</option>
+              <option value="month-day-year">{t.monthDayYear}</option>
+              <option value="dd-mm-yyyy">{t.ddmmyyyy}</option>
+            </select>
+          </div>
+
+          <div className={`settings-row settings-row-col${!clockEnabled ? " settings-row-dimmed" : ""}`} style={{ borderTop: `1px solid ${rowBorder}` }}>
+            <span className="settings-row-label">{t.clockSize}</span>
+            <div className="settings-slider-row">
+              <input type="range" className="settings-slider" min={0} max={100} value={clockSizeNum}
+                onChange={(e) => setClockSizeNum(Number(e.target.value))} disabled={!clockEnabled} />
+            </div>
+          </div>
+
+          <div className={`settings-row${!clockEnabled ? " settings-row-dimmed" : ""}`} style={{ borderTop: `1px solid ${rowBorder}` }}>
+            <span className="settings-row-label">{t.worldClocks}</span>
+            <button className={`toggle${worldClocks ? " on" : ""}`} onClick={() => setWorldClocks(!worldClocks)} disabled={!clockEnabled} aria-label="World clocks" />
+          </div>
+
+          <div className={`settings-row${!clockEnabled ? " settings-row-dimmed" : ""}`} style={{ borderTop: `1px solid ${rowBorder}` }}>
+            <span className="settings-row-label">{t.timeZone}</span>
+            <select className="settings-select" value={timezone} onChange={(e) => setTimezone(e.target.value)}
+              disabled={!clockEnabled} style={{ background: selectBg, color: selectColor, borderColor: selectBorder }}>
+              {TIMEZONES.map((tz) => (
+                <option key={tz} value={tz}>{tz === "Automatic" ? t.automatic : tz.replace("_", " ")}</option>
+              ))}
+            </select>
+          </div>
+
+          <div className={`settings-row${!clockEnabled ? " settings-row-dimmed" : ""}`} style={{ borderTop: `1px solid ${rowBorder}` }}>
+            <span className="settings-row-label">{t.show}</span>
+            <select className="settings-select" value={clockShow} onChange={(e) => setClockShow(e.target.value as "both" | "clock" | "date")}
+              disabled={!clockEnabled} style={{ background: selectBg, color: selectColor, borderColor: selectBorder }}>
+              <option value="both">{t.clockAndDate}</option>
+              <option value="clock">{t.clockOnly}</option>
+              <option value="date">{t.dateOnly}</option>
+            </select>
+          </div>
+
+        </div>
+
+    </div>
     </div>
     </div>
     </div>
