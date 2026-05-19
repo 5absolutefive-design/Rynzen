@@ -54,18 +54,18 @@ const TIMEZONES = [
 ];
 
 const T: Record<string, Record<string, string>> = {
-  en: { searchPlaceholder: "Search with", quickAccess: "Quick Access", customize: "Customize", gmail: "Gmail", images: "Images", footer: "SearchHub — Search anywhere, all in one place", showAllSettings: "Show all settings", language: "Language", darkMode: "Dark mode", tabAppearance: "Tab appearance", hideSettingsIcon: "Hide settings icon", general: "General", system: "System", light: "Light", dark: "Dark", timeAndDate: "Time & Date", enable: "Enable", showSeconds: "Show seconds", twelveHourTime: "12-Hour Time", showAmPm: "Show AM/PM", amPmPosition: "AM/PM position", topLeft: "Top left", topRight: "Top right", bottomLeft: "Bottom left", bottomRight: "Bottom right", analogClock: "Analog clock", clockShape: "Clock shape", clockFace: "Clock face", clockHands: "Clock hands", clockBackground: "Clock background", clockBorder: "Clock border", dateFormat: "Date format", clockSize: "Clock size", dateSize: "Date size", worldClocks: "World clocks", timeZone: "Time zone", show: "Show", clockAndDate: "Clock and date", clockOnly: "Clock only", dateOnly: "Date only", automatic: "Automatic", dayMonthDate: "Day, month date", monthDayYear: "Month day, year", ddmmyyyy: "DD/MM/YYYY" },
-  bn: { searchPlaceholder: "অনুসন্ধান করুন", quickAccess: "দ্রুত অ্যাক্সেস", customize: "কাস্টমাইজ", gmail: "জিমেইল", images: "ছবি", footer: "SearchHub — এক জায়গায় সব জায়গা খুঁজুন", showAllSettings: "সব সেটিংস দেখান", language: "ভাষা", darkMode: "ডার্ক মোড", tabAppearance: "ট্যাব চেহারা", hideSettingsIcon: "সেটিংস আইকন লুকান", general: "সাধারণ", system: "সিস্টেম", light: "আলো", dark: "অন্ধকার", timeAndDate: "সময় ও তারিখ", enable: "সক্ষম করুন", showSeconds: "সেকেন্ড দেখান", twelveHourTime: "১২-ঘণ্টা সময়", showAmPm: "AM/PM দেখান", amPmPosition: "AM/PM অবস্থান", topLeft: "উপরে বামে", topRight: "উপরে ডানে", bottomLeft: "নিচে বামে", bottomRight: "নিচে ডানে", analogClock: "অ্যানালগ ক্লক", clockShape: "ঘড়ির আকার", clockFace: "ঘড়ির মুখ", clockHands: "ঘড়ির কাঁটা", clockBackground: "ঘড়ির পটভূমি", clockBorder: "ঘড়ির বর্ডার", dateFormat: "তারিখের ফরম্যাট", clockSize: "ঘড়ির সাইজ", dateSize: "তারিখের সাইজ", worldClocks: "বিশ্ব ঘড়ি", timeZone: "সময় অঞ্চল", show: "দেখান", clockAndDate: "ঘড়ি ও তারিখ", clockOnly: "শুধু ঘড়ি", dateOnly: "শুধু তারিখ", automatic: "স্বয়ংক্রিয়", dayMonthDate: "দিন, মাস তারিখ", monthDayYear: "মাস দিন, বছর", ddmmyyyy: "দদ/মম/বববব" },
-  hi: { searchPlaceholder: "खोजें", quickAccess: "त्वरित पहुँच", customize: "कस्टमाइज़", gmail: "जीमेल", images: "चित्र", footer: "SearchHub — एक जगह से हर जगह खोजें", showAllSettings: "सभी सेटिंग दिखाएं", language: "भाषा", darkMode: "डार्क मोड", tabAppearance: "टैब का स्वरूप", hideSettingsIcon: "सेटिंग्स आइकन छुपाएं", general: "सामान्य", system: "सिस्टम", light: "हल्का", dark: "गहरा", timeAndDate: "समय और तारीख", enable: "सक्षम", showSeconds: "सेकंड दिखाएं", twelveHourTime: "12-घंटे का समय", showAmPm: "AM/PM दिखाएं", amPmPosition: "AM/PM स्थिति", topLeft: "ऊपर बाएं", topRight: "ऊपर दाएं", bottomLeft: "नीचे बाएं", bottomRight: "नीचे दाएं", analogClock: "एनालॉग घड़ी", clockShape: "घड़ी का आकार", clockFace: "घड़ी का चेहरा", clockHands: "घड़ी की सूइयां", clockBackground: "घड़ी की पृष्ठभूमि", clockBorder: "घड़ी की सीमा", dateFormat: "तारीख प्रारूप", clockSize: "घड़ी का आकार", dateSize: "तारीख का आकार", worldClocks: "विश्व घड़ियाँ", timeZone: "समय क्षेत्र", show: "दिखाएं", clockAndDate: "घड़ी और तारीख", clockOnly: "केवल घड़ी", dateOnly: "केवल तारीख", automatic: "स्वचालित", dayMonthDate: "दिन, महीना तारीख", monthDayYear: "महीना दिन, साल", ddmmyyyy: "दद/मम/वववव" },
-  es: { searchPlaceholder: "Buscar con", quickAccess: "Acceso rápido", customize: "Personalizar", gmail: "Gmail", images: "Imágenes", footer: "SearchHub — Busca en cualquier lugar, todo en uno", showAllSettings: "Mostrar todos los ajustes", language: "Idioma", darkMode: "Modo oscuro", tabAppearance: "Apariencia de pestaña", hideSettingsIcon: "Ocultar icono de configuración", general: "General", system: "Sistema", light: "Claro", dark: "Oscuro", timeAndDate: "Hora y Fecha", enable: "Activar", showSeconds: "Mostrar segundos", twelveHourTime: "Hora de 12", showAmPm: "Mostrar AM/PM", amPmPosition: "Posición AM/PM", topLeft: "Arriba izquierda", topRight: "Arriba derecha", bottomLeft: "Abajo izquierda", bottomRight: "Abajo derecha", analogClock: "Reloj analógico", clockShape: "Forma del reloj", clockFace: "Cara del reloj", clockHands: "Manecillas", clockBackground: "Fondo del reloj", clockBorder: "Borde del reloj", dateFormat: "Formato de fecha", clockSize: "Tamaño del reloj", dateSize: "Tamaño de la fecha", worldClocks: "Relojes del mundo", timeZone: "Zona horaria", show: "Mostrar", clockAndDate: "Reloj y fecha", clockOnly: "Solo reloj", dateOnly: "Solo fecha", automatic: "Automático", dayMonthDate: "Día, mes fecha", monthDayYear: "Mes día, año", ddmmyyyy: "DD/MM/AAAA" },
-  fr: { searchPlaceholder: "Rechercher avec", quickAccess: "Accès rapide", customize: "Personnaliser", gmail: "Gmail", images: "Images", footer: "SearchHub — Recherchez partout, tout en un", showAllSettings: "Afficher tous les paramètres", language: "Langue", darkMode: "Mode sombre", tabAppearance: "Apparence de l'onglet", hideSettingsIcon: "Masquer l'icône", general: "Général", system: "Système", light: "Clair", dark: "Sombre", timeAndDate: "Heure et Date", enable: "Activer", showSeconds: "Afficher les secondes", twelveHourTime: "Heure en 12h", showAmPm: "Afficher AM/PM", amPmPosition: "Position AM/PM", topLeft: "En haut à gauche", topRight: "En haut à droite", bottomLeft: "En bas à gauche", bottomRight: "En bas à droite", analogClock: "Horloge analogique", clockShape: "Forme de l'horloge", clockFace: "Cadran", clockHands: "Aiguilles", clockBackground: "Fond de l'horloge", clockBorder: "Bordure", dateFormat: "Format de date", clockSize: "Taille de l'horloge", dateSize: "Taille de la date", worldClocks: "Horloges mondiales", timeZone: "Fuseau horaire", show: "Afficher", clockAndDate: "Horloge et date", clockOnly: "Horloge seule", dateOnly: "Date seule", automatic: "Automatique", dayMonthDate: "Jour, mois date", monthDayYear: "Mois jour, année", ddmmyyyy: "JJ/MM/AAAA" },
-  de: { searchPlaceholder: "Suchen mit", quickAccess: "Schnellzugriff", customize: "Anpassen", gmail: "Gmail", images: "Bilder", footer: "SearchHub — Überall suchen, alles an einem Ort", showAllSettings: "Alle Einstellungen anzeigen", language: "Sprache", darkMode: "Dunkelmodus", tabAppearance: "Tab-Erscheinungsbild", hideSettingsIcon: "Symbol ausblenden", general: "Allgemein", system: "System", light: "Hell", dark: "Dunkel", timeAndDate: "Zeit & Datum", enable: "Aktivieren", showSeconds: "Sekunden anzeigen", twelveHourTime: "12-Stunden-Zeit", showAmPm: "AM/PM anzeigen", amPmPosition: "AM/PM Position", topLeft: "Oben links", topRight: "Oben rechts", bottomLeft: "Unten links", bottomRight: "Unten rechts", analogClock: "Analoge Uhr", clockShape: "Uhrenform", clockFace: "Zifferblatt", clockHands: "Uhrzeiger", clockBackground: "Uhr-Hintergrund", clockBorder: "Uhr-Rand", dateFormat: "Datumsformat", clockSize: "Uhrengröße", dateSize: "Datumsgröße", worldClocks: "Weltuhren", timeZone: "Zeitzone", show: "Anzeigen", clockAndDate: "Uhr und Datum", clockOnly: "Nur Uhr", dateOnly: "Nur Datum", automatic: "Automatisch", dayMonthDate: "Tag, Monat Datum", monthDayYear: "Monat Tag, Jahr", ddmmyyyy: "TT/MM/JJJJ" },
-  ar: { searchPlaceholder: "ابحث مع", quickAccess: "وصول سريع", customize: "تخصيص", gmail: "جيميل", images: "صور", footer: "SearchHub — ابحث في أي مكان", showAllSettings: "إظهار كل الإعدادات", language: "اللغة", darkMode: "الوضع المظلم", tabAppearance: "مظهر التبويب", hideSettingsIcon: "إخفاء أيقونة الإعدادات", general: "عام", system: "النظام", light: "فاتح", dark: "داكن", timeAndDate: "الوقت والتاريخ", enable: "تفعيل", showSeconds: "إظهار الثواني", twelveHourTime: "توقيت 12 ساعة", showAmPm: "إظهار AM/PM", amPmPosition: "موضع AM/PM", topLeft: "أعلى اليسار", topRight: "أعلى اليمين", bottomLeft: "أسفل اليسار", bottomRight: "أسفل اليمين", analogClock: "ساعة تناظرية", clockShape: "شكل الساعة", clockFace: "وجه الساعة", clockHands: "عقارب الساعة", clockBackground: "خلفية الساعة", clockBorder: "حدود الساعة", dateFormat: "تنسيق التاريخ", clockSize: "حجم الساعة", dateSize: "حجم التاريخ", worldClocks: "ساعات العالم", timeZone: "المنطقة الزمنية", show: "إظهار", clockAndDate: "الساعة والتاريخ", clockOnly: "الساعة فقط", dateOnly: "التاريخ فقط", automatic: "تلقائي", dayMonthDate: "يوم، شهر تاريخ", monthDayYear: "شهر يوم، سنة", ddmmyyyy: "يي/شش/سسسس" },
-  zh: { searchPlaceholder: "使用搜索", quickAccess: "快速访问", customize: "自定义", gmail: "Gmail", images: "图片", footer: "SearchHub — 随处搜索，一站直达", showAllSettings: "显示所有设置", language: "语言", darkMode: "深色模式", tabAppearance: "标签外观", hideSettingsIcon: "隐藏设置图标", general: "常规", system: "系统", light: "浅色", dark: "深色", timeAndDate: "时间与日期", enable: "启用", showSeconds: "显示秒数", twelveHourTime: "12小时制", showAmPm: "显示上午/下午", amPmPosition: "上午/下午位置", topLeft: "左上", topRight: "右上", bottomLeft: "左下", bottomRight: "右下", analogClock: "模拟时钟", clockShape: "时钟形状", clockFace: "表盘", clockHands: "时钟指针", clockBackground: "时钟背景", clockBorder: "时钟边框", dateFormat: "日期格式", clockSize: "时钟大小", dateSize: "日期大小", worldClocks: "世界时钟", timeZone: "时区", show: "显示", clockAndDate: "时钟和日期", clockOnly: "仅时钟", dateOnly: "仅日期", automatic: "自动", dayMonthDate: "日，月 日期", monthDayYear: "月 日，年", ddmmyyyy: "日/月/年" },
-  ja: { searchPlaceholder: "検索", quickAccess: "クイックアクセス", customize: "カスタマイズ", gmail: "Gmail", images: "画像", footer: "SearchHub — どこでも検索、すべて一か所で", showAllSettings: "すべての設定を表示", language: "言語", darkMode: "ダークモード", tabAppearance: "タブの外観", hideSettingsIcon: "設定アイコンを隠す", general: "一般", system: "システム", light: "ライト", dark: "ダーク", timeAndDate: "時刻と日付", enable: "有効", showSeconds: "秒を表示", twelveHourTime: "12時間制", showAmPm: "AM/PMを表示", amPmPosition: "AM/PMの位置", topLeft: "左上", topRight: "右上", bottomLeft: "左下", bottomRight: "右下", analogClock: "アナログ時計", clockShape: "時計の形", clockFace: "文字盤", clockHands: "時計の針", clockBackground: "時計の背景", clockBorder: "時計の枠", dateFormat: "日付形式", clockSize: "時計のサイズ", dateSize: "日付サイズ", worldClocks: "世界時計", timeZone: "タイムゾーン", show: "表示", clockAndDate: "時計と日付", clockOnly: "時計のみ", dateOnly: "日付のみ", automatic: "自動", dayMonthDate: "曜日、月 日", monthDayYear: "月 日、年", ddmmyyyy: "日/月/年" },
-  pt: { searchPlaceholder: "Pesquisar com", quickAccess: "Acesso rápido", customize: "Personalizar", gmail: "Gmail", images: "Imagens", footer: "SearchHub — Pesquise em qualquer lugar, tudo em um", showAllSettings: "Mostrar todas as configurações", language: "Idioma", darkMode: "Modo escuro", tabAppearance: "Aparência da guia", hideSettingsIcon: "Ocultar ícone", general: "Geral", system: "Sistema", light: "Claro", dark: "Escuro", timeAndDate: "Hora e Data", enable: "Ativar", showSeconds: "Mostrar segundos", twelveHourTime: "Hora de 12h", showAmPm: "Mostrar AM/PM", amPmPosition: "Posição AM/PM", topLeft: "Superior esquerdo", topRight: "Superior direito", bottomLeft: "Inferior esquerdo", bottomRight: "Inferior direito", analogClock: "Relógio analógico", clockShape: "Formato", clockFace: "Mostrador", clockHands: "Ponteiros", clockBackground: "Fundo do relógio", clockBorder: "Borda do relógio", dateFormat: "Formato de data", clockSize: "Tamanho do relógio", dateSize: "Tamanho da data", worldClocks: "Relógios mundiais", timeZone: "Fuso horário", show: "Mostrar", clockAndDate: "Relógio e data", clockOnly: "Apenas relógio", dateOnly: "Apenas data", automatic: "Automático", dayMonthDate: "Dia, mês data", monthDayYear: "Mês dia, ano", ddmmyyyy: "DD/MM/AAAA" },
-  ru: { searchPlaceholder: "Поиск с помощью", quickAccess: "Быстрый доступ", customize: "Настроить", gmail: "Gmail", images: "Изображения", footer: "SearchHub — Ищите везде, всё в одном месте", showAllSettings: "Показать все настройки", language: "Язык", darkMode: "Тёмный режим", tabAppearance: "Внешний вид вкладки", hideSettingsIcon: "Скрыть значок", general: "Общие", system: "Система", light: "Светлый", dark: "Тёмный", timeAndDate: "Время и Дата", enable: "Включить", showSeconds: "Показывать секунды", twelveHourTime: "12-часовой формат", showAmPm: "Показать AM/PM", amPmPosition: "Позиция AM/PM", topLeft: "Верх лево", topRight: "Верх право", bottomLeft: "Низ лево", bottomRight: "Низ право", analogClock: "Аналоговые часы", clockShape: "Форма часов", clockFace: "Циферблат", clockHands: "Стрелки", clockBackground: "Фон часов", clockBorder: "Рамка часов", dateFormat: "Формат даты", clockSize: "Размер часов", dateSize: "Размер даты", worldClocks: "Мировые часы", timeZone: "Часовой пояс", show: "Показывать", clockAndDate: "Часы и дата", clockOnly: "Только часы", dateOnly: "Только дата", automatic: "Автоматически", dayMonthDate: "День, месяц дата", monthDayYear: "Месяц день, год", ddmmyyyy: "ДД/ММ/ГГГГ" },
-  ko: { searchPlaceholder: "검색", quickAccess: "빠른 접근", customize: "사용자 정의", gmail: "Gmail", images: "이미지", footer: "SearchHub — 어디서나 검색, 한 곳에서 모두", showAllSettings: "모든 설정 표시", language: "언어", darkMode: "다크 모드", tabAppearance: "탭 모양", hideSettingsIcon: "설정 아이콘 숨기기", general: "일반", system: "시스템", light: "밝게", dark: "어둡게", timeAndDate: "시간 및 날짜", enable: "활성화", showSeconds: "초 표시", twelveHourTime: "12시간제", showAmPm: "AM/PM 표시", amPmPosition: "AM/PM 위치", topLeft: "왼쪽 위", topRight: "오른쪽 위", bottomLeft: "왼쪽 아래", bottomRight: "오른쪽 아래", analogClock: "아날로그 시계", clockShape: "시계 모양", clockFace: "시계 면", clockHands: "시계 바늘", clockBackground: "시계 배경", clockBorder: "시계 테두리", dateFormat: "날짜 형식", clockSize: "시계 크기", dateSize: "날짜 크기", worldClocks: "세계 시계", timeZone: "시간대", show: "표시", clockAndDate: "시계 및 날짜", clockOnly: "시계만", dateOnly: "날짜만", automatic: "자동", dayMonthDate: "요일, 월 일", monthDayYear: "월 일, 년", ddmmyyyy: "일/월/년" },
+  en: { quickLinks: "Quick Links", addLink: "Add link", importBookmarks: "Import bookmarks", importBtn: "Import", showGroups: "Show groups", openInNewTab: "Open in new tab", iconCornerRadius: "Icon corner radius", linksPerRow: "Links per row", linkStyle: "Style", small: "Small", medium: "Medium", large: "Large", titlePlaceholder: "Title", searchPlaceholder: "Search with", quickAccess: "Quick Access", customize: "Customize", gmail: "Gmail", images: "Images", footer: "SearchHub — Search anywhere, all in one place", showAllSettings: "Show all settings", language: "Language", darkMode: "Dark mode", tabAppearance: "Tab appearance", hideSettingsIcon: "Hide settings icon", general: "General", system: "System", light: "Light", dark: "Dark", timeAndDate: "Time & Date", enable: "Enable", showSeconds: "Show seconds", twelveHourTime: "12-Hour Time", showAmPm: "Show AM/PM", amPmPosition: "AM/PM position", topLeft: "Top left", topRight: "Top right", bottomLeft: "Bottom left", bottomRight: "Bottom right", analogClock: "Analog clock", clockShape: "Clock shape", clockFace: "Clock face", clockHands: "Clock hands", clockBackground: "Clock background", clockBorder: "Clock border", dateFormat: "Date format", clockSize: "Clock size", dateSize: "Date size", worldClocks: "World clocks", timeZone: "Time zone", show: "Show", clockAndDate: "Clock and date", clockOnly: "Clock only", dateOnly: "Date only", automatic: "Automatic", dayMonthDate: "Day, month date", monthDayYear: "Month day, year", ddmmyyyy: "DD/MM/YYYY" },
+  bn: { quickLinks: "দ্রুত লিংক", addLink: "লিংক যোগ করুন", importBookmarks: "বুকমার্ক আনুন", importBtn: "আনুন", showGroups: "গ্রুপ দেখান", openInNewTab: "নতুন ট্যাবে খুলুন", iconCornerRadius: "আইকন কর্নার রেডিয়াস", linksPerRow: "প্রতি সারিতে লিংক", linkStyle: "স্টাইল", small: "ছোট", medium: "মাঝারি", large: "বড়", titlePlaceholder: "শিরোনাম", searchPlaceholder: "অনুসন্ধান করুন", quickAccess: "দ্রুত অ্যাক্সেস", customize: "কাস্টমাইজ", gmail: "জিমেইল", images: "ছবি", footer: "SearchHub — এক জায়গায় সব জায়গা খুঁজুন", showAllSettings: "সব সেটিংস দেখান", language: "ভাষা", darkMode: "ডার্ক মোড", tabAppearance: "ট্যাব চেহারা", hideSettingsIcon: "সেটিংস আইকন লুকান", general: "সাধারণ", system: "সিস্টেম", light: "আলো", dark: "অন্ধকার", timeAndDate: "সময় ও তারিখ", enable: "সক্ষম করুন", showSeconds: "সেকেন্ড দেখান", twelveHourTime: "১২-ঘণ্টা সময়", showAmPm: "AM/PM দেখান", amPmPosition: "AM/PM অবস্থান", topLeft: "উপরে বামে", topRight: "উপরে ডানে", bottomLeft: "নিচে বামে", bottomRight: "নিচে ডানে", analogClock: "অ্যানালগ ক্লক", clockShape: "ঘড়ির আকার", clockFace: "ঘড়ির মুখ", clockHands: "ঘড়ির কাঁটা", clockBackground: "ঘড়ির পটভূমি", clockBorder: "ঘড়ির বর্ডার", dateFormat: "তারিখের ফরম্যাট", clockSize: "ঘড়ির সাইজ", dateSize: "তারিখের সাইজ", worldClocks: "বিশ্ব ঘড়ি", timeZone: "সময় অঞ্চল", show: "দেখান", clockAndDate: "ঘড়ি ও তারিখ", clockOnly: "শুধু ঘড়ি", dateOnly: "শুধু তারিখ", automatic: "স্বয়ংক্রিয়", dayMonthDate: "দিন, মাস তারিখ", monthDayYear: "মাস দিন, বছর", ddmmyyyy: "দদ/মম/বববব" },
+  hi: { quickLinks: "त्वरित लिंक", addLink: "लिंक जोड़ें", importBookmarks: "बुकमार्क आयात करें", importBtn: "आयात", showGroups: "समूह दिखाएं", openInNewTab: "नए टैब में खोलें", iconCornerRadius: "आइकन कोना त्रिज्या", linksPerRow: "पंक्ति प्रति लिंक", linkStyle: "शैली", small: "छोटा", medium: "मध्यम", large: "बड़ा", titlePlaceholder: "शीर्षक", searchPlaceholder: "खोजें", quickAccess: "त्वरित पहुँच", customize: "कस्टमाइज़", gmail: "जीमेल", images: "चित्र", footer: "SearchHub — एक जगह से हर जगह खोजें", showAllSettings: "सभी सेटिंग दिखाएं", language: "भाषा", darkMode: "डार्क मोड", tabAppearance: "टैब का स्वरूप", hideSettingsIcon: "सेटिंग्स आइकन छुपाएं", general: "सामान्य", system: "सिस्टम", light: "हल्का", dark: "गहरा", timeAndDate: "समय और तारीख", enable: "सक्षम", showSeconds: "सेकंड दिखाएं", twelveHourTime: "12-घंटे का समय", showAmPm: "AM/PM दिखाएं", amPmPosition: "AM/PM स्थिति", topLeft: "ऊपर बाएं", topRight: "ऊपर दाएं", bottomLeft: "नीचे बाएं", bottomRight: "नीचे दाएं", analogClock: "एनालॉग घड़ी", clockShape: "घड़ी का आकार", clockFace: "घड़ी का चेहरा", clockHands: "घड़ी की सूइयां", clockBackground: "घड़ी की पृष्ठभूमि", clockBorder: "घड़ी की सीमा", dateFormat: "तारीख प्रारूप", clockSize: "घड़ी का आकार", dateSize: "तारीख का आकार", worldClocks: "विश्व घड़ियाँ", timeZone: "समय क्षेत्र", show: "दिखाएं", clockAndDate: "घड़ी और तारीख", clockOnly: "केवल घड़ी", dateOnly: "केवल तारीख", automatic: "स्वचालित", dayMonthDate: "दिन, महीना तारीख", monthDayYear: "महीना दिन, साल", ddmmyyyy: "दद/मम/वववव" },
+  es: { quickLinks: "Accesos rápidos", addLink: "Agregar enlace", importBookmarks: "Importar marcadores", importBtn: "Importar", showGroups: "Mostrar grupos", openInNewTab: "Abrir en nueva pestaña", iconCornerRadius: "Radio del icono", linksPerRow: "Enlace por fila", linkStyle: "Estilo", small: "Pequeño", medium: "Mediano", large: "Grande", titlePlaceholder: "Título", searchPlaceholder: "Buscar con", quickAccess: "Acceso rápido", customize: "Personalizar", gmail: "Gmail", images: "Imágenes", footer: "SearchHub — Busca en cualquier lugar, todo en uno", showAllSettings: "Mostrar todos los ajustes", language: "Idioma", darkMode: "Modo oscuro", tabAppearance: "Apariencia de pestaña", hideSettingsIcon: "Ocultar icono de configuración", general: "General", system: "Sistema", light: "Claro", dark: "Oscuro", timeAndDate: "Hora y Fecha", enable: "Activar", showSeconds: "Mostrar segundos", twelveHourTime: "Hora de 12", showAmPm: "Mostrar AM/PM", amPmPosition: "Posición AM/PM", topLeft: "Arriba izquierda", topRight: "Arriba derecha", bottomLeft: "Abajo izquierda", bottomRight: "Abajo derecha", analogClock: "Reloj analógico", clockShape: "Forma del reloj", clockFace: "Cara del reloj", clockHands: "Manecillas", clockBackground: "Fondo del reloj", clockBorder: "Borde del reloj", dateFormat: "Formato de fecha", clockSize: "Tamaño del reloj", dateSize: "Tamaño de la fecha", worldClocks: "Relojes del mundo", timeZone: "Zona horaria", show: "Mostrar", clockAndDate: "Reloj y fecha", clockOnly: "Solo reloj", dateOnly: "Solo fecha", automatic: "Automático", dayMonthDate: "Día, mes fecha", monthDayYear: "Mes día, año", ddmmyyyy: "DD/MM/AAAA" },
+  fr: { quickLinks: "Liens rapides", addLink: "Ajouter un lien", importBookmarks: "Importer les favoris", importBtn: "Importer", showGroups: "Afficher les groupes", openInNewTab: "Ouvrir dans un nouvel onglet", iconCornerRadius: "Rayon d'icône", linksPerRow: "Liens par ligne", linkStyle: "Style", small: "Petit", medium: "Moyen", large: "Grand", titlePlaceholder: "Titre", searchPlaceholder: "Rechercher avec", quickAccess: "Accès rapide", customize: "Personnaliser", gmail: "Gmail", images: "Images", footer: "SearchHub — Recherchez partout, tout en un", showAllSettings: "Afficher tous les paramètres", language: "Langue", darkMode: "Mode sombre", tabAppearance: "Apparence de l'onglet", hideSettingsIcon: "Masquer l'icône", general: "Général", system: "Système", light: "Clair", dark: "Sombre", timeAndDate: "Heure et Date", enable: "Activer", showSeconds: "Afficher les secondes", twelveHourTime: "Heure en 12h", showAmPm: "Afficher AM/PM", amPmPosition: "Position AM/PM", topLeft: "En haut à gauche", topRight: "En haut à droite", bottomLeft: "En bas à gauche", bottomRight: "En bas à droite", analogClock: "Horloge analogique", clockShape: "Forme de l'horloge", clockFace: "Cadran", clockHands: "Aiguilles", clockBackground: "Fond de l'horloge", clockBorder: "Bordure", dateFormat: "Format de date", clockSize: "Taille de l'horloge", dateSize: "Taille de la date", worldClocks: "Horloges mondiales", timeZone: "Fuseau horaire", show: "Afficher", clockAndDate: "Horloge et date", clockOnly: "Horloge seule", dateOnly: "Date seule", automatic: "Automatique", dayMonthDate: "Jour, mois date", monthDayYear: "Mois jour, année", ddmmyyyy: "JJ/MM/AAAA" },
+  de: { quickLinks: "Schnelllinks", addLink: "Link hinzufügen", importBookmarks: "Lesezeichen importieren", importBtn: "Importieren", showGroups: "Gruppen anzeigen", openInNewTab: "In neuem Tab öffnen", iconCornerRadius: "Symbol-Eckenradius", linksPerRow: "Links pro Zeile", linkStyle: "Stil", small: "Klein", medium: "Mittel", large: "Groß", titlePlaceholder: "Titel", searchPlaceholder: "Suchen mit", quickAccess: "Schnellzugriff", customize: "Anpassen", gmail: "Gmail", images: "Bilder", footer: "SearchHub — Überall suchen, alles an einem Ort", showAllSettings: "Alle Einstellungen anzeigen", language: "Sprache", darkMode: "Dunkelmodus", tabAppearance: "Tab-Erscheinungsbild", hideSettingsIcon: "Symbol ausblenden", general: "Allgemein", system: "System", light: "Hell", dark: "Dunkel", timeAndDate: "Zeit & Datum", enable: "Aktivieren", showSeconds: "Sekunden anzeigen", twelveHourTime: "12-Stunden-Zeit", showAmPm: "AM/PM anzeigen", amPmPosition: "AM/PM Position", topLeft: "Oben links", topRight: "Oben rechts", bottomLeft: "Unten links", bottomRight: "Unten rechts", analogClock: "Analoge Uhr", clockShape: "Uhrenform", clockFace: "Zifferblatt", clockHands: "Uhrzeiger", clockBackground: "Uhr-Hintergrund", clockBorder: "Uhr-Rand", dateFormat: "Datumsformat", clockSize: "Uhrengröße", dateSize: "Datumsgröße", worldClocks: "Weltuhren", timeZone: "Zeitzone", show: "Anzeigen", clockAndDate: "Uhr und Datum", clockOnly: "Nur Uhr", dateOnly: "Nur Datum", automatic: "Automatisch", dayMonthDate: "Tag, Monat Datum", monthDayYear: "Monat Tag, Jahr", ddmmyyyy: "TT/MM/JJJJ" },
+  ar: { quickLinks: "روابط سريعة", addLink: "إضافة رابط", importBookmarks: "استيراد الإشارات", importBtn: "استيراد", showGroups: "إظهار المجموعات", openInNewTab: "فتح في تبويب جديد", iconCornerRadius: "نصف قطر الأيقونة", linksPerRow: "روابط في الصف", linkStyle: "النمط", small: "صغير", medium: "متوسط", large: "كبير", titlePlaceholder: "العنوان", searchPlaceholder: "ابحث مع", quickAccess: "وصول سريع", customize: "تخصيص", gmail: "جيميل", images: "صور", footer: "SearchHub — ابحث في أي مكان", showAllSettings: "إظهار كل الإعدادات", language: "اللغة", darkMode: "الوضع المظلم", tabAppearance: "مظهر التبويب", hideSettingsIcon: "إخفاء أيقونة الإعدادات", general: "عام", system: "النظام", light: "فاتح", dark: "داكن", timeAndDate: "الوقت والتاريخ", enable: "تفعيل", showSeconds: "إظهار الثواني", twelveHourTime: "توقيت 12 ساعة", showAmPm: "إظهار AM/PM", amPmPosition: "موضع AM/PM", topLeft: "أعلى اليسار", topRight: "أعلى اليمين", bottomLeft: "أسفل اليسار", bottomRight: "أسفل اليمين", analogClock: "ساعة تناظرية", clockShape: "شكل الساعة", clockFace: "وجه الساعة", clockHands: "عقارب الساعة", clockBackground: "خلفية الساعة", clockBorder: "حدود الساعة", dateFormat: "تنسيق التاريخ", clockSize: "حجم الساعة", dateSize: "حجم التاريخ", worldClocks: "ساعات العالم", timeZone: "المنطقة الزمنية", show: "إظهار", clockAndDate: "الساعة والتاريخ", clockOnly: "الساعة فقط", dateOnly: "التاريخ فقط", automatic: "تلقائي", dayMonthDate: "يوم، شهر تاريخ", monthDayYear: "شهر يوم، سنة", ddmmyyyy: "يي/شش/سسسس" },
+  zh: { quickLinks: "快速链接", addLink: "添加链接", importBookmarks: "导入书签", importBtn: "导入", showGroups: "显示分组", openInNewTab: "在新标签打开", iconCornerRadius: "图标圆角", linksPerRow: "每行链接数", linkStyle: "样式", small: "小", medium: "中", large: "大", titlePlaceholder: "标题", searchPlaceholder: "使用搜索", quickAccess: "快速访问", customize: "自定义", gmail: "Gmail", images: "图片", footer: "SearchHub — 随处搜索，一站直达", showAllSettings: "显示所有设置", language: "语言", darkMode: "深色模式", tabAppearance: "标签外观", hideSettingsIcon: "隐藏设置图标", general: "常规", system: "系统", light: "浅色", dark: "深色", timeAndDate: "时间与日期", enable: "启用", showSeconds: "显示秒数", twelveHourTime: "12小时制", showAmPm: "显示上午/下午", amPmPosition: "上午/下午位置", topLeft: "左上", topRight: "右上", bottomLeft: "左下", bottomRight: "右下", analogClock: "模拟时钟", clockShape: "时钟形状", clockFace: "表盘", clockHands: "时钟指针", clockBackground: "时钟背景", clockBorder: "时钟边框", dateFormat: "日期格式", clockSize: "时钟大小", dateSize: "日期大小", worldClocks: "世界时钟", timeZone: "时区", show: "显示", clockAndDate: "时钟和日期", clockOnly: "仅时钟", dateOnly: "仅日期", automatic: "自动", dayMonthDate: "日，月 日期", monthDayYear: "月 日，年", ddmmyyyy: "日/月/年" },
+  ja: { quickLinks: "クイックリンク", addLink: "リンクを追加", importBookmarks: "ブックマークをインポート", importBtn: "インポート", showGroups: "グループを表示", openInNewTab: "新しいタブで開く", iconCornerRadius: "アイコン角丸", linksPerRow: "1行のリンク数", linkStyle: "スタイル", small: "小", medium: "中", large: "大", titlePlaceholder: "タイトル", searchPlaceholder: "検索", quickAccess: "クイックアクセス", customize: "カスタマイズ", gmail: "Gmail", images: "画像", footer: "SearchHub — どこでも検索、すべて一か所で", showAllSettings: "すべての設定を表示", language: "言語", darkMode: "ダークモード", tabAppearance: "タブの外観", hideSettingsIcon: "設定アイコンを隠す", general: "一般", system: "システム", light: "ライト", dark: "ダーク", timeAndDate: "時刻と日付", enable: "有効", showSeconds: "秒を表示", twelveHourTime: "12時間制", showAmPm: "AM/PMを表示", amPmPosition: "AM/PMの位置", topLeft: "左上", topRight: "右上", bottomLeft: "左下", bottomRight: "右下", analogClock: "アナログ時計", clockShape: "時計の形", clockFace: "文字盤", clockHands: "時計の針", clockBackground: "時計の背景", clockBorder: "時計の枠", dateFormat: "日付形式", clockSize: "時計のサイズ", dateSize: "日付サイズ", worldClocks: "世界時計", timeZone: "タイムゾーン", show: "表示", clockAndDate: "時計と日付", clockOnly: "時計のみ", dateOnly: "日付のみ", automatic: "自動", dayMonthDate: "曜日、月 日", monthDayYear: "月 日、年", ddmmyyyy: "日/月/年" },
+  pt: { quickLinks: "Links rápidos", addLink: "Adicionar link", importBookmarks: "Importar favoritos", importBtn: "Importar", showGroups: "Mostrar grupos", openInNewTab: "Abrir em nova aba", iconCornerRadius: "Raio do ícone", linksPerRow: "Links por linha", linkStyle: "Estilo", small: "Pequeno", medium: "Médio", large: "Grande", titlePlaceholder: "Título", searchPlaceholder: "Pesquisar com", quickAccess: "Acesso rápido", customize: "Personalizar", gmail: "Gmail", images: "Imagens", footer: "SearchHub — Pesquise em qualquer lugar, tudo em um", showAllSettings: "Mostrar todas as configurações", language: "Idioma", darkMode: "Modo escuro", tabAppearance: "Aparência da guia", hideSettingsIcon: "Ocultar ícone", general: "Geral", system: "Sistema", light: "Claro", dark: "Escuro", timeAndDate: "Hora e Data", enable: "Ativar", showSeconds: "Mostrar segundos", twelveHourTime: "Hora de 12h", showAmPm: "Mostrar AM/PM", amPmPosition: "Posição AM/PM", topLeft: "Superior esquerdo", topRight: "Superior direito", bottomLeft: "Inferior esquerdo", bottomRight: "Inferior direito", analogClock: "Relógio analógico", clockShape: "Formato", clockFace: "Mostrador", clockHands: "Ponteiros", clockBackground: "Fundo do relógio", clockBorder: "Borda do relógio", dateFormat: "Formato de data", clockSize: "Tamanho do relógio", dateSize: "Tamanho da data", worldClocks: "Relógios mundiais", timeZone: "Fuso horário", show: "Mostrar", clockAndDate: "Relógio e data", clockOnly: "Apenas relógio", dateOnly: "Apenas data", automatic: "Automático", dayMonthDate: "Dia, mês data", monthDayYear: "Mês dia, ano", ddmmyyyy: "DD/MM/AAAA" },
+  ru: { quickLinks: "Быстрые ссылки", addLink: "Добавить ссылку", importBookmarks: "Импорт закладок", importBtn: "Импорт", showGroups: "Показать группы", openInNewTab: "Открыть в новой вкладке", iconCornerRadius: "Радиус угла иконки", linksPerRow: "Ссылок в строке", linkStyle: "Стиль", small: "Малый", medium: "Средний", large: "Большой", titlePlaceholder: "Заголовок", searchPlaceholder: "Поиск с помощью", quickAccess: "Быстрый доступ", customize: "Настроить", gmail: "Gmail", images: "Изображения", footer: "SearchHub — Ищите везде, всё в одном месте", showAllSettings: "Показать все настройки", language: "Язык", darkMode: "Тёмный режим", tabAppearance: "Внешний вид вкладки", hideSettingsIcon: "Скрыть значок", general: "Общие", system: "Система", light: "Светлый", dark: "Тёмный", timeAndDate: "Время и Дата", enable: "Включить", showSeconds: "Показывать секунды", twelveHourTime: "12-часовой формат", showAmPm: "Показать AM/PM", amPmPosition: "Позиция AM/PM", topLeft: "Верх лево", topRight: "Верх право", bottomLeft: "Низ лево", bottomRight: "Низ право", analogClock: "Аналоговые часы", clockShape: "Форма часов", clockFace: "Циферблат", clockHands: "Стрелки", clockBackground: "Фон часов", clockBorder: "Рамка часов", dateFormat: "Формат даты", clockSize: "Размер часов", dateSize: "Размер даты", worldClocks: "Мировые часы", timeZone: "Часовой пояс", show: "Показывать", clockAndDate: "Часы и дата", clockOnly: "Только часы", dateOnly: "Только дата", automatic: "Автоматически", dayMonthDate: "День, месяц дата", monthDayYear: "Месяц день, год", ddmmyyyy: "ДД/ММ/ГГГГ" },
+  ko: { quickLinks: "빠른 링크", addLink: "링크 추가", importBookmarks: "북마크 가져오기", importBtn: "가져오기", showGroups: "그룹 표시", openInNewTab: "새 탭에서 열기", iconCornerRadius: "아이콘 모서리 반경", linksPerRow: "행당 링크 수", linkStyle: "스타일", small: "소형", medium: "중형", large: "대형", titlePlaceholder: "제목", searchPlaceholder: "검색", quickAccess: "빠른 접근", customize: "사용자 정의", gmail: "Gmail", images: "이미지", footer: "SearchHub — 어디서나 검색, 한 곳에서 모두", showAllSettings: "모든 설정 표시", language: "언어", darkMode: "다크 모드", tabAppearance: "탭 모양", hideSettingsIcon: "설정 아이콘 숨기기", general: "일반", system: "시스템", light: "밝게", dark: "어둡게", timeAndDate: "시간 및 날짜", enable: "활성화", showSeconds: "초 표시", twelveHourTime: "12시간제", showAmPm: "AM/PM 표시", amPmPosition: "AM/PM 위치", topLeft: "왼쪽 위", topRight: "오른쪽 위", bottomLeft: "왼쪽 아래", bottomRight: "오른쪽 아래", analogClock: "아날로그 시계", clockShape: "시계 모양", clockFace: "시계 면", clockHands: "시계 바늘", clockBackground: "시계 배경", clockBorder: "시계 테두리", dateFormat: "날짜 형식", clockSize: "시계 크기", dateSize: "날짜 크기", worldClocks: "세계 시계", timeZone: "시간대", show: "표시", clockAndDate: "시계 및 날짜", clockOnly: "시계만", dateOnly: "날짜만", automatic: "자동", dayMonthDate: "요일, 월 일", monthDayYear: "월 일, 년", ddmmyyyy: "일/월/년" },
 };
 
 function AnalogClock({ now, tz, size, shape, face, hands, isDark, bgOpacity, borderOpacity }: {
@@ -157,12 +157,21 @@ export default function App() {
   const [clockShow, setClockShow] = useState<"both" | "clock" | "date">("both");
 
   const [bgColor] = useState("#f5f4f0");
-  const [showShortcuts] = useState(true);
+  const [showShortcuts, setShowShortcuts] = useState(true);
+  const [quickLinksOpenNewTab, setQuickLinksOpenNewTab] = useState(true);
+  const [quickLinksShowGroups, setQuickLinksShowGroups] = useState(false);
+  const [quickLinksIconRadius, setQuickLinksIconRadius] = useState(10);
+  const [quickLinksPerRow, setQuickLinksPerRow] = useState(8);
+  const [quickLinksStyle, setQuickLinksStyle] = useState<"icon" | "text">("icon");
+  const [quickLinksSize, setQuickLinksSize] = useState<"small" | "medium" | "large">("medium");
+  const [newLinkTitle, setNewLinkTitle] = useState("");
+  const [newLinkUrl, setNewLinkUrl] = useState("");
   const [engineColorEffect] = useState(true);
 
   const inputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const settingsRef = useRef<HTMLDivElement>(null);
+  const bookmarkInputRef = useRef<HTMLInputElement>(null);
 
   const t = T[language] ?? T["en"];
 
@@ -242,6 +251,47 @@ export default function App() {
   }
 
   function handleDragEnd() { setDragIndex(null); setOverIndex(null); }
+
+  function handleAddLink() {
+    if (!newLinkUrl.trim()) return;
+    let url = newLinkUrl.trim();
+    if (!/^https?:\/\//i.test(url)) url = "https://" + url;
+    try {
+      const u = new URL(url);
+      const name = newLinkTitle.trim() || u.hostname;
+      setShortcuts((prev) => [...prev, { name, url, domain: u.hostname }]);
+      setNewLinkTitle("");
+      setNewLinkUrl("");
+    } catch { /* invalid URL */ }
+  }
+
+  function handleImportBookmarks(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const html = ev.target?.result as string;
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, "text/html");
+      const links = Array.from(doc.querySelectorAll("a[href]")) as HTMLAnchorElement[];
+      const imported = links
+        .filter((a) => /^https?:\/\//.test(a.getAttribute("href") || ""))
+        .map((a) => {
+          const href = a.getAttribute("href")!;
+          try {
+            const u = new URL(href);
+            return { name: a.textContent?.trim() || u.hostname, url: href, domain: u.hostname };
+          } catch { return null; }
+        })
+        .filter(Boolean) as { name: string; url: string; domain: string }[];
+      if (imported.length > 0) setShortcuts((prev) => [...prev, ...imported]);
+    };
+    reader.readAsText(file);
+    e.target.value = "";
+  }
+
+  const qlFaviconSize = quickLinksSize === "small" ? 28 : quickLinksSize === "large" ? 52 : 40;
+  const qlSzParam = quickLinksSize === "small" ? 32 : quickLinksSize === "large" ? 64 : 64;
 
   // Clock computed values
   const clockFontSize = `${40 + (clockSizeNum / 100) * 56}px`;
@@ -409,16 +459,24 @@ export default function App() {
         {showShortcuts && (
           <div className="shortcuts-section">
             <h3 className="shortcuts-title" style={{ color: isDark ? "#667799" : "#9aa0b2" }}>{t.quickAccess}</h3>
-            <div className="shortcuts-grid">
+            <div className="shortcuts-grid" style={{ gap: quickLinksStyle === "text" ? "8px" : "12px" }}>
               {shortcuts.map((s, index) => (
-                <a key={s.name} href={dragIndex !== null ? undefined : s.url} target="_blank" rel="noopener noreferrer"
-                  className={`shortcut-card${dragIndex === index ? " dragging" : ""}${overIndex === index && dragIndex !== index ? " drag-over" : ""}`}
+                <a key={s.name} href={dragIndex !== null ? undefined : s.url}
+                  target={quickLinksOpenNewTab ? "_blank" : "_self"} rel="noopener noreferrer"
+                  className={`shortcut-card${quickLinksStyle === "text" ? " shortcut-card--text" : ""}${dragIndex === index ? " dragging" : ""}${overIndex === index && dragIndex !== index ? " drag-over" : ""}`}
                   draggable onDragStart={(e) => handleDragStart(e, index)} onDragOver={(e) => handleDragOver(e, index)}
                   onDrop={(e) => handleDrop(e, index)} onDragEnd={handleDragEnd}
                   onClick={(e) => { if (dragIndex !== null) e.preventDefault(); }}
                   style={{ cursor: dragIndex !== null ? "grabbing" : "grab" }}
                 >
-                  <img src={`https://www.google.com/s2/favicons?domain=${s.domain}&sz=64`} alt={s.name} className="shortcut-favicon" title={s.name} />
+                  <img
+                    src={`https://www.google.com/s2/favicons?domain=${s.domain}&sz=${qlSzParam}`}
+                    alt={s.name} title={s.name}
+                    style={{ width: qlFaviconSize, height: qlFaviconSize, objectFit: "contain", borderRadius: quickLinksIconRadius, flexShrink: 0 }}
+                  />
+                  {quickLinksStyle === "text" && (
+                    <span className="shortcut-label" style={{ color: isDark ? "#c8cce0" : "#444" }}>{s.name}</span>
+                  )}
                 </a>
               ))}
             </div>
@@ -631,6 +689,124 @@ export default function App() {
               <option value="clock">{t.clockOnly}</option>
               <option value="date">{t.dateOnly}</option>
             </select>
+          </div>
+
+        </div>
+
+        {/* ── Quick Links Card ── */}
+        <p className="settings-section-label" style={{ marginTop: 12 }}>{t.quickLinks}</p>
+        <div className="settings-card" style={{ background: cardBg }}>
+
+          <div className="settings-row">
+            <span className="settings-row-label">{t.enable}</span>
+            <button className={`toggle${showShortcuts ? " on" : ""}`} onClick={() => setShowShortcuts(!showShortcuts)} aria-label="Enable quick links" />
+          </div>
+
+          {/* Add link form */}
+          <div className={`settings-row settings-row-col${!showShortcuts ? " settings-row-dimmed" : ""}`} style={{ borderTop: `1px solid ${rowBorder}` }}>
+            <span className="settings-row-label">{t.addLink}</span>
+            <div className="ql-add-form">
+              <input
+                className="ql-input"
+                type="text"
+                placeholder={t.titlePlaceholder}
+                value={newLinkTitle}
+                onChange={(e) => setNewLinkTitle(e.target.value)}
+                disabled={!showShortcuts}
+                style={{ background: isDark ? "#252540" : "#f0f0f5", color: isDark ? "#e8e8f0" : "#1a1a2e", borderColor: isDark ? "#3a3a5c" : "#dde0e8" }}
+              />
+              <input
+                className="ql-input"
+                type="text"
+                placeholder="https://"
+                value={newLinkUrl}
+                onChange={(e) => setNewLinkUrl(e.target.value)}
+                onKeyDown={(e) => { if (e.key === "Enter") handleAddLink(); }}
+                disabled={!showShortcuts}
+                style={{ background: isDark ? "#252540" : "#f0f0f5", color: isDark ? "#e8e8f0" : "#1a1a2e", borderColor: isDark ? "#3a3a5c" : "#dde0e8" }}
+              />
+              <button className="ql-add-btn" onClick={handleAddLink} disabled={!showShortcuts}
+                style={{ background: isDark ? "#3a3a6a" : "#e0e2ef", color: isDark ? "#c8cce0" : "#444" }}>
+                +
+              </button>
+            </div>
+          </div>
+
+          {/* Import bookmarks */}
+          <div className={`settings-row${!showShortcuts ? " settings-row-dimmed" : ""}`} style={{ borderTop: `1px solid ${rowBorder}` }}>
+            <span className="settings-row-label">{t.importBookmarks}</span>
+            <button className="ql-import-btn" onClick={() => bookmarkInputRef.current?.click()} disabled={!showShortcuts}
+              style={{ background: isDark ? "#3a3a6a" : "#e0e2ef", color: isDark ? "#c8cce0" : "#444" }}>
+              {t.importBtn}
+            </button>
+            <input ref={bookmarkInputRef} type="file" accept=".html,.htm" style={{ display: "none" }} onChange={handleImportBookmarks} />
+          </div>
+
+          <div className={`settings-row${!showShortcuts ? " settings-row-dimmed" : ""}`} style={{ borderTop: `1px solid ${rowBorder}` }}>
+            <span className="settings-row-label">{t.showGroups}</span>
+            <button className={`toggle${quickLinksShowGroups ? " on" : ""}`} onClick={() => setQuickLinksShowGroups(!quickLinksShowGroups)} disabled={!showShortcuts} aria-label="Show groups" />
+          </div>
+
+          <div className={`settings-row${!showShortcuts ? " settings-row-dimmed" : ""}`} style={{ borderTop: `1px solid ${rowBorder}` }}>
+            <span className="settings-row-label">{t.openInNewTab}</span>
+            <button className={`toggle${quickLinksOpenNewTab ? " on" : ""}`} onClick={() => setQuickLinksOpenNewTab(!quickLinksOpenNewTab)} disabled={!showShortcuts} aria-label="Open in new tab" />
+          </div>
+
+          {/* Icon corner radius slider */}
+          <div className={`settings-row settings-row-col${!showShortcuts ? " settings-row-dimmed" : ""}`} style={{ borderTop: `1px solid ${rowBorder}` }}>
+            <span className="settings-row-label">{t.iconCornerRadius}</span>
+            <div className="settings-slider-row">
+              <input type="range" className="settings-slider" min={0} max={50} value={quickLinksIconRadius}
+                onChange={(e) => setQuickLinksIconRadius(Number(e.target.value))} disabled={!showShortcuts} />
+              <span style={{ fontSize: 11, opacity: 0.6, minWidth: 22, textAlign: "right" }}>{quickLinksIconRadius}</span>
+            </div>
+          </div>
+
+          {/* Links per row slider */}
+          <div className={`settings-row settings-row-col${!showShortcuts ? " settings-row-dimmed" : ""}`} style={{ borderTop: `1px solid ${rowBorder}` }}>
+            <span className="settings-row-label">{t.linksPerRow}</span>
+            <div className="settings-slider-row">
+              <input type="range" className="settings-slider" min={3} max={12} value={quickLinksPerRow}
+                onChange={(e) => setQuickLinksPerRow(Number(e.target.value))} disabled={!showShortcuts} />
+              <span style={{ fontSize: 11, opacity: 0.6, minWidth: 22, textAlign: "right" }}>{quickLinksPerRow}</span>
+            </div>
+          </div>
+
+          {/* Style picker */}
+          <div className={`settings-row${!showShortcuts ? " settings-row-dimmed" : ""}`} style={{ borderTop: `1px solid ${rowBorder}` }}>
+            <span className="settings-row-label">{t.linkStyle}</span>
+            <div className="ql-style-picker">
+              <button
+                className={`ql-style-btn${quickLinksStyle === "icon" ? " active" : ""}`}
+                onClick={() => setQuickLinksStyle("icon")} disabled={!showShortcuts}
+                title="Icon only"
+                style={{ background: quickLinksStyle === "icon" ? (isDark ? "#4a4a8a" : "#d0d4f0") : (isDark ? "#2a2a44" : "#e8eaf0"), color: isDark ? "#e8e8f0" : "#1a1a2e" }}
+              >
+                <svg viewBox="0 0 20 20" fill="currentColor" width="14" height="14"><rect x="2" y="2" width="16" height="16" rx="4"/></svg>
+              </button>
+              <button
+                className={`ql-style-btn${quickLinksStyle === "text" ? " active" : ""}`}
+                onClick={() => setQuickLinksStyle("text")} disabled={!showShortcuts}
+                title="Icon + label"
+                style={{ background: quickLinksStyle === "text" ? (isDark ? "#4a4a8a" : "#d0d4f0") : (isDark ? "#2a2a44" : "#e8eaf0"), color: isDark ? "#e8e8f0" : "#1a1a2e" }}
+              >
+                T
+              </button>
+            </div>
+          </div>
+
+          {/* Size picker */}
+          <div className={`settings-row${!showShortcuts ? " settings-row-dimmed" : ""}`} style={{ borderTop: `1px solid ${rowBorder}` }}>
+            <span className="settings-row-label">{t.linkStyle} / Size</span>
+            <div className="ql-size-picker">
+              {(["small", "medium", "large"] as const).map((s) => (
+                <button key={s} onClick={() => setQuickLinksSize(s)} disabled={!showShortcuts}
+                  className={`ql-size-btn${quickLinksSize === s ? " active" : ""}`}
+                  style={{ background: quickLinksSize === s ? (isDark ? "#4a4a8a" : "#d0d4f0") : (isDark ? "#2a2a44" : "#e8eaf0"), color: isDark ? "#e8e8f0" : "#1a1a2e" }}>
+                  {t[s]}
+                </button>
+              ))}
+            </div>
           </div>
 
         </div>

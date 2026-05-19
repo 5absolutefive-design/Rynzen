@@ -826,6 +826,127 @@ body {
   background: rgba(128,128,128,0.12);
 }
 
+/* ── Quick Links settings UI ── */
+.ql-add-form {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+}
+
+.ql-input {
+  flex: 1;
+  min-width: 0;
+  padding: 6px 9px;
+  border-radius: 8px;
+  border: 1px solid #dde0e8;
+  font-size: 12px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.ql-input:focus {
+  border-color: #4285F4;
+}
+
+.ql-input:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.ql-add-btn {
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  border: none;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: filter 0.15s;
+}
+
+.ql-add-btn:hover:not(:disabled) { filter: brightness(0.9); }
+.ql-add-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.ql-import-btn {
+  flex-shrink: 0;
+  padding: 5px 12px;
+  border-radius: 8px;
+  border: none;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: filter 0.15s;
+}
+
+.ql-import-btn:hover:not(:disabled) { filter: brightness(0.9); }
+.ql-import-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.ql-style-picker {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.ql-style-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 30px;
+  border-radius: 8px;
+  border: none;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: filter 0.15s;
+}
+
+.ql-style-btn:hover:not(:disabled) { filter: brightness(0.9); }
+.ql-style-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.ql-size-picker {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.ql-size-btn {
+  padding: 4px 9px;
+  border-radius: 8px;
+  border: none;
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: filter 0.15s;
+}
+
+.ql-size-btn:hover:not(:disabled) { filter: brightness(0.9); }
+.ql-size-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* Text-style shortcut card */
+.shortcut-card--text {
+  flex-direction: column;
+  gap: 5px;
+  padding: 8px 10px;
+  min-width: 60px;
+  max-width: 80px;
+}
+
+.shortcut-label {
+  font-size: 11px;
+  font-weight: 500;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 70px;
+}
+
 /* Responsive */
 @media (max-width: 600px) {
   .logo-area {
