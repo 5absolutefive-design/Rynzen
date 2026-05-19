@@ -278,20 +278,7 @@ export default function App() {
 
       <main className="main-content">
         {clockEnabled && (
-          <div
-            className="clock-area"
-            style={{
-              background: !analogClock && clockBgOpacity > 0
-                ? `rgba(${isDark ? "255,255,255" : "0,0,0"},${(clockBgOpacity / 100) * 0.08})`
-                : "transparent",
-              borderRadius: !analogClock && clockBgOpacity > 0 ? "20px" : undefined,
-              padding: !analogClock && clockBgOpacity > 0 ? "20px 32px" : undefined,
-              border: !analogClock && clockBorderOpacity > 0
-                ? `2px solid rgba(${isDark ? "255,255,255" : "0,0,0"},${(clockBorderOpacity / 100) * 0.3})`
-                : undefined,
-              transition: "background 0.3s, padding 0.3s, border 0.3s",
-            }}
-          >
+          <div className="clock-area">
             {(clockShow === "both" || clockShow === "clock") && analogClock ? (
               <AnalogClock
                 now={now}
