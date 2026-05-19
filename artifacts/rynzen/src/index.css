@@ -398,11 +398,12 @@ body {
   padding: 16px;
 }
 
-/* When settings sidebar is open: FAB completely gone, no hover */
-.fab-zone.fab-invisible .settings-fab {
-  opacity: 0;
-  pointer-events: none;
-  transform: scale(0.7);
+/* When settings sidebar is open: FAB completely gone, no hover at all */
+.fab-zone.fab-invisible .settings-fab,
+.fab-zone.fab-invisible:hover .settings-fab {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transform: scale(0.7) !important;
 }
 
 /* When hidden: FAB invisible, but zone still hoverable */
