@@ -459,7 +459,7 @@ export default function App() {
         {showShortcuts && (
           <div className="shortcuts-section">
             <h3 className="shortcuts-title" style={{ color: isDark ? "#667799" : "#9aa0b2" }}>{t.quickAccess}</h3>
-            <div className="shortcuts-grid" style={{ gap: quickLinksStyle === "text" ? "8px" : "12px" }}>
+            <div className="shortcuts-grid" style={{ gap: quickLinksStyle === "text" ? "8px" : "12px", gridTemplateColumns: `repeat(${quickLinksPerRow}, max-content)` }}>
               {shortcuts.map((s, index) => (
                 <a key={s.name} href={dragIndex !== null ? undefined : s.url}
                   target={quickLinksOpenNewTab ? "_blank" : "_self"} rel="noopener noreferrer"

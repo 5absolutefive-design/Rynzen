@@ -337,8 +337,7 @@ body {
 }
 
 .shortcuts-grid {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
   gap: 12px;
   justify-content: center;
 }
