@@ -67,7 +67,7 @@ const engines: SearchEngine[] = [
   },
 ];
 
-const shortcuts = [
+const initialShortcuts = [
   { name: "YouTube", url: "https://www.youtube.com", domain: "youtube.com" },
   { name: "Facebook", url: "https://www.facebook.com", domain: "facebook.com" },
   { name: "Twitter", url: "https://twitter.com", domain: "x.com" },
@@ -84,6 +84,9 @@ export default function App() {
   const [showDropdown, setShowDropdown] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [now, setNow] = useState(new Date());
+  const [shortcuts, setShortcuts] = useState(initialShortcuts);
+  const [dragIndex, setDragIndex] = useState<number | null>(null);
+  const [overIndex, setOverIndex] = useState<number | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -125,6 +128,38 @@ export default function App() {
     } else if (e.key === "Escape") {
       setShowSuggestions(false);
     }
+  }
+
+  function handleDragStart(e: React.DragEvent, index: number) {
+    setDragIndex(index);
+    e.dataTransfer.effectAllowed = "move";
+    e.dataTransfer.setData("text/plain", String(index));
+  }
+
+  function handleDragOver(e: React.DragEvent, index: number) {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+    setOverIndex(index);
+  }
+
+  function handleDrop(e: React.DragEvent, index: number) {
+    e.preventDefault();
+    if (dragIndex === null || dragIndex === index) {
+      setDragIndex(null);
+      setOverIndex(null);
+      return;
+    }
+    const updated = [...shortcuts];
+    const [moved] = updated.splice(dragIndex, 1);
+    updated.splice(index, 0, moved);
+    setShortcuts(updated);
+    setDragIndex(null);
+    setOverIndex(null);
+  }
+
+  function handleDragEnd() {
+    setDragIndex(null);
+    setOverIndex(null);
   }
 
   return (
@@ -267,13 +302,22 @@ export default function App() {
         <div className="shortcuts-section">
           <h3 className="shortcuts-title">Quick Access</h3>
           <div className="shortcuts-grid">
-            {shortcuts.map((s) => (
+            {shortcuts.map((s, index) => (
               <a
                 key={s.name}
-                href={s.url}
+                href={dragIndex !== null ? undefined : s.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="shortcut-card"
+                className={`shortcut-card${dragIndex === index ? " dragging" : ""}${overIndex === index && dragIndex !== index ? " drag-over" : ""}`}
+                draggable
+                onDragStart={(e) => handleDragStart(e, index)}
+                onDragOver={(e) => handleDragOver(e, index)}
+                onDrop={(e) => handleDrop(e, index)}
+                onDragEnd={handleDragEnd}
+                onClick={(e) => {
+                  if (dragIndex !== null) e.preventDefault();
+                }}
+                style={{ cursor: dragIndex !== null ? "grabbing" : "grab" }}
               >
                 <img
                   src={`https://www.google.com/s2/favicons?domain=${s.domain}&sz=64`}
