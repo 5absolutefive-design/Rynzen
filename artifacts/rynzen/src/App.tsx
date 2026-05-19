@@ -238,6 +238,9 @@ export default function App() {
   const [fontDropdownOpen, setFontDropdownOpen] = useState(false);
   const [fontWeightSetting, setFontWeightSetting] = useState<"light" | "normal" | "semi-bold" | "bold">("normal");
   const [fontSizeNum, setFontSizeNum] = useState(50);
+  const [fontColor, setFontColor] = useState("");
+  const [fontColorOpen, setFontColorOpen] = useState(false);
+  const fontColorRef = useRef<HTMLDivElement>(null);
 
   const [engineColorEffect] = useState(true);
 
@@ -306,6 +309,9 @@ export default function App() {
         const fab = document.getElementById("settings-fab");
         if (fab && fab.contains(e.target as Node)) return;
         setShowSettings(false);
+      }
+      if (fontColorRef.current && !fontColorRef.current.contains(e.target as Node)) {
+        setFontColorOpen(false);
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
@@ -433,7 +439,7 @@ export default function App() {
       backgroundImage: (bgType === "images" && bgImageSelected) ? `url(${bgImageSelected}?w=1920&h=1080&fit=crop&q=90)` : undefined,
       backgroundSize: (bgType === "images" && bgImageSelected) ? "cover" : undefined,
       backgroundPosition: (bgType === "images" && bgImageSelected) ? "center" : undefined,
-      color: isDark ? "#e8e8f0" : "#1a1a2e",
+      color: fontColor || (isDark ? "#e8e8f0" : "#1a1a2e"),
     }}>
       <div className="top-bar">
         <span className="top-link" style={{ color: isDark ? "#aab" : "#444" }}>{t.gmail}</span>
@@ -1049,6 +1055,58 @@ export default function App() {
               <input type="range" className="settings-slider" min={0} max={100} value={fontSizeNum}
                 onChange={(e) => setFontSizeNum(Number(e.target.value))} />
               <span style={{ fontSize: 11, opacity: 0.6, minWidth: 28, textAlign: "right" }}>{fontSizePx}px</span>
+            </div>
+          </div>
+
+          {/* Colour row */}
+          <div className="settings-row" style={{ borderTop: `1px solid ${rowBorder}` }}>
+            <span className="settings-row-label">Colour</span>
+            <div className="font-color-wrap" ref={fontColorRef}>
+              <button
+                className="font-color-swatch-btn"
+                onClick={() => setFontColorOpen(o => !o)}
+                style={{
+                  background: fontColor || (isDark ? "#e8e8f0" : "#1a1a2e"),
+                  border: `2px solid ${isDark ? "#3a3a5c" : "#ccc"}`,
+                }}
+                title="Pick font colour"
+              />
+              {fontColor && (
+                <button
+                  className="font-color-reset"
+                  onClick={() => setFontColor("")}
+                  style={{ color: isDark ? "#aab" : "#888" }}
+                  title="Reset to default"
+                >✕</button>
+              )}
+              {fontColorOpen && (
+                <div className="font-color-popup" style={{ background: isDark ? "#1e1e38" : "#fff", borderColor: isDark ? "#3a3a5c" : "#dde0e8", boxShadow: isDark ? "0 8px 28px rgba(0,0,0,0.55)" : "0 8px 28px rgba(0,0,0,0.14)" }}>
+                  <div className="font-color-swatches">
+                    {["#ffffff","#e0e0e0","#9e9e9e","#424242","#212121","#000000",
+                      "#ef5350","#ff7043","#ffa726","#ffee58","#aed581","#66bb6a",
+                      "#26a69a","#26c6da","#42a5f5","#5c6bc0","#7e57c2","#ec407a",
+                      "#ffcdd2","#ffe0b2","#fff9c4","#c8e6c9","#b3e5fc","#e1bee7"
+                    ].map(c => (
+                      <button
+                        key={c}
+                        className={`font-color-dot${fontColor === c ? " active" : ""}`}
+                        style={{ background: c, outline: fontColor === c ? "2px solid #5a7aff" : "none", outlineOffset: 2 }}
+                        onClick={() => { setFontColor(c); setFontColorOpen(false); }}
+                        title={c}
+                      />
+                    ))}
+                  </div>
+                  <div className="font-color-custom-row">
+                    <span style={{ fontSize: "0.72rem", opacity: 0.6, color: isDark ? "#c8cce0" : "#555" }}>Custom</span>
+                    <input
+                      type="color"
+                      className="font-color-custom-input"
+                      value={fontColor || (isDark ? "#e8e8f0" : "#1a1a2e")}
+                      onChange={(e) => setFontColor(e.target.value)}
+                    />
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 

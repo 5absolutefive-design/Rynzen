@@ -1023,6 +1023,92 @@ body {
   }
 }
 
+/* ── Font colour picker ── */
+.font-color-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.font-color-swatch-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  cursor: pointer;
+  padding: 0;
+  flex-shrink: 0;
+  transition: transform 0.15s;
+}
+
+.font-color-swatch-btn:hover {
+  transform: scale(1.12);
+}
+
+.font-color-reset {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 12px;
+  padding: 2px 4px;
+  border-radius: 4px;
+  line-height: 1;
+  opacity: 0.7;
+}
+
+.font-color-reset:hover { opacity: 1; }
+
+.font-color-popup {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 8px);
+  border: 1px solid;
+  border-radius: 12px;
+  padding: 10px;
+  z-index: 200;
+  width: 192px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.font-color-swatches {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 5px;
+}
+
+.font-color-dot {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(0,0,0,0.12);
+  cursor: pointer;
+  padding: 0;
+  transition: transform 0.12s;
+}
+
+.font-color-dot:hover { transform: scale(1.2); }
+.font-color-dot.active { transform: scale(1.15); }
+
+.font-color-custom-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 6px;
+  border-top: 1px solid rgba(128,128,128,0.2);
+}
+
+.font-color-custom-input {
+  width: 36px;
+  height: 26px;
+  border-radius: 6px;
+  border: 1.5px solid rgba(128,128,128,0.3);
+  cursor: pointer;
+  padding: 1px 2px;
+  background: none;
+}
+
 /* ── Background folder/image picker ── */
 .bg-image-panel {
   padding: 10px 12px 12px;
