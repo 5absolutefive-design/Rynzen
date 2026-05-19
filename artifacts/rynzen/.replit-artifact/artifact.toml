@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "Rynzen Search Hub"
+version = "1.0.0"
+id = "artifacts/rynzen"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 21316
+
+[services.development]
+run = "pnpm --filter @workspace/rynzen run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/rynzen", "run", "build" ]
+publicDir = "artifacts/rynzen/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "21316"
+BASE_PATH = "/"

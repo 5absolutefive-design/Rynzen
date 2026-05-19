@@ -1,0 +1,367 @@
+@import "tailwindcss";
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background: #f5f4f0;
+  color: #1a1a2e;
+  min-height: 100vh;
+}
+
+.app-root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Top bar */
+.top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 16px;
+  padding: 12px 24px;
+}
+
+.top-link {
+  font-size: 14px;
+  color: #444;
+  cursor: pointer;
+  opacity: 0.8;
+  transition: opacity 0.2s;
+}
+
+.top-link:hover {
+  opacity: 1;
+  text-decoration: underline;
+}
+
+.avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #4285F4, #a367dc);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 14px;
+  color: #fff;
+  cursor: pointer;
+}
+
+/* Main content */
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 60px 20px 40px;
+  gap: 40px;
+}
+
+/* Clock */
+.clock-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  user-select: none;
+}
+
+.clock-time {
+  font-size: 72px;
+  font-weight: 200;
+  letter-spacing: -2px;
+  line-height: 1;
+  color: #1a1a2e;
+  font-variant-numeric: tabular-nums;
+}
+
+.clock-date {
+  font-size: 16px;
+  font-weight: 400;
+  color: #666;
+  letter-spacing: 0.3px;
+}
+
+/* Search section */
+.search-section {
+  width: 100%;
+  max-width: 680px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Premium search bar row */
+.search-bar-row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Engine pill — standalone rounded square */
+.engine-pill {
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  background: #ffffff;
+  border: 1.5px solid #dde0e8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: border-color 0.2s, background 0.2s, transform 0.15s, box-shadow 0.2s;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.engine-pill:hover {
+  background: #f0f2ff;
+  border-color: #aab4ff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+}
+
+.engine-pill:active {
+  transform: translateY(0);
+}
+
+.engine-pill-favicon {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+}
+
+/* Search input box */
+.search-input-box {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  background: #ffffff;
+  border: 1.5px solid #dde0e8;
+  border-radius: 18px;
+  height: 56px;
+  padding: 0 8px 0 20px;
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07), inset 0 1px 0 rgba(255,255,255,0.9);
+}
+
+.search-input-box:focus-within {
+  border-color: #4285F4;
+  box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.14), 0 4px 20px rgba(0,0,0,0.1);
+  background: #fff;
+}
+
+.search-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-size: 16px;
+  color: #1a1a2e;
+  height: 100%;
+  letter-spacing: 0.2px;
+}
+
+.search-input::placeholder {
+  color: #9aa0b2;
+  font-size: 15px;
+}
+
+/* Right-side action icons inside input */
+.input-right-actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.input-icon-btn {
+  background: none;
+  border: none;
+  color: #9aa0b2;
+  cursor: pointer;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s, background 0.2s;
+  flex-shrink: 0;
+}
+
+.input-icon-btn:hover {
+  color: #4285F4;
+  background: rgba(66, 133, 244, 0.08);
+}
+
+.input-divider {
+  display: inline-block;
+  width: 1px;
+  height: 20px;
+  background: #dde0e8;
+  margin: 0 4px;
+  flex-shrink: 0;
+}
+
+/* Engine dropdown */
+.engine-dropdown {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 0;
+  background: #ffffff;
+  border: 1px solid #dde0e8;
+  border-radius: 16px;
+  padding: 8px;
+  min-width: 210px;
+  z-index: 100;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+}
+
+.dropdown-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #9aa0b2;
+  padding: 6px 10px 4px;
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #1a1a2e;
+  transition: background 0.15s;
+}
+
+.dropdown-item:hover {
+  background: #f0f4ff;
+}
+
+.dropdown-item.active {
+  background: rgba(66, 133, 244, 0.08);
+}
+
+.dropdown-favicon {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.check {
+  margin-left: auto;
+  color: #4285F4;
+  font-size: 14px;
+}
+
+/* Suggestions dropdown — glassmorphism */
+.suggestions-dropdown {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 0;
+  right: 0;
+  background: rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(28px) saturate(2);
+  -webkit-backdrop-filter: blur(28px) saturate(2);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 20px;
+  padding: 8px;
+  z-index: 100;
+  box-shadow: 0 8px 32px rgba(66, 133, 244, 0.08), 0 2px 12px rgba(0,0,0,0.06);
+}
+
+.suggestion-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 16px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #1a1a2e;
+  transition: background 0.15s;
+}
+
+.suggestion-item:hover {
+  background: rgba(66, 133, 244, 0.08);
+}
+
+/* Shortcuts */
+.shortcuts-section {
+  width: 100%;
+  max-width: 680px;
+}
+
+.shortcuts-title {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #9aa0b2;
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+.shortcuts-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+}
+
+.shortcut-card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  padding: 10px;
+  border-radius: 16px;
+  transition: background 0.2s, transform 0.15s;
+}
+
+.shortcut-card:hover {
+  background: rgba(0,0,0,0.06);
+  transform: translateY(-2px);
+}
+
+.shortcut-favicon {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  border-radius: 10px;
+}
+
+/* Footer */
+.footer {
+  padding: 16px;
+  text-align: center;
+  font-size: 12px;
+  color: #aaa;
+  border-top: 1px solid #e8e8e4;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .logo-area {
+    font-size: 48px;
+  }
+
+  .shortcut-card {
+    width: 76px;
+    padding: 10px 12px;
+  }
+}
