@@ -353,6 +353,7 @@ export default function App() {
     {/* Settings Sidebar */}
     <div ref={settingsRef} className={`settings-sidebar${showSettings ? " open" : ""}`}
       style={{ background: isDark ? "#1e1e38" : "#ffffff", color: isDark ? "#e8e8f0" : "#1a1a2e", borderLeftColor: isDark ? "#2a2a44" : "#e8e8e4" }}>
+    <div className="settings-scroll-wrapper">
       <div className="settings-header">
         <span className="settings-title">{t.customize}</span>
         <button className="settings-close" onClick={() => setShowSettings(false)} style={{ color: isDark ? "#aab" : "#666" }}>
@@ -396,6 +397,7 @@ export default function App() {
         </div>
 
       </div>
+    </div>
     </div>
     </div>
   );
