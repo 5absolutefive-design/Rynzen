@@ -273,7 +273,6 @@ export default function App() {
                 <div className="shortcut-icon-bg" style={{ background: s.color + "22" }}>
                   <span className="shortcut-icon" style={{ color: s.color }}>{s.icon}</span>
                 </div>
-                <span className="shortcut-name">{s.name}</span>
               </a>
             ))}
           </div>
