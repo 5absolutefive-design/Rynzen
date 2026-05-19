@@ -280,7 +280,7 @@ export default function App() {
       </footer>
 
       {/* Settings FAB hover zone */}
-      <div className={`fab-zone${hideFab ? " fab-hidden" : ""}`}>
+      <div className={`fab-zone${hideFab ? " fab-hidden" : ""}${showSettings ? " fab-invisible" : ""}`}>
         <button
           id="settings-fab"
           className="settings-fab"
