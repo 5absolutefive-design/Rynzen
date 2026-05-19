@@ -887,7 +887,7 @@ export default function App() {
               </button>
             </div>
             <div className="font-presets">
-              {["Inter", "Roboto", "Nunito", "Poppins", "Lato", "Montserrat", "Open Sans", "Raleway", "Playfair Display", "Merriweather"].map(f => (
+              {["Inter", "Poppins", "Roboto", "Montserrat", "Open Sans", "Lato", "Playfair Display", "Oswald", "Merriweather", "DM Sans", "Manrope", "Urbanist", "Raleway", "Lora", "Work Sans"].map(f => (
                 <button
                   key={f}
                   className={`font-preset-chip${appliedFontFamily === f ? " active" : ""}`}
