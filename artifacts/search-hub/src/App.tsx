@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 
 interface SearchEngine {
   name: string;
-  icon: string;
+  domain: string;
   color: string;
   searchUrl: string;
   homeUrl: string;
@@ -11,56 +11,56 @@ interface SearchEngine {
 const engines: SearchEngine[] = [
   {
     name: "Google",
-    icon: "G",
+    domain: "google.com",
     color: "#4285F4",
     searchUrl: "https://www.google.com/search?q=",
     homeUrl: "https://www.google.com",
   },
   {
     name: "YouTube",
-    icon: "▶",
+    domain: "youtube.com",
     color: "#FF0000",
     searchUrl: "https://www.youtube.com/results?search_query=",
     homeUrl: "https://www.youtube.com",
   },
   {
     name: "Facebook",
-    icon: "f",
+    domain: "facebook.com",
     color: "#1877F2",
     searchUrl: "https://www.facebook.com/search/top?q=",
     homeUrl: "https://www.facebook.com",
   },
   {
-    name: "Twitter",
-    icon: "𝕏",
+    name: "Twitter / X",
+    domain: "x.com",
     color: "#000000",
     searchUrl: "https://twitter.com/search?q=",
     homeUrl: "https://twitter.com",
   },
   {
     name: "Wikipedia",
-    icon: "W",
+    domain: "wikipedia.org",
     color: "#636466",
     searchUrl: "https://en.wikipedia.org/w/index.php?search=",
     homeUrl: "https://www.wikipedia.org",
   },
   {
     name: "Bing",
-    icon: "B",
+    domain: "bing.com",
     color: "#008272",
     searchUrl: "https://www.bing.com/search?q=",
     homeUrl: "https://www.bing.com",
   },
   {
     name: "Instagram",
-    icon: "📷",
+    domain: "instagram.com",
     color: "#E1306C",
     searchUrl: "https://www.instagram.com/explore/tags/",
     homeUrl: "https://www.instagram.com",
   },
   {
     name: "Amazon",
-    icon: "a",
+    domain: "amazon.com",
     color: "#FF9900",
     searchUrl: "https://www.amazon.com/s?k=",
     homeUrl: "https://www.amazon.com",
@@ -151,11 +151,12 @@ export default function App() {
               className="engine-pill"
               onClick={() => setShowDropdown(!showDropdown)}
               title={selectedEngine.name}
-              style={{ "--engine-color": selectedEngine.color } as React.CSSProperties}
             >
-              <span className="engine-pill-icon" style={{ color: selectedEngine.color }}>
-                {selectedEngine.icon}
-              </span>
+              <img
+                src={`https://www.google.com/s2/favicons?domain=${selectedEngine.domain}&sz=64`}
+                alt={selectedEngine.name}
+                className="engine-pill-favicon"
+              />
             </div>
 
             <div className="search-input-box">
@@ -248,9 +249,11 @@ export default function App() {
                       inputRef.current?.focus();
                     }}
                   >
-                    <span className="dropdown-icon" style={{ color: engine.color }}>
-                      {engine.icon}
-                    </span>
+                    <img
+                      src={`https://www.google.com/s2/favicons?domain=${engine.domain}&sz=32`}
+                      alt={engine.name}
+                      className="dropdown-favicon"
+                    />
                     <span>{engine.name}</span>
                     {selectedEngine.name === engine.name && <span className="check">✓</span>}
                   </div>
@@ -272,14 +275,12 @@ export default function App() {
                 rel="noopener noreferrer"
                 className="shortcut-card"
               >
-                <div className="shortcut-icon-bg">
-                  <img
-                    src={`https://www.google.com/s2/favicons?domain=${s.domain}&sz=64`}
-                    alt={s.name}
-                    className="shortcut-favicon"
-                    title={s.name}
-                  />
-                </div>
+                <img
+                  src={`https://www.google.com/s2/favicons?domain=${s.domain}&sz=64`}
+                  alt={s.name}
+                  className="shortcut-favicon"
+                  title={s.name}
+                />
               </a>
             ))}
           </div>

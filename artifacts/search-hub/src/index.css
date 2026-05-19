@@ -134,13 +134,10 @@ body {
   transform: translateY(0);
 }
 
-.engine-pill-icon {
-  font-size: 22px;
-  font-weight: 800;
-  line-height: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.engine-pill-favicon {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
 }
 
 /* Search input box */
@@ -259,11 +256,11 @@ body {
   background: rgba(66, 133, 244, 0.08);
 }
 
-.dropdown-icon {
-  font-size: 16px;
-  width: 22px;
-  text-align: center;
-  font-weight: 700;
+.dropdown-favicon {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  flex-shrink: 0;
 }
 
 .check {
@@ -328,41 +325,24 @@ body {
 
 .shortcut-card {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 8px;
+  justify-content: center;
   text-decoration: none;
-  color: #444;
-  padding: 12px;
-  background: #ffffff;
-  border: 1px solid #dde0e8;
+  padding: 10px;
   border-radius: 16px;
-  width: 76px;
-  transition: background 0.2s, border-color 0.2s, transform 0.15s, box-shadow 0.2s;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  transition: background 0.2s, transform 0.15s;
 }
 
 .shortcut-card:hover {
-  background: #f0f4ff;
-  border-color: #aab4ff;
+  background: rgba(0,0,0,0.06);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-}
-
-.shortcut-icon-bg {
-  width: 48px;
-  height: 48px;
-  border-radius: 14px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #f0f4ff;
 }
 
 .shortcut-favicon {
-  width: 32px;
-  height: 32px;
+  width: 40px;
+  height: 40px;
   object-fit: contain;
+  border-radius: 10px;
 }
 
 /* Footer */
