@@ -136,6 +136,7 @@ export default function App() {
   const clockFontSize = clockSize === "small" ? "42px" : clockSize === "medium" ? "58px" : "72px";
 
   return (
+    <div className={`app-shell${showSettings ? " sidebar-open" : ""}`}>
     <div className="app-root" style={{ background: isDark ? "#1a1a2e" : bgColor, color: isDark ? "#e8e8f0" : "#1a1a2e" }}>
       <div className="top-bar">
         <span className="top-link" style={{ color: isDark ? "#aab" : "#444" }}>Gmail</span>
@@ -277,7 +278,7 @@ export default function App() {
         <span>{footerText}</span>
       </footer>
 
-      {/* Settings FAB */}
+      {/* Settings FAB — stays inside app-root so it scrolls with page */}
       <button
         id="settings-fab"
         className="settings-fab"
@@ -289,16 +290,14 @@ export default function App() {
           <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
         </svg>
       </button>
+    </div>
 
-      {/* Settings Sidebar Overlay */}
-      {showSettings && <div className="settings-overlay" onClick={() => setShowSettings(false)} />}
-
-      {/* Settings Sidebar */}
-      <div
-        ref={settingsRef}
-        className={`settings-sidebar${showSettings ? " open" : ""}`}
-        style={{ background: isDark ? "#1e1e38" : "#ffffff", color: isDark ? "#e8e8f0" : "#1a1a2e" }}
-      >
+    {/* Settings Sidebar — sibling to app-root, pushes layout */}
+    <div
+      ref={settingsRef}
+      className={`settings-sidebar${showSettings ? " open" : ""}`}
+      style={{ background: isDark ? "#1e1e38" : "#ffffff", color: isDark ? "#e8e8f0" : "#1a1a2e", borderLeftColor: isDark ? "#2a2a44" : "#e8e8e4" }}
+    >
         <div className="settings-header">
           <span className="settings-title">Customize</span>
           <button className="settings-close" onClick={() => setShowSettings(false)} style={{ color: isDark ? "#aab" : "#666" }}>
