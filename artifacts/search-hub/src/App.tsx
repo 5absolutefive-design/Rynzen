@@ -230,26 +230,6 @@ export default function App() {
             )}
           </div>
 
-          <div className="quick-engines">
-            {engines.map((engine) => (
-              <button
-                key={engine.name}
-                className={`quick-engine-btn ${selectedEngine.name === engine.name ? "selected" : ""}`}
-                onClick={() => {
-                  setSelectedEngine(engine);
-                  if (query.trim()) {
-                    handleSearch(query);
-                  } else {
-                    window.open(engine.homeUrl, "_blank");
-                  }
-                }}
-                style={selectedEngine.name === engine.name ? { borderColor: engine.color, color: engine.color } : {}}
-              >
-                <span style={{ color: engine.color }}>{engine.icon}</span>
-                {engine.name}
-              </button>
-            ))}
-          </div>
         </div>
 
         <div className="shortcuts-section">
