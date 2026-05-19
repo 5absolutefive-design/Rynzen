@@ -1030,3 +1030,97 @@ body {
     width: 100vw;
   }
 }
+
+/* ── Background folder/image picker ── */
+.bg-image-panel {
+  padding: 10px 12px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.bg-folder-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.bg-folder-card {
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1.5px solid;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.bg-folder-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgba(0,0,0,0.18);
+}
+
+.bg-folder-thumb {
+  width: 100%;
+  height: 80px;
+  object-fit: cover;
+  display: block;
+}
+
+.bg-folder-name {
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 5px 7px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.bg-back-btn:hover {
+  opacity: 0.75;
+}
+
+.bg-image-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 6px;
+}
+
+.bg-image-thumb {
+  border-radius: 8px;
+  overflow: hidden;
+  border: 2px solid;
+  cursor: pointer;
+  position: relative;
+  transition: transform 0.12s, box-shadow 0.12s;
+}
+
+.bg-image-thumb:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.bg-image-thumb.active {
+  box-shadow: 0 0 0 2px #5a7aff;
+}
+
+.bg-image-img {
+  width: 100%;
+  height: 60px;
+  object-fit: cover;
+  display: block;
+}
+
+.bg-image-check {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background: #5a7aff;
+  color: #fff;
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  font-size: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+}

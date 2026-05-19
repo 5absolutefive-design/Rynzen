@@ -8,6 +8,64 @@ interface SearchEngine {
   homeUrl: string;
 }
 
+const BG_FOLDERS = [
+  {
+    id: "nature", name: "Nature", emoji: "🌿",
+    photos: [
+      "https://images.unsplash.com/photo-1469474968028-56623f02e42e",
+      "https://images.unsplash.com/photo-1447752875215-b2761acf3dbd",
+      "https://images.unsplash.com/photo-1506905925346-21bda4d32df4",
+      "https://images.unsplash.com/photo-1441974231531-c6227db76b6e",
+      "https://images.unsplash.com/photo-1426604966848-d7adac402bff",
+      "https://images.unsplash.com/photo-1475924156734-496f6cac6ec1",
+    ],
+  },
+  {
+    id: "city", name: "City", emoji: "🌆",
+    photos: [
+      "https://images.unsplash.com/photo-1477959858617-67f85cf4f1df",
+      "https://images.unsplash.com/photo-1449824913935-59a10b8d2000",
+      "https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b",
+      "https://images.unsplash.com/photo-1486325212027-8081e485255e",
+      "https://images.unsplash.com/photo-1514214246283-d427a95c5d2f",
+      "https://images.unsplash.com/photo-1444723121867-7a241cacace9",
+    ],
+  },
+  {
+    id: "abstract", name: "Abstract", emoji: "✨",
+    photos: [
+      "https://images.unsplash.com/photo-1557682250-33bd709cbe85",
+      "https://images.unsplash.com/photo-1558618666-fcd25c85cd64",
+      "https://images.unsplash.com/photo-1550684376-efcbd6e3f031",
+      "https://images.unsplash.com/photo-1483728642387-6c3bdd6c93e5",
+      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d",
+      "https://images.unsplash.com/photo-1553356084-58ef4a67b2a7",
+    ],
+  },
+  {
+    id: "space", name: "Space", emoji: "🚀",
+    photos: [
+      "https://images.unsplash.com/photo-1462331940025-496dfbfc7564",
+      "https://images.unsplash.com/photo-1419242902214-272b3f66ee7a",
+      "https://images.unsplash.com/photo-1451187580459-43490279c0fa",
+      "https://images.unsplash.com/photo-1444703686981-a3abbc4d4fe3",
+      "https://images.unsplash.com/photo-1484589065579-248aad0d8b13",
+      "https://images.unsplash.com/photo-1516339901601-2e1b62dc0c45",
+    ],
+  },
+  {
+    id: "ocean", name: "Ocean", emoji: "🌊",
+    photos: [
+      "https://images.unsplash.com/photo-1505118380757-91f5f5632de0",
+      "https://images.unsplash.com/photo-1507525428034-b723cf961d3e",
+      "https://images.unsplash.com/photo-1455763916899-e8b50eca9967",
+      "https://images.unsplash.com/photo-1439405326-bdf8d03cf2ae",
+      "https://images.unsplash.com/photo-1518020382113-a7e8fc38eac9",
+      "https://images.unsplash.com/photo-1504208434309-cb69f4fe52b0",
+    ],
+  },
+];
+
 const engines: SearchEngine[] = [
   { name: "Google", domain: "google.com", color: "#4285F4", searchUrl: "https://www.google.com/search?q=", homeUrl: "https://www.google.com" },
   { name: "YouTube", domain: "youtube.com", color: "#FF0000", searchUrl: "https://www.youtube.com/results?search_query=", homeUrl: "https://www.youtube.com" },
@@ -168,6 +226,12 @@ export default function App() {
   const [newLinkUrl, setNewLinkUrl] = useState("");
 
   const [bgType, setBgType] = useState<"none" | "images" | "color" | "gradient">("none");
+  const [bgImageSelected, setBgImageSelected] = useState("");
+  const [bgImageFolder, setBgImageFolder] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (bgType !== "images") { setBgImageSelected(""); setBgImageFolder(null); }
+  }, [bgType]);
 
   const [appliedFontFamily, setAppliedFontFamily] = useState("");
   const [fontFamilyInput, setFontFamilyInput] = useState("");
@@ -364,7 +428,13 @@ export default function App() {
 
   return (
     <div className={`app-shell${showSettings ? " sidebar-open" : ""}`}>
-    <div className="app-root" style={{ background: isDark ? "#1a1a2e" : bgColor, color: isDark ? "#e8e8f0" : "#1a1a2e" }}>
+    <div className="app-root" style={{
+      background: (bgType === "images" && bgImageSelected) ? undefined : (isDark ? "#1a1a2e" : bgColor),
+      backgroundImage: (bgType === "images" && bgImageSelected) ? `url(${bgImageSelected}?w=1920&h=1080&fit=crop&q=90)` : undefined,
+      backgroundSize: (bgType === "images" && bgImageSelected) ? "cover" : undefined,
+      backgroundPosition: (bgType === "images" && bgImageSelected) ? "center" : undefined,
+      color: isDark ? "#e8e8f0" : "#1a1a2e",
+    }}>
       <div className="top-bar">
         <span className="top-link" style={{ color: isDark ? "#aab" : "#444" }}>{t.gmail}</span>
         <span className="top-link" style={{ color: isDark ? "#aab" : "#444" }}>{t.images}</span>
@@ -858,6 +928,58 @@ export default function App() {
               <option value="gradient">{t.bgGradient}</option>
             </select>
           </div>
+
+          {bgType === "images" && (
+            <div className="bg-image-panel" style={{ borderTop: `1px solid ${rowBorder}` }}>
+              {bgImageFolder === null ? (
+                <div className="bg-folder-grid">
+                  {BG_FOLDERS.map(folder => (
+                    <div
+                      key={folder.id}
+                      className="bg-folder-card"
+                      onClick={() => setBgImageFolder(folder.id)}
+                      style={{ borderColor: isDark ? "#3a3a5c" : "#dde0e8" }}
+                    >
+                      <img
+                        src={`${folder.photos[0]}?w=280&h=160&fit=crop&q=75`}
+                        alt={folder.name}
+                        className="bg-folder-thumb"
+                      />
+                      <div className="bg-folder-name" style={{ color: isDark ? "#c8cce0" : "#333" }}>
+                        {folder.emoji} {folder.name}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <>
+                  <button
+                    className="bg-back-btn"
+                    onClick={() => setBgImageFolder(null)}
+                    style={{ color: isDark ? "#aab" : "#555", background: "none", border: "none", cursor: "pointer", padding: "6px 0", fontSize: "0.8rem", display: "flex", alignItems: "center", gap: 4 }}
+                  >
+                    ← {BG_FOLDERS.find(f => f.id === bgImageFolder)?.emoji} {BG_FOLDERS.find(f => f.id === bgImageFolder)?.name}
+                  </button>
+                  <div className="bg-image-grid">
+                    {BG_FOLDERS.find(f => f.id === bgImageFolder)?.photos.map((photo, i) => {
+                      const isActive = bgImageSelected === photo;
+                      return (
+                        <div
+                          key={i}
+                          className={`bg-image-thumb${isActive ? " active" : ""}`}
+                          onClick={() => setBgImageSelected(isActive ? "" : photo)}
+                          style={{ borderColor: isActive ? "#5a7aff" : (isDark ? "#3a3a5c" : "#dde0e8") }}
+                        >
+                          <img src={`${photo}?w=200&h=130&fit=crop&q=75`} alt="" className="bg-image-img" />
+                          {isActive && <div className="bg-image-check">✓</div>}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </>
+              )}
+            </div>
+          )}
 
         </div>
 
