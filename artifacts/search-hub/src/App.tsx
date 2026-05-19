@@ -68,12 +68,14 @@ const engines: SearchEngine[] = [
 ];
 
 const shortcuts = [
-  { name: "YouTube", url: "https://www.youtube.com", icon: "▶", color: "#FF0000" },
-  { name: "Facebook", url: "https://www.facebook.com", icon: "f", color: "#1877F2" },
-  { name: "Twitter", url: "https://twitter.com", icon: "𝕏", color: "#000000" },
-  { name: "Instagram", url: "https://www.instagram.com", icon: "📷", color: "#E1306C" },
-  { name: "Gmail", url: "https://mail.google.com", icon: "✉", color: "#D44638" },
-  { name: "Wikipedia", url: "https://www.wikipedia.org", icon: "W", color: "#636466" },
+  { name: "YouTube", url: "https://www.youtube.com", domain: "youtube.com" },
+  { name: "Facebook", url: "https://www.facebook.com", domain: "facebook.com" },
+  { name: "Twitter", url: "https://twitter.com", domain: "x.com" },
+  { name: "Instagram", url: "https://www.instagram.com", domain: "instagram.com" },
+  { name: "Gmail", url: "https://mail.google.com", domain: "gmail.com" },
+  { name: "Wikipedia", url: "https://www.wikipedia.org", domain: "wikipedia.org" },
+  { name: "WhatsApp", url: "https://web.whatsapp.com", domain: "whatsapp.com" },
+  { name: "TikTok", url: "https://www.tiktok.com", domain: "tiktok.com" },
 ];
 
 export default function App() {
@@ -270,8 +272,13 @@ export default function App() {
                 rel="noopener noreferrer"
                 className="shortcut-card"
               >
-                <div className="shortcut-icon-bg" style={{ background: s.color + "22" }}>
-                  <span className="shortcut-icon" style={{ color: s.color }}>{s.icon}</span>
+                <div className="shortcut-icon-bg">
+                  <img
+                    src={`https://www.google.com/s2/favicons?domain=${s.domain}&sz=64`}
+                    alt={s.name}
+                    className="shortcut-favicon"
+                    title={s.name}
+                  />
                 </div>
               </a>
             ))}

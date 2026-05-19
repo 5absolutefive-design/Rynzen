@@ -333,11 +333,11 @@ body {
   gap: 8px;
   text-decoration: none;
   color: #444;
-  padding: 14px 18px;
+  padding: 12px;
   background: #ffffff;
   border: 1px solid #dde0e8;
   border-radius: 16px;
-  width: 90px;
+  width: 76px;
   transition: background 0.2s, border-color 0.2s, transform 0.15s, box-shadow 0.2s;
   box-shadow: 0 1px 4px rgba(0,0,0,0.06);
 }
@@ -350,22 +350,19 @@ body {
 }
 
 .shortcut-icon-bg {
-  width: 42px;
-  height: 42px;
-  border-radius: 12px;
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
+  background: #f0f4ff;
 }
 
-.shortcut-icon {
-  font-size: 20px;
-}
-
-.shortcut-name {
-  font-size: 12px;
-  color: #666;
-  text-align: center;
+.shortcut-favicon {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
 }
 
 /* Footer */
