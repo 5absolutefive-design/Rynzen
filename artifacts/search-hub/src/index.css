@@ -88,66 +88,69 @@ body {
   gap: 16px;
 }
 
-.search-bar-wrapper {
+/* Premium search bar row */
+.search-bar-row {
   position: relative;
   display: flex;
   align-items: center;
-  background: #313244;
-  border-radius: 50px;
-  border: 1px solid #45475a;
-  transition: border-color 0.2s, box-shadow 0.2s;
-  overflow: visible;
+  gap: 12px;
 }
 
-.search-bar-wrapper:focus-within {
-  border-color: #89b4fa;
-  box-shadow: 0 0 0 3px rgba(137, 180, 250, 0.15);
-}
-
-/* Engine selector */
-.engine-selector {
+/* Engine pill — standalone rounded square */
+.engine-pill {
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  background: #2a2a3d;
+  border: 1.5px solid #3d3f58;
   display: flex;
   align-items: center;
-  gap: 4px;
-  padding: 0 12px;
-  height: 52px;
+  justify-content: center;
   cursor: pointer;
-  border-right: 1px solid #45475a;
   flex-shrink: 0;
-  user-select: none;
+  transition: border-color 0.2s, background 0.2s, transform 0.15s, box-shadow 0.2s;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.25);
 }
 
-.engine-selector:hover {
-  background: rgba(255,255,255,0.05);
-  border-radius: 50px 0 0 50px;
+.engine-pill:hover {
+  background: #32334a;
+  border-color: #5a5c7a;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.35);
 }
 
-.engine-icon {
-  font-size: 18px;
-  font-weight: 700;
-  width: 22px;
-  text-align: center;
+.engine-pill:active {
+  transform: translateY(0);
+}
+
+.engine-pill-icon {
+  font-size: 22px;
+  font-weight: 800;
   line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.chevron {
-  font-size: 10px;
-  color: #6c7086;
-}
-
-/* Search input */
-.search-input-area {
+/* Search input box */
+.search-input-box {
+  position: relative;
   flex: 1;
   display: flex;
   align-items: center;
-  padding: 0 12px;
-  gap: 8px;
+  background: #252535;
+  border: 1.5px solid #3d3f58;
+  border-radius: 18px;
+  height: 56px;
+  padding: 0 8px 0 20px;
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.04);
 }
 
-.search-icon {
-  font-size: 16px;
-  opacity: 0.5;
-  flex-shrink: 0;
+.search-input-box:focus-within {
+  border-color: #6e7aff;
+  box-shadow: 0 0 0 3px rgba(110, 122, 255, 0.18), 0 4px 20px rgba(0,0,0,0.3);
+  background: #2a2a40;
 }
 
 .search-input {
@@ -156,48 +159,32 @@ body {
   border: none;
   outline: none;
   font-size: 16px;
-  color: #cdd6f4;
-  height: 52px;
+  color: #e0e2f0;
+  height: 100%;
+  letter-spacing: 0.2px;
 }
 
 .search-input::placeholder {
-  color: #6c7086;
+  color: #4a4c6a;
+  font-size: 15px;
 }
 
-.clear-btn {
-  background: none;
-  border: none;
-  color: #6c7086;
-  cursor: pointer;
-  font-size: 14px;
-  padding: 4px 6px;
-  border-radius: 50%;
-  transition: color 0.2s, background 0.2s;
-  flex-shrink: 0;
-}
-
-.clear-btn:hover {
-  color: #cdd6f4;
-  background: rgba(255,255,255,0.1);
-}
-
-/* Search actions area */
-.search-actions {
+/* Right-side action icons inside input */
+.input-right-actions {
   display: flex;
   align-items: center;
   gap: 2px;
-  padding: 0 6px;
   flex-shrink: 0;
 }
 
-.action-icon-btn {
+.input-icon-btn {
   background: none;
   border: none;
-  color: #6c7086;
+  color: #5a5c7a;
   cursor: pointer;
   width: 36px;
   height: 36px;
-  border-radius: 50%;
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -205,32 +192,18 @@ body {
   flex-shrink: 0;
 }
 
-.action-icon-btn:hover {
-  color: #cdd6f4;
-  background: rgba(255,255,255,0.08);
+.input-icon-btn:hover {
+  color: #a0a8d0;
+  background: rgba(255,255,255,0.07);
 }
 
-.search-go-btn {
-  border: none;
-  color: white;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: filter 0.2s;
+.input-divider {
+  display: inline-block;
+  width: 1px;
+  height: 20px;
+  background: #3d3f58;
+  margin: 0 4px;
   flex-shrink: 0;
-  margin-left: 2px;
-}
-
-.search-go-btn:hover {
-  filter: brightness(1.15);
-}
-
-.search-go-btn:active {
-  filter: brightness(0.9);
 }
 
 /* Engine dropdown */
