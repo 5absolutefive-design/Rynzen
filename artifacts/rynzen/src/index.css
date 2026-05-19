@@ -380,14 +380,6 @@ body {
   border-radius: 10px;
 }
 
-/* Footer */
-.footer {
-  padding: 16px;
-  text-align: center;
-  font-size: 0.75rem;
-  color: #aaa;
-  border-top: 1px solid #e8e8e4;
-}
 
 /* FAB hover zone — invisible trigger area in bottom-right corner */
 .fab-zone {

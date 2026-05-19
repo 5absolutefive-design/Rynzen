@@ -587,9 +587,6 @@ export default function App() {
         )}
       </main>
 
-      <footer className="footer" style={{ color: isDark ? "#556677" : "#aaa", borderTopColor: isDark ? "#2a2a44" : "#e8e8e4" }}>
-        <span>{t.footer}</span>
-      </footer>
 
       <div className={`fab-zone${hideFab ? " fab-hidden" : ""}${showSettings ? " fab-invisible" : ""}`}>
         <button id="settings-fab" className="settings-fab" onClick={() => setShowSettings(!showSettings)} title="Customize"
