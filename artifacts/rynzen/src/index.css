@@ -551,9 +551,18 @@ body {
   border-top: 1px solid rgba(128,128,128,0.08);
 }
 
+.settings-section-label {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  opacity: 0.5;
+  padding: 4px 4px 6px;
+}
+
 .settings-row-label {
   font-size: 13.5px;
-  font-weight: 400;
+  font-weight: 600;
   flex: 1;
 }
 

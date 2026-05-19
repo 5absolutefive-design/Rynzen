@@ -351,10 +351,8 @@ export default function App() {
       <div className="settings-body">
 
         {/* General Card */}
+        <p className="settings-section-label">{t.general}</p>
         <div className="settings-card" style={{ background: cardBg }}>
-          <div className="settings-card-header" style={{ borderBottom: `1px solid ${rowBorder}` }}>
-            {t.general}
-          </div>
 
           {/* Show all settings — disabled (no cards built yet) */}
           <div className="settings-row" style={{ opacity: 0.42, cursor: "not-allowed" }}>
