@@ -68,8 +68,9 @@ const T: Record<string, Record<string, string>> = {
   ko: { searchPlaceholder: "검색", quickAccess: "빠른 접근", customize: "사용자 정의", gmail: "Gmail", images: "이미지", footer: "SearchHub — 어디서나 검색, 한 곳에서 모두", showAllSettings: "모든 설정 표시", language: "언어", darkMode: "다크 모드", tabAppearance: "탭 모양", hideSettingsIcon: "설정 아이콘 숨기기", general: "일반", system: "시스템", light: "밝게", dark: "어둡게", timeAndDate: "시간 및 날짜", enable: "활성화", showSeconds: "초 표시", analogClock: "아날로그 시계", clockShape: "시계 모양", clockFace: "시계 면", clockHands: "시계 바늘", clockBackground: "시계 배경", clockBorder: "시계 테두리", dateFormat: "날짜 형식", clockSize: "시계 크기", worldClocks: "세계 시계", timeZone: "시간대", show: "표시", clockAndDate: "시계 및 날짜", clockOnly: "시계만", dateOnly: "날짜만", automatic: "자동", dayMonthDate: "요일, 월 일", monthDayYear: "월 일, 년", ddmmyyyy: "일/월/년" },
 };
 
-function AnalogClock({ now, tz, size, shape, face, hands, isDark }: {
+function AnalogClock({ now, tz, size, shape, face, hands, isDark, bgOpacity, borderOpacity }: {
   now: Date; tz: string | undefined; size: number; shape: string; face: string; hands: string; isDark: boolean;
+  bgOpacity: number; borderOpacity: number;
 }) {
   const d = tz ? new Date(now.toLocaleString("en-US", { timeZone: tz })) : now;
   const h = d.getHours() % 12, m = d.getMinutes(), s = d.getSeconds();
@@ -78,11 +79,15 @@ function AnalogClock({ now, tz, size, shape, face, hands, isDark }: {
   const sDeg = (s / 60) * 360;
   const r = size / 2;
   const cx = r, cy = r;
-  const faceColor = isDark ? "#1e1e38" : "#f8f8f4";
+  const baseFace = isDark ? "30,30,60" : "248,248,244";
+  const faceAlpha = bgOpacity / 100;
+  const faceColor = `rgba(${baseFace},${faceAlpha})`;
   const strokeColor = isDark ? "#e8e8f0" : "#1a1a2e";
+  const borderAlpha = (borderOpacity / 100) * 0.9;
   const thinStroke = hands === "thin" ? 1.5 : hands === "classic" ? 3 : 2;
   const hourLen = r * 0.55, minLen = r * 0.75, secLen = r * 0.85;
   const borderR = shape === "square" ? "12%" : shape === "rectangle" ? "8%" : "50%";
+  const rx = shape === "round" ? r : shape === "square" ? r * 0.24 : r * 0.16;
 
   function hand(deg: number, len: number, width: number, color: string) {
     const rad = (deg - 90) * (Math.PI / 180);
@@ -93,8 +98,10 @@ function AnalogClock({ now, tz, size, shape, face, hands, isDark }: {
 
   return (
     <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{ borderRadius: borderR, display: "block" }}>
-      <rect x={0} y={0} width={size} height={size} rx={shape === "round" ? r : shape === "square" ? r * 0.24 : r * 0.16}
-        fill={faceColor} stroke={strokeColor} strokeOpacity={0.15} strokeWidth={1.5} />
+      <rect x={0} y={0} width={size} height={size} rx={rx}
+        fill={faceColor}
+        stroke={borderOpacity > 0 ? `rgba(${isDark ? "232,232,240" : "26,26,46"},${borderAlpha})` : "none"}
+        strokeWidth={borderOpacity > 0 ? 2 : 0} />
       {face !== "none" && Array.from({ length: 12 }, (_, i) => {
         const a = (i / 12) * 2 * Math.PI - Math.PI / 2;
         const inner = face === "classic" ? r * 0.82 : r * 0.85;
@@ -274,12 +281,12 @@ export default function App() {
           <div
             className="clock-area"
             style={{
-              background: clockBgOpacity > 0
+              background: !analogClock && clockBgOpacity > 0
                 ? `rgba(${isDark ? "255,255,255" : "0,0,0"},${(clockBgOpacity / 100) * 0.08})`
                 : "transparent",
-              borderRadius: clockBgOpacity > 0 ? "20px" : undefined,
-              padding: clockBgOpacity > 0 ? "20px 32px" : undefined,
-              border: clockBorderOpacity > 0
+              borderRadius: !analogClock && clockBgOpacity > 0 ? "20px" : undefined,
+              padding: !analogClock && clockBgOpacity > 0 ? "20px 32px" : undefined,
+              border: !analogClock && clockBorderOpacity > 0
                 ? `2px solid rgba(${isDark ? "255,255,255" : "0,0,0"},${(clockBorderOpacity / 100) * 0.3})`
                 : undefined,
               transition: "background 0.3s, padding 0.3s, border 0.3s",
@@ -289,11 +296,13 @@ export default function App() {
               <AnalogClock
                 now={now}
                 tz={tz}
-                size={40 + (clockSizeNum / 100) * 80}
+                size={40 + (clockSizeNum / 100) * 160}
                 shape={clockShape}
                 face={clockFace}
                 hands={clockHands}
                 isDark={isDark}
+                bgOpacity={clockBgOpacity}
+                borderOpacity={clockBorderOpacity}
               />
             ) : (clockShow === "both" || clockShow === "clock") ? (
               <div className="clock-time" style={{ fontSize: clockFontSize, color: isDark ? "#e8e8f0" : "#1a1a2e" }}>
