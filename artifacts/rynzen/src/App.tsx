@@ -140,7 +140,7 @@ function AnalogClock({ now, tz, size, shape, face, hands, isDark, bgOpacity, bor
   const baseFace = isDark ? "30,30,60" : "248,248,244";
   const faceAlpha = bgOpacity / 100;
   const faceColor = `rgba(${baseFace},${faceAlpha})`;
-  const strokeColor = isDark ? "#e8e8f0" : "#1a1a2e";
+  const strokeColor = textColor;
   const borderAlpha = (borderOpacity / 100) * 0.9;
   const thinStroke = hands === "thin" ? 1.5 : hands === "classic" ? 3 : 2;
   const hourLen = r * 0.55, minLen = r * 0.75, secLen = r * 0.85;
@@ -269,10 +269,11 @@ export default function App() {
 
   useEffect(() => {
     document.body.style.background = isDark ? "#1a1a2e" : bgColor;
-    document.body.style.color = isDark ? "#e8e8f0" : "#1a1a2e";
-  }, [isDark, bgColor]);
+    document.body.style.color = fontColor || (isDark ? "#e8e8f0" : "#1a1a2e");
+  }, [isDark, bgColor, fontColor]);
 
   const fontSizePx = 12 + Math.round((fontSizeNum / 100) * 16);
+  const textColor = fontColor || (isDark ? "#e8e8f0" : "#1a1a2e");
 
   useEffect(() => {
     const weightMap: Record<string, string> = { light: "300", normal: "400", "semi-bold": "600", bold: "700" };
@@ -429,7 +430,7 @@ export default function App() {
   const cardBg = isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.035)";
   const rowBorder = isDark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.07)";
   const selectBg = isDark ? "#252540" : "#f0f0f5";
-  const selectColor = isDark ? "#e8e8f0" : "#1a1a2e";
+  const selectColor = textColor;
   const selectBorder = isDark ? "#3a3a5c" : "#dde0e8";
 
   return (
@@ -439,7 +440,7 @@ export default function App() {
       backgroundImage: (bgType === "images" && bgImageSelected) ? `url(${bgImageSelected}?w=1920&h=1080&fit=crop&q=90)` : undefined,
       backgroundSize: (bgType === "images" && bgImageSelected) ? "cover" : undefined,
       backgroundPosition: (bgType === "images" && bgImageSelected) ? "center" : undefined,
-      color: fontColor || (isDark ? "#e8e8f0" : "#1a1a2e"),
+      color: textColor,
     }}>
       <div className="top-bar">
         <span className="top-link" style={{ color: isDark ? "#aab" : "#444" }}>{t.gmail}</span>
@@ -465,7 +466,7 @@ export default function App() {
             ) : (clockShow === "both" || clockShow === "clock") ? (
               <div className="clock-time" style={{
                 fontSize: clockFontSize,
-                color: isDark ? "#e8e8f0" : "#1a1a2e",
+                color: textColor,
                 position: "relative",
                 display: "inline-flex",
                 alignItems: (amPmPosition === "top-left" || amPmPosition === "top-right") ? "flex-start" : "flex-end",
@@ -521,7 +522,7 @@ export default function App() {
                 onFocus={() => setShowSuggestions(query.length > 0)}
                 onKeyDown={handleKeyDown}
                 autoComplete="off"
-                style={{ color: isDark ? "#e8e8f0" : "#1a1a2e" }}
+                style={{ color: textColor }}
               />
               <div className="input-right-actions">
                 {query && (
@@ -542,7 +543,7 @@ export default function App() {
               {showSuggestions && suggestions.length > 0 && (
                 <div className="suggestions-dropdown" style={{ background: isDark ? "rgba(30,30,50,0.92)" : "rgba(255,255,255,0.18)" }}>
                   {suggestions.map((s) => (
-                    <div key={s} className="suggestion-item" style={{ color: isDark ? "#e8e8f0" : "#1a1a2e" }} onClick={() => { setQuery(s); handleSearch(s); }}>
+                    <div key={s} className="suggestion-item" style={{ color: textColor }} onClick={() => { setQuery(s); handleSearch(s); }}>
                       <svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14" style={{ opacity: 0.4, flexShrink: 0 }}><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
                       <span>{s}</span>
                     </div>
@@ -554,7 +555,7 @@ export default function App() {
               <div className="engine-dropdown" style={{ background: isDark ? "#252540" : "#ffffff", borderColor: isDark ? "#3a3a5c" : "#dde0e8" }}>
                 <p className="dropdown-label">Search with:</p>
                 {engines.map((engine) => (
-                  <div key={engine.name} className={`dropdown-item ${selectedEngine.name === engine.name ? "active" : ""}`} style={{ color: isDark ? "#e8e8f0" : "#1a1a2e" }} onClick={() => { setSelectedEngine(engine); setShowDropdown(false); inputRef.current?.focus(); }}>
+                  <div key={engine.name} className={`dropdown-item ${selectedEngine.name === engine.name ? "active" : ""}`} style={{ color: textColor }} onClick={() => { setSelectedEngine(engine); setShowDropdown(false); inputRef.current?.focus(); }}>
                     <img src={`https://www.google.com/s2/favicons?domain=${engine.domain}&sz=32`} alt={engine.name} className="dropdown-favicon" />
                     <span>{engine.name}</span>
                     {selectedEngine.name === engine.name && <span className="check">✓</span>}
@@ -606,7 +607,7 @@ export default function App() {
 
     {/* Settings Sidebar */}
     <div ref={settingsRef} className={`settings-sidebar${showSettings ? " open" : ""}`}
-      style={{ background: isDark ? "#1e1e38" : "#ffffff", color: isDark ? "#e8e8f0" : "#1a1a2e", borderLeftColor: isDark ? "#2a2a44" : "#e8e8e4" }}>
+      style={{ background: isDark ? "#1e1e38" : "#ffffff", color: textColor, borderLeftColor: isDark ? "#2a2a44" : "#e8e8e4" }}>
     <div className="settings-scroll-wrapper">
       <div className="settings-header">
         <span className="settings-title">{t.customize}</span>
@@ -819,7 +820,7 @@ export default function App() {
                 value={newLinkTitle}
                 onChange={(e) => setNewLinkTitle(e.target.value)}
                 disabled={!showShortcuts}
-                style={{ background: isDark ? "#252540" : "#f0f0f5", color: isDark ? "#e8e8f0" : "#1a1a2e", borderColor: isDark ? "#3a3a5c" : "#dde0e8" }}
+                style={{ background: isDark ? "#252540" : "#f0f0f5", color: textColor, borderColor: isDark ? "#3a3a5c" : "#dde0e8" }}
               />
               <input
                 className="ql-input"
@@ -829,7 +830,7 @@ export default function App() {
                 onChange={(e) => setNewLinkUrl(e.target.value)}
                 onKeyDown={(e) => { if (e.key === "Enter") handleAddLink(); }}
                 disabled={!showShortcuts}
-                style={{ background: isDark ? "#252540" : "#f0f0f5", color: isDark ? "#e8e8f0" : "#1a1a2e", borderColor: isDark ? "#3a3a5c" : "#dde0e8" }}
+                style={{ background: isDark ? "#252540" : "#f0f0f5", color: textColor, borderColor: isDark ? "#3a3a5c" : "#dde0e8" }}
               />
               <button className="ql-add-btn" onClick={handleAddLink} disabled={!showShortcuts}
                 style={{ background: isDark ? "#3a3a6a" : "#e0e2ef", color: isDark ? "#c8cce0" : "#444" }}>
@@ -886,7 +887,7 @@ export default function App() {
                 className={`ql-style-btn${quickLinksStyle === "icon" ? " active" : ""}`}
                 onClick={() => setQuickLinksStyle("icon")} disabled={!showShortcuts}
                 title="Icon only"
-                style={{ background: quickLinksStyle === "icon" ? (isDark ? "#4a4a8a" : "#d0d4f0") : (isDark ? "#2a2a44" : "#e8eaf0"), color: isDark ? "#e8e8f0" : "#1a1a2e" }}
+                style={{ background: quickLinksStyle === "icon" ? (isDark ? "#4a4a8a" : "#d0d4f0") : (isDark ? "#2a2a44" : "#e8eaf0"), color: textColor }}
               >
                 <svg viewBox="0 0 20 20" fill="currentColor" width="14" height="14"><rect x="2" y="2" width="16" height="16" rx="4"/></svg>
               </button>
@@ -894,7 +895,7 @@ export default function App() {
                 className={`ql-style-btn${quickLinksStyle === "text" ? " active" : ""}`}
                 onClick={() => setQuickLinksStyle("text")} disabled={!showShortcuts}
                 title="Icon + label"
-                style={{ background: quickLinksStyle === "text" ? (isDark ? "#4a4a8a" : "#d0d4f0") : (isDark ? "#2a2a44" : "#e8eaf0"), color: isDark ? "#e8e8f0" : "#1a1a2e" }}
+                style={{ background: quickLinksStyle === "text" ? (isDark ? "#4a4a8a" : "#d0d4f0") : (isDark ? "#2a2a44" : "#e8eaf0"), color: textColor }}
               >
                 T
               </button>
@@ -908,7 +909,7 @@ export default function App() {
               {(["small", "medium", "large"] as const).map((s) => (
                 <button key={s} onClick={() => setQuickLinksSize(s)} disabled={!showShortcuts}
                   className={`ql-size-btn${quickLinksSize === s ? " active" : ""}`}
-                  style={{ background: quickLinksSize === s ? (isDark ? "#4a4a8a" : "#d0d4f0") : (isDark ? "#2a2a44" : "#e8eaf0"), color: isDark ? "#e8e8f0" : "#1a1a2e" }}>
+                  style={{ background: quickLinksSize === s ? (isDark ? "#4a4a8a" : "#d0d4f0") : (isDark ? "#2a2a44" : "#e8eaf0"), color: textColor }}>
                   {t[s]}
                 </button>
               ))}
@@ -1006,7 +1007,7 @@ export default function App() {
                   if (e.key === "Enter") { setAppliedFontFamily(fontFamilyInput.trim()); setFontDropdownOpen(false); }
                   if (e.key === "Escape") setFontDropdownOpen(false);
                 }}
-                style={{ background: isDark ? "#252540" : "#f0f0f5", color: isDark ? "#e8e8f0" : "#1a1a2e", borderColor: isDark ? "#3a3a5c" : "#dde0e8" }}
+                style={{ background: isDark ? "#252540" : "#f0f0f5", color: textColor, borderColor: isDark ? "#3a3a5c" : "#dde0e8" }}
               />
               <button className="font-apply-btn"
                 onClick={() => { setAppliedFontFamily(fontFamilyInput.trim()); setFontDropdownOpen(false); }}
@@ -1066,7 +1067,7 @@ export default function App() {
                 className="font-color-swatch-btn"
                 onClick={() => setFontColorOpen(o => !o)}
                 style={{
-                  background: fontColor || (isDark ? "#e8e8f0" : "#1a1a2e"),
+                  background: fontColor || (textColor),
                   border: `2px solid ${isDark ? "#3a3a5c" : "#ccc"}`,
                 }}
                 title="Pick font colour"
@@ -1101,7 +1102,7 @@ export default function App() {
                     <input
                       type="color"
                       className="font-color-custom-input"
-                      value={fontColor || (isDark ? "#e8e8f0" : "#1a1a2e")}
+                      value={fontColor || (textColor)}
                       onChange={(e) => setFontColor(e.target.value)}
                     />
                   </div>
