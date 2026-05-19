@@ -182,19 +182,19 @@ export default function App() {
 
         <div className="search-section">
           <div className="search-bar-row" ref={dropdownRef}>
-            <div
-              className="engine-pill"
-              onClick={() => setShowDropdown(!showDropdown)}
-              title={selectedEngine.name}
-            >
-              <img
-                src={`https://www.google.com/s2/favicons?domain=${selectedEngine.domain}&sz=64`}
-                alt={selectedEngine.name}
-                className="engine-pill-favicon"
-              />
-            </div>
-
             <div className="search-input-box">
+              <div
+                className="engine-pill"
+                onClick={() => setShowDropdown(!showDropdown)}
+                title={selectedEngine.name}
+              >
+                <img
+                  src={`https://www.google.com/s2/favicons?domain=${selectedEngine.domain}&sz=64`}
+                  alt={selectedEngine.name}
+                  className="engine-pill-favicon"
+                />
+              </div>
+              <span className="engine-divider" />
               <input
                 ref={inputRef}
                 type="text"

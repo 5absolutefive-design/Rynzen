@@ -104,43 +104,9 @@ body {
   position: relative;
   display: flex;
   align-items: center;
-  gap: 12px;
 }
 
-/* Engine pill — standalone rounded square */
-.engine-pill {
-  width: 56px;
-  height: 56px;
-  border-radius: 16px;
-  background: #ffffff;
-  border: 1.5px solid #dde0e8;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  flex-shrink: 0;
-  transition: border-color 0.2s, background 0.2s, transform 0.15s, box-shadow 0.2s;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-}
-
-.engine-pill:hover {
-  background: #f0f2ff;
-  border-color: #aab4ff;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
-}
-
-.engine-pill:active {
-  transform: translateY(0);
-}
-
-.engine-pill-favicon {
-  width: 28px;
-  height: 28px;
-  object-fit: contain;
-}
-
-/* Search input box */
+/* Unified search bar — engine + input in one box */
 .search-input-box {
   position: relative;
   flex: 1;
@@ -150,7 +116,7 @@ body {
   border: 1.5px solid #dde0e8;
   border-radius: 18px;
   height: 56px;
-  padding: 0 8px 0 20px;
+  padding: 0 8px 0 8px;
   transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
   box-shadow: 0 2px 8px rgba(0,0,0,0.07), inset 0 1px 0 rgba(255,255,255,0.9);
 }
@@ -159,6 +125,46 @@ body {
   border-color: #4285F4;
   box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.14), 0 4px 20px rgba(0,0,0,0.1);
   background: #fff;
+}
+
+/* Engine button — now lives inside the search box */
+.engine-pill {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  background: transparent;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.15s;
+  padding: 0;
+}
+
+.engine-pill:hover {
+  background: rgba(0,0,0,0.06);
+}
+
+.engine-pill:active {
+  background: rgba(0,0,0,0.1);
+}
+
+.engine-pill-favicon {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+
+/* Divider between engine icon and text */
+.engine-divider {
+  display: inline-block;
+  width: 1px;
+  height: 22px;
+  background: #dde0e8;
+  margin: 0 8px;
+  flex-shrink: 0;
 }
 
 .search-input {
