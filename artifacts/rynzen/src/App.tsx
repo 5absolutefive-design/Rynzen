@@ -473,57 +473,61 @@ export default function App() {
             <button className={`toggle${analogClock ? " on" : ""}`} onClick={() => setAnalogClock(!analogClock)} disabled={!clockEnabled} aria-label="Analog clock" />
           </div>
 
-          <div className={`settings-row${(!clockEnabled || !analogClock) ? " settings-row-dimmed" : ""}`} style={{ borderTop: `1px solid ${rowBorder}` }}>
-            <span className="settings-row-label">{t.clockShape}</span>
-            <select className="settings-select" value={clockShape} onChange={(e) => setClockShape(e.target.value)}
-              disabled={!clockEnabled || !analogClock} style={{ background: selectBg, color: selectColor, borderColor: selectBorder }}>
-              <option value="round">Round</option>
-              <option value="square">Square</option>
-              <option value="rectangle">Rectangle</option>
-            </select>
-          </div>
+          {analogClock && (
+            <>
+              <div className={`settings-row${!clockEnabled ? " settings-row-dimmed" : ""}`} style={{ borderTop: `1px solid ${rowBorder}` }}>
+                <span className="settings-row-label">{t.clockShape}</span>
+                <select className="settings-select" value={clockShape} onChange={(e) => setClockShape(e.target.value)}
+                  disabled={!clockEnabled} style={{ background: selectBg, color: selectColor, borderColor: selectBorder }}>
+                  <option value="round">Round</option>
+                  <option value="square">Square</option>
+                  <option value="rectangle">Rectangle</option>
+                </select>
+              </div>
 
-          <div className={`settings-row${(!clockEnabled || !analogClock) ? " settings-row-dimmed" : ""}`} style={{ borderTop: `1px solid ${rowBorder}` }}>
-            <span className="settings-row-label">{t.clockFace}</span>
-            <select className="settings-select" value={clockFace} onChange={(e) => setClockFace(e.target.value)}
-              disabled={!clockEnabled || !analogClock} style={{ background: selectBg, color: selectColor, borderColor: selectBorder }}>
-              <option value="none">None</option>
-              <option value="classic">Classic</option>
-              <option value="minimal">Minimal</option>
-            </select>
-          </div>
+              <div className={`settings-row${!clockEnabled ? " settings-row-dimmed" : ""}`} style={{ borderTop: `1px solid ${rowBorder}` }}>
+                <span className="settings-row-label">{t.clockFace}</span>
+                <select className="settings-select" value={clockFace} onChange={(e) => setClockFace(e.target.value)}
+                  disabled={!clockEnabled} style={{ background: selectBg, color: selectColor, borderColor: selectBorder }}>
+                  <option value="none">None</option>
+                  <option value="classic">Classic</option>
+                  <option value="minimal">Minimal</option>
+                </select>
+              </div>
 
-          <div className={`settings-row${(!clockEnabled || !analogClock) ? " settings-row-dimmed" : ""}`} style={{ borderTop: `1px solid ${rowBorder}` }}>
-            <span className="settings-row-label">{t.clockHands}</span>
-            <select className="settings-select" value={clockHands} onChange={(e) => setClockHands(e.target.value)}
-              disabled={!clockEnabled || !analogClock} style={{ background: selectBg, color: selectColor, borderColor: selectBorder }}>
-              <option value="modern">Modern</option>
-              <option value="classic">Classic</option>
-              <option value="thin">Thin</option>
-            </select>
-          </div>
+              <div className={`settings-row${!clockEnabled ? " settings-row-dimmed" : ""}`} style={{ borderTop: `1px solid ${rowBorder}` }}>
+                <span className="settings-row-label">{t.clockHands}</span>
+                <select className="settings-select" value={clockHands} onChange={(e) => setClockHands(e.target.value)}
+                  disabled={!clockEnabled} style={{ background: selectBg, color: selectColor, borderColor: selectBorder }}>
+                  <option value="modern">Modern</option>
+                  <option value="classic">Classic</option>
+                  <option value="thin">Thin</option>
+                </select>
+              </div>
 
-          <div className={`settings-row settings-row-col${!clockEnabled ? " settings-row-dimmed" : ""}`} style={{ borderTop: `1px solid ${rowBorder}` }}>
-            <span className="settings-row-label">{t.clockBackground}</span>
-            <div className="settings-slider-row">
-              <input type="range" className="settings-slider" min={0} max={100} value={clockBgOpacity}
-                onChange={(e) => setClockBgOpacity(Number(e.target.value))} disabled={!clockEnabled} />
-              <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16" style={{ opacity: 0.5, flexShrink: 0 }}>
-                <path d="M6.76 4.84l-1.8-1.79-1.41 1.41 1.79 1.79 1.42-1.41zM4 10.5H1v2h3v-2zm9-9.95h-2V3.5h2V.55zm7.45 3.91l-1.41-1.41-1.79 1.79 1.41 1.41 1.79-1.79zm-3.21 13.7l1.79 1.8 1.41-1.41-1.8-1.79-1.4 1.4zM20 10.5v2h3v-2h-3zm-8-5c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm-1 16.95h2V19.5h-2v2.95zm-7.45-3.91l1.41 1.41 1.79-1.8-1.41-1.41-1.79 1.8z"/>
-              </svg>
-            </div>
-          </div>
+              <div className={`settings-row settings-row-col${!clockEnabled ? " settings-row-dimmed" : ""}`} style={{ borderTop: `1px solid ${rowBorder}` }}>
+                <span className="settings-row-label">{t.clockBackground}</span>
+                <div className="settings-slider-row">
+                  <input type="range" className="settings-slider" min={0} max={100} value={clockBgOpacity}
+                    onChange={(e) => setClockBgOpacity(Number(e.target.value))} disabled={!clockEnabled} />
+                  <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16" style={{ opacity: 0.5, flexShrink: 0 }}>
+                    <path d="M6.76 4.84l-1.8-1.79-1.41 1.41 1.79 1.79 1.42-1.41zM4 10.5H1v2h3v-2zm9-9.95h-2V3.5h2V.55zm7.45 3.91l-1.41-1.41-1.79 1.79 1.41 1.41 1.79-1.79zm-3.21 13.7l1.79 1.8 1.41-1.41-1.8-1.79-1.4 1.4zM20 10.5v2h3v-2h-3zm-8-5c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm-1 16.95h2V19.5h-2v2.95zm-7.45-3.91l1.41 1.41 1.79-1.8-1.41-1.41-1.79 1.8z"/>
+                  </svg>
+                </div>
+              </div>
 
-          <div className={`settings-row settings-row-col${!clockEnabled ? " settings-row-dimmed" : ""}`} style={{ borderTop: `1px solid ${rowBorder}` }}>
-            <span className="settings-row-label">{t.clockBorder}</span>
-            <div className="settings-slider-row">
-              <input type="range" className="settings-slider" min={0} max={100} value={clockBorderOpacity}
-                onChange={(e) => setClockBorderOpacity(Number(e.target.value))} disabled={!clockEnabled} />
-              <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16" style={{ opacity: 0.5, flexShrink: 0 }}>
-                <path d="M3 3h18v18H3V3zm2 2v14h14V5H5z"/>
-              </svg>
-            </div>
-          </div>
+              <div className={`settings-row settings-row-col${!clockEnabled ? " settings-row-dimmed" : ""}`} style={{ borderTop: `1px solid ${rowBorder}` }}>
+                <span className="settings-row-label">{t.clockBorder}</span>
+                <div className="settings-slider-row">
+                  <input type="range" className="settings-slider" min={0} max={100} value={clockBorderOpacity}
+                    onChange={(e) => setClockBorderOpacity(Number(e.target.value))} disabled={!clockEnabled} />
+                  <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16" style={{ opacity: 0.5, flexShrink: 0 }}>
+                    <path d="M3 3h18v18H3V3zm2 2v14h14V5H5z"/>
+                  </svg>
+                </div>
+              </div>
+            </>
+          )}
 
           <div className={`settings-row${!clockEnabled ? " settings-row-dimmed" : ""}`} style={{ borderTop: `1px solid ${rowBorder}` }}>
             <span className="settings-row-label">{t.dateFormat}</span>
