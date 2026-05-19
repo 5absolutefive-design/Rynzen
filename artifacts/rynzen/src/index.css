@@ -385,11 +385,39 @@ body {
   border-top: 1px solid #e8e8e4;
 }
 
+/* FAB hover zone — invisible trigger area in bottom-right corner */
+.fab-zone {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  padding: 16px;
+}
+
+/* When hidden: FAB invisible, but zone still hoverable */
+.fab-zone.fab-hidden .settings-fab {
+  opacity: 0;
+  transform: scale(0.7);
+  pointer-events: none;
+  transition: opacity 0.2s, transform 0.2s;
+}
+
+/* On hover over zone: FAB fades in */
+.fab-zone.fab-hidden:hover .settings-fab {
+  opacity: 1;
+  transform: scale(1);
+  pointer-events: auto;
+}
+
 /* Settings FAB */
 .settings-fab {
-  position: absolute;
-  bottom: 24px;
-  right: 24px;
+  position: relative;
+  bottom: auto;
+  right: auto;
   width: 48px;
   height: 48px;
   border-radius: 50%;
