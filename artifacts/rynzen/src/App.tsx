@@ -886,6 +886,20 @@ export default function App() {
                 ✓
               </button>
             </div>
+            <div className="font-presets">
+              {["Inter", "Roboto", "Nunito", "Poppins", "Lato", "Montserrat", "Open Sans", "Raleway", "Playfair Display", "Merriweather"].map(f => (
+                <button
+                  key={f}
+                  className={`font-preset-chip${appliedFontFamily === f ? " active" : ""}`}
+                  onClick={() => { setFontFamilyInput(f); setAppliedFontFamily(f); }}
+                  style={{
+                    background: appliedFontFamily === f ? (isDark ? "#5a5aaa" : "#4a4aaa") : (isDark ? "#252540" : "#f0f0f5"),
+                    color: appliedFontFamily === f ? "#fff" : (isDark ? "#c8cce0" : "#444"),
+                    borderColor: appliedFontFamily === f ? (isDark ? "#7a7acc" : "#4a4aaa") : (isDark ? "#3a3a5c" : "#dde0e8"),
+                  }}
+                >{f}</button>
+              ))}
+            </div>
           </div>
 
           {/* Weight row */}

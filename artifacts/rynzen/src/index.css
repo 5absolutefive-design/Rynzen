@@ -870,6 +870,26 @@ body {
 
 .font-apply-btn:hover { filter: brightness(0.9); }
 
+.font-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 6px;
+  width: 100%;
+}
+
+.font-preset-chip {
+  padding: 3px 9px;
+  border-radius: 20px;
+  border: 1px solid;
+  font-size: 11px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  white-space: nowrap;
+}
+
+.font-preset-chip:hover { filter: brightness(0.9); }
+
 /* ── Quick Links settings UI ── */
 .ql-add-form {
   display: flex;
