@@ -632,15 +632,19 @@ export default function App() {
 
   const hasPersistedLayout = activeSlot !== "main" && Object.values(persistedPositions).some(p => p !== null);
 
+  // search always gets a higher z-index so its dropdowns float above shortcuts
+  const BASE_Z: Record<string, number> = { search: 20, clock: 5, shortcuts: 5, pomodoro: 5 };
+
   function layoutElStyle(key: string): React.CSSProperties {
+    const base = BASE_Z[key] ?? 5;
     if (layoutMode) {
       const pos = layoutPositions[key];
       return pos
-        ? { position: "absolute", left: pos.x, top: pos.y, zIndex: activeLayoutEl === key ? 10 : 5 }
+        ? { position: "absolute", left: pos.x, top: pos.y, zIndex: activeLayoutEl === key ? base + 15 : base }
         : {};
     }
     const pos = persistedPositions[key];
-    return pos ? { position: "absolute", left: pos.x, top: pos.y, zIndex: 5 } : {};
+    return pos ? { position: "absolute", left: pos.x, top: pos.y, zIndex: base } : {};
   }
 
   return (
