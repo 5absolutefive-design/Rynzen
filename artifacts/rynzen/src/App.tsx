@@ -284,7 +284,7 @@ export default function App() {
   const [pomodoroRunning, setPomodoroRunning] = useState(false);
   const [pomodoroTask, setPomodoroTask] = useState("");
   const [pomodoroFocus, setPomodoroFocus] = useState(false);
-  const [pomodoroEditingPart, setPomodoroEditingPart] = useState<"min" | "sec" | null>(null);
+  const [pomodoroEditingPart, setPomodoroEditingPart] = useState<"hr" | "min" | "sec" | null>(null);
   const [pomodoroEditVal, setPomodoroEditVal] = useState("");
   const pomodoroEditRef = useRef<HTMLInputElement>(null);
 
@@ -596,64 +596,50 @@ export default function App() {
                 ))}
               </div>
               <div className="pomo-time" style={{ color: textColor }}>
-                {pomodoroEditingPart === "min" ? (
-                  <input
-                    ref={pomodoroEditRef}
-                    type="number"
-                    min={0}
-                    max={99}
-                    value={pomodoroEditVal}
+                {/* Hours */}
+                {pomodoroEditingPart === "hr" ? (
+                  <input ref={pomodoroEditRef} type="number" min={0} max={99} value={pomodoroEditVal}
                     className="pomo-inline-input"
                     style={{ color: textColor, borderColor: isDark ? "rgba(255,255,255,0.35)" : "rgba(0,0,0,0.25)", background: "transparent" }}
                     onChange={(e) => setPomodoroEditVal(e.target.value)}
-                    onBlur={() => {
-                      const v = Math.max(0, Math.min(99, parseInt(pomodoroEditVal) || 0));
-                      setPomodoroSeconds(v * 60 + (pomodoroSeconds % 60));
-                      setPomodoroRunning(false);
-                      setPomodoroEditingPart(null);
-                    }}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") { const v = Math.max(0, Math.min(99, parseInt(pomodoroEditVal) || 0)); setPomodoroSeconds(v * 60 + (pomodoroSeconds % 60)); setPomodoroRunning(false); setPomodoroEditingPart(null); }
-                      if (e.key === "Escape") setPomodoroEditingPart(null);
-                    }}
-                    autoFocus
-                  />
+                    onBlur={() => { const v = Math.max(0, Math.min(99, parseInt(pomodoroEditVal) || 0)); setPomodoroSeconds(v * 3600 + (pomodoroSeconds % 3600)); setPomodoroRunning(false); setPomodoroEditingPart(null); }}
+                    onKeyDown={(e) => { if (e.key === "Enter") { const v = Math.max(0, Math.min(99, parseInt(pomodoroEditVal) || 0)); setPomodoroSeconds(v * 3600 + (pomodoroSeconds % 3600)); setPomodoroRunning(false); setPomodoroEditingPart(null); } if (e.key === "Escape") setPomodoroEditingPart(null); }}
+                    autoFocus />
                 ) : (
-                  <span
-                    className={!pomodoroRunning ? "pomo-part-clickable" : ""}
-                    onClick={() => { if (!pomodoroRunning) { setPomodoroEditVal(String(Math.floor(pomodoroSeconds / 60)).padStart(2,"0")); setPomodoroEditingPart("min"); } }}
-                  >
-                    {String(Math.floor(pomodoroSeconds / 60)).padStart(2,"0")}
+                  <span className={!pomodoroRunning ? "pomo-part-clickable" : ""}
+                    onClick={() => { if (!pomodoroRunning) { setPomodoroEditVal(String(Math.floor(pomodoroSeconds / 3600)).padStart(2,"0")); setPomodoroEditingPart("hr"); } }}>
+                    {String(Math.floor(pomodoroSeconds / 3600)).padStart(2,"0")}
                   </span>
                 )}
                 <span>:</span>
-                {pomodoroEditingPart === "sec" ? (
-                  <input
-                    ref={pomodoroEditRef}
-                    type="number"
-                    min={0}
-                    max={59}
-                    value={pomodoroEditVal}
+                {/* Minutes */}
+                {pomodoroEditingPart === "min" ? (
+                  <input ref={pomodoroEditRef} type="number" min={0} max={59} value={pomodoroEditVal}
                     className="pomo-inline-input"
                     style={{ color: textColor, borderColor: isDark ? "rgba(255,255,255,0.35)" : "rgba(0,0,0,0.25)", background: "transparent" }}
                     onChange={(e) => setPomodoroEditVal(e.target.value)}
-                    onBlur={() => {
-                      const v = Math.max(0, Math.min(59, parseInt(pomodoroEditVal) || 0));
-                      setPomodoroSeconds(Math.floor(pomodoroSeconds / 60) * 60 + v);
-                      setPomodoroRunning(false);
-                      setPomodoroEditingPart(null);
-                    }}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") { const v = Math.max(0, Math.min(59, parseInt(pomodoroEditVal) || 0)); setPomodoroSeconds(Math.floor(pomodoroSeconds / 60) * 60 + v); setPomodoroRunning(false); setPomodoroEditingPart(null); }
-                      if (e.key === "Escape") setPomodoroEditingPart(null);
-                    }}
-                    autoFocus
-                  />
+                    onBlur={() => { const v = Math.max(0, Math.min(59, parseInt(pomodoroEditVal) || 0)); const h = Math.floor(pomodoroSeconds / 3600); setPomodoroSeconds(h * 3600 + v * 60 + (pomodoroSeconds % 60)); setPomodoroRunning(false); setPomodoroEditingPart(null); }}
+                    onKeyDown={(e) => { if (e.key === "Enter") { const v = Math.max(0, Math.min(59, parseInt(pomodoroEditVal) || 0)); const h = Math.floor(pomodoroSeconds / 3600); setPomodoroSeconds(h * 3600 + v * 60 + (pomodoroSeconds % 60)); setPomodoroRunning(false); setPomodoroEditingPart(null); } if (e.key === "Escape") setPomodoroEditingPart(null); }}
+                    autoFocus />
                 ) : (
-                  <span
-                    className={!pomodoroRunning ? "pomo-part-clickable" : ""}
-                    onClick={() => { if (!pomodoroRunning) { setPomodoroEditVal(String(pomodoroSeconds % 60).padStart(2,"0")); setPomodoroEditingPart("sec"); } }}
-                  >
+                  <span className={!pomodoroRunning ? "pomo-part-clickable" : ""}
+                    onClick={() => { if (!pomodoroRunning) { setPomodoroEditVal(String(Math.floor((pomodoroSeconds % 3600) / 60)).padStart(2,"0")); setPomodoroEditingPart("min"); } }}>
+                    {String(Math.floor((pomodoroSeconds % 3600) / 60)).padStart(2,"0")}
+                  </span>
+                )}
+                <span>:</span>
+                {/* Seconds */}
+                {pomodoroEditingPart === "sec" ? (
+                  <input ref={pomodoroEditRef} type="number" min={0} max={59} value={pomodoroEditVal}
+                    className="pomo-inline-input"
+                    style={{ color: textColor, borderColor: isDark ? "rgba(255,255,255,0.35)" : "rgba(0,0,0,0.25)", background: "transparent" }}
+                    onChange={(e) => setPomodoroEditVal(e.target.value)}
+                    onBlur={() => { const v = Math.max(0, Math.min(59, parseInt(pomodoroEditVal) || 0)); setPomodoroSeconds(Math.floor(pomodoroSeconds / 60) * 60 + v); setPomodoroRunning(false); setPomodoroEditingPart(null); }}
+                    onKeyDown={(e) => { if (e.key === "Enter") { const v = Math.max(0, Math.min(59, parseInt(pomodoroEditVal) || 0)); setPomodoroSeconds(Math.floor(pomodoroSeconds / 60) * 60 + v); setPomodoroRunning(false); setPomodoroEditingPart(null); } if (e.key === "Escape") setPomodoroEditingPart(null); }}
+                    autoFocus />
+                ) : (
+                  <span className={!pomodoroRunning ? "pomo-part-clickable" : ""}
+                    onClick={() => { if (!pomodoroRunning) { setPomodoroEditVal(String(pomodoroSeconds % 60).padStart(2,"0")); setPomodoroEditingPart("sec"); } }}>
                     {String(pomodoroSeconds % 60).padStart(2,"0")}
                   </span>
                 )}
