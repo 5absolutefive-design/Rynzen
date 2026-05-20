@@ -295,7 +295,7 @@ export default function App() {
   const [engineColorEffect] = useState(true);
 
   // Page Layout mode
-  type LayoutPos = { x: number; y: number };
+  type LayoutPos = { x: number; y: number; w?: number; h?: number };
   type LayoutSlotKey = "main" | "A1" | "B2" | "C3";
   type SlotData = Record<string, LayoutPos | null>;
   const emptySlotData = (): SlotData => ({ clock: null, search: null, shortcuts: null, pomodoro: null });
@@ -319,6 +319,7 @@ export default function App() {
     : (layoutSlots[activeSlot as "A1"|"B2"|"C3"] ?? emptySlotData());
   const [activeLayoutEl, setActiveLayoutEl] = useState<string | null>(null);
   const layoutDragRef = useRef<{ el: string; startMX: number; startMY: number; startElX: number; startElY: number } | null>(null);
+  const resizeDragRef = useRef<{ el: string; handle: string; startMX: number; startMY: number; startX: number; startY: number; startW: number; startH: number } | null>(null);
   const mainRef = useRef<HTMLElement>(null);
   const clockRef = useRef<HTMLDivElement>(null);
   const searchSectionRef = useRef<HTMLDivElement>(null);
@@ -487,10 +488,12 @@ export default function App() {
       if (!mainRect) { setPendingLayoutMode(false); return; }
       const slotData = activeSlot === "main" ? emptySlotData() : (layoutSlots[activeSlot as "A1"|"B2"|"C3"] ?? emptySlotData());
       const getPos = (el: HTMLElement | null, key: string): LayoutPos | null => {
-        if (slotData[key]) return slotData[key];
-        if (!el) return null;
+        const existing = slotData[key];
+        if (!el) return existing ?? null;
         const r = el.getBoundingClientRect();
-        return { x: r.left - mainRect.left, y: r.top - mainRect.top };
+        return existing
+          ? { ...existing, w: existing.w ?? r.width, h: existing.h ?? r.height }
+          : { x: r.left - mainRect.left, y: r.top - mainRect.top, w: r.width, h: r.height };
       };
       setLayoutPositions({
         clock: getPos(clockRef.current, "clock"),
@@ -549,6 +552,36 @@ export default function App() {
       document.removeEventListener("mousemove", onMove);
       document.removeEventListener("mouseup", onUp);
     };
+    document.addEventListener("mousemove", onMove);
+    document.addEventListener("mouseup", onUp);
+  }, [layoutPositions]);
+
+  const handleResizeMouseDown = useCallback((el: string, handle: string, e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const pos = layoutPositions[el];
+    if (!pos || pos.w === undefined || pos.h === undefined) return;
+    resizeDragRef.current = { el, handle, startMX: e.clientX, startMY: e.clientY, startX: pos.x, startY: pos.y, startW: pos.w, startH: pos.h };
+    const onMove = (ev: MouseEvent) => {
+      const d = resizeDragRef.current;
+      if (!d) return;
+      const dx = ev.clientX - d.startMX;
+      const dy = ev.clientY - d.startMY;
+      let x = d.startX, y = d.startY, w = d.startW, h = d.startH;
+      const minW = 80, minH = 30;
+      switch (d.handle) {
+        case "se": w = Math.max(minW, d.startW + dx); h = Math.max(minH, d.startH + dy); break;
+        case "sw": { const nw = Math.max(minW, d.startW - dx); x = d.startX + (d.startW - nw); w = nw; h = Math.max(minH, d.startH + dy); break; }
+        case "ne": { const nh = Math.max(minH, d.startH - dy); y = d.startY + (d.startH - nh); w = Math.max(minW, d.startW + dx); h = nh; break; }
+        case "nw": { const nw2 = Math.max(minW, d.startW - dx); const nh2 = Math.max(minH, d.startH - dy); x = d.startX + (d.startW - nw2); y = d.startY + (d.startH - nh2); w = nw2; h = nh2; break; }
+        case "e": w = Math.max(minW, d.startW + dx); break;
+        case "w": { const nw3 = Math.max(minW, d.startW - dx); x = d.startX + (d.startW - nw3); w = nw3; break; }
+        case "s": h = Math.max(minH, d.startH + dy); break;
+        case "n": { const nh3 = Math.max(minH, d.startH - dy); y = d.startY + (d.startH - nh3); h = nh3; break; }
+      }
+      setLayoutPositions(prev => ({ ...prev, [d.el]: { x, y, w, h } }));
+    };
+    const onUp = () => { resizeDragRef.current = null; document.removeEventListener("mousemove", onMove); document.removeEventListener("mouseup", onUp); };
     document.addEventListener("mousemove", onMove);
     document.addEventListener("mouseup", onUp);
   }, [layoutPositions]);
@@ -639,13 +672,32 @@ export default function App() {
     const base = BASE_Z[key] ?? 5;
     if (layoutMode) {
       const pos = layoutPositions[key];
-      return pos
-        ? { position: "absolute", left: pos.x, top: pos.y, zIndex: activeLayoutEl === key ? base + 15 : base }
-        : {};
+      if (!pos) return {};
+      return {
+        position: "absolute", left: pos.x, top: pos.y,
+        zIndex: activeLayoutEl === key ? base + 15 : base,
+        overflow: "visible",
+        ...(pos.w !== undefined ? { width: pos.w } : {}),
+        ...(pos.h !== undefined ? { height: pos.h } : {}),
+      };
     }
     const pos = persistedPositions[key];
-    return pos ? { position: "absolute", left: pos.x, top: pos.y, zIndex: base } : {};
+    if (!pos) return {};
+    return {
+      position: "absolute", left: pos.x, top: pos.y, zIndex: base,
+      ...(pos.w !== undefined ? { width: pos.w } : {}),
+      ...(pos.h !== undefined ? { height: pos.h } : {}),
+    };
   }
+
+  const RH_LIST = ["nw","n","ne","e","se","s","sw","w"] as const;
+  const renderResizeHandles = (el: string) => {
+    if (!layoutMode || activeLayoutEl !== el) return null;
+    return RH_LIST.map(h => (
+      <div key={h} className={`lrh lrh-${h}`}
+        onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); handleResizeMouseDown(el, h, e); }} />
+    ));
+  };
 
   return (
     <div className={`app-shell${showSettings ? " sidebar-open" : ""}`}>
@@ -679,6 +731,7 @@ export default function App() {
           <div ref={clockRef} className={`clock-area${layoutMode ? " layout-el" + (activeLayoutEl === "clock" ? " layout-el-active" : "") : ""}`}
             style={layoutElStyle("clock")}
             onMouseDown={layoutMode ? (e) => handleLayoutMouseDown("clock", e) : undefined}>
+            {renderResizeHandles("clock")}
             {(clockShow === "both" || clockShow === "clock") && analogClock ? (
               <AnalogClock
                 now={now}
@@ -729,7 +782,7 @@ export default function App() {
             className={`pomodoro-card${layoutMode ? " layout-el" + (activeLayoutEl === "pomodoro" ? " layout-el-active" : "") : ""}`}
             style={layoutElStyle("pomodoro")}
             onMouseDown={layoutMode ? (e) => handleLayoutMouseDown("pomodoro", e) : undefined}>
-
+            {renderResizeHandles("pomodoro")}
             {!countdownEnabled && (<>
               {!pomodoroRunning && (
               <div className="pomo-tabs">
@@ -873,6 +926,7 @@ export default function App() {
           className={`search-section${layoutMode ? " layout-el" + (activeLayoutEl === "search" ? " layout-el-active" : "") : ""}`}
           style={layoutElStyle("search")}
           onMouseDown={layoutMode ? (e) => handleLayoutMouseDown("search", e) : undefined}>
+          {renderResizeHandles("search")}
           <div className="search-bar-row" ref={dropdownRef}>
             <div
               className="search-input-box"
@@ -947,6 +1001,7 @@ export default function App() {
             className={`shortcuts-section${layoutMode ? " layout-el" + (activeLayoutEl === "shortcuts" ? " layout-el-active" : "") : ""}`}
             style={layoutElStyle("shortcuts")}
             onMouseDown={layoutMode ? (e) => handleLayoutMouseDown("shortcuts", e) : undefined}>
+            {renderResizeHandles("shortcuts")}
             <h3 className="shortcuts-title" style={{ color: fontColor ? fontColor : (isDark ? "#667799" : "#9aa0b2") }}>{t.quickAccess}</h3>
             <div className="shortcuts-grid" style={{ gap: quickLinksStyle === "text" ? "8px" : "12px", gridTemplateColumns: `repeat(${quickLinksPerRow}, max-content)` }}>
               {shortcuts.map((s, index) => (

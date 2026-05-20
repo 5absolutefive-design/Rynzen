@@ -1558,7 +1558,33 @@ body {
   outline: 2.5px solid #4285F4 !important;
   outline-offset: 6px;
   box-shadow: 0 0 0 6px rgba(66, 133, 244, 0.12);
+  overflow: visible !important;
 }
+
+/* ── Resize handles ── */
+.lrh {
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  background: #fff;
+  border: 2px solid #4285F4;
+  border-radius: 2px;
+  z-index: 9999;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.18);
+}
+.lrh:hover { background: #d0e4ff; }
+
+/* corners */
+.lrh-nw { top: -5px;  left: -5px;  cursor: nw-resize; }
+.lrh-ne { top: -5px;  right: -5px; cursor: ne-resize; }
+.lrh-se { bottom: -5px; right: -5px; cursor: se-resize; }
+.lrh-sw { bottom: -5px; left: -5px;  cursor: sw-resize; }
+
+/* edge midpoints */
+.lrh-n  { top: -5px;    left: calc(50% - 4px); cursor: n-resize; }
+.lrh-s  { bottom: -5px; left: calc(50% - 4px); cursor: s-resize; }
+.lrh-e  { top: calc(50% - 4px); right: -5px;   cursor: e-resize; }
+.lrh-w  { top: calc(50% - 4px); left: -5px;    cursor: w-resize; }
 
 /* Open button in layout card */
 .layout-open-btn {
