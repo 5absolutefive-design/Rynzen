@@ -286,8 +286,8 @@ export default function App() {
   const [pomodoroFocus, setPomodoroFocus] = useState(false);
 
   const [countdownEnabled, setCountdownEnabled] = useState(false);
-  const [countdownTarget, setCountdownTarget] = useState("");
-  const [countdownSavedTarget, setCountdownSavedTarget] = useState("");
+  const [countdownElapsed, setCountdownElapsed] = useState(0);
+  const [countdownRunning, setCountdownRunning] = useState(false);
 
   const [engineColorEffect] = useState(true);
 
@@ -318,6 +318,13 @@ export default function App() {
     return () => clearInterval(interval);
   }, [pomodoroRunning, pomodoroSound, pomodoroTune, pomodoroVolume]);
 
+  useEffect(() => {
+    if (!countdownRunning) return;
+    const start = Date.now() - countdownElapsed;
+    const interval = setInterval(() => setCountdownElapsed(Date.now() - start), 10);
+    return () => clearInterval(interval);
+  }, [countdownRunning]);
+
   function handlePomodoroMode(mode: "pomodoro" | "break" | "longbreak") {
     setPomodoroMode(mode);
     setPomodoroRunning(false);
@@ -346,12 +353,10 @@ export default function App() {
   const textColor = fontColor || (isDark ? "#e8e8f0" : "#1a1a2e");
   const themeColor = isDark ? "#e8e8f0" : "#1a1a2e";
 
-  const cdRemaining = countdownSavedTarget ? Math.max(0, new Date(countdownSavedTarget).getTime() - now.getTime()) : 0;
-  const cdDays = Math.floor(cdRemaining / 86400000);
-  const cdHours = Math.floor((cdRemaining % 86400000) / 3600000);
-  const cdMins = Math.floor((cdRemaining % 3600000) / 60000);
-  const cdSecs = Math.floor((cdRemaining % 60000) / 1000);
-  const cdDone = countdownSavedTarget && cdRemaining === 0;
+  const cdH = Math.floor(countdownElapsed / 3600000);
+  const cdM = Math.floor((countdownElapsed % 3600000) / 60000);
+  const cdS = Math.floor((countdownElapsed % 60000) / 1000);
+  const cdMs = Math.floor((countdownElapsed % 1000) / 10);
 
   useEffect(() => {
     const weightMap: Record<string, string> = { light: "300", normal: "400", "semi-bold": "600", bold: "700" };
@@ -622,46 +627,44 @@ export default function App() {
 
             {countdownEnabled && (
               <>
-                <div className="cd-header" style={{ color: fontColor ? fontColor : (isDark ? "#bbc" : "#666") }}>Countdown</div>
-                {!countdownSavedTarget ? (
-                  <div className="cd-setup">
-                    <input
-                      type="datetime-local"
-                      className="cd-datetime-input"
-                      value={countdownTarget}
-                      onChange={(e) => setCountdownTarget(e.target.value)}
-                      style={{ background: isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)", color: textColor, borderColor: isDark ? "rgba(255,255,255,0.15)" : "rgba(0,0,0,0.12)" }}
-                    />
-                    <button
-                      className="cd-save-btn"
-                      onClick={() => { if (countdownTarget) setCountdownSavedTarget(countdownTarget); }}
-                      disabled={!countdownTarget}
-                      style={{ background: isDark ? "rgba(90,122,255,0.3)" : "rgba(90,122,255,0.15)", color: textColor, opacity: countdownTarget ? 1 : 0.4 }}>
-                      Save
-                    </button>
+                <div className="cd-header" style={{ color: fontColor ? fontColor : (isDark ? "#bbc" : "#666") }}>Stopwatch</div>
+                <div className="cd-display">
+                  {cdH > 0 && (
+                    <div className="cd-segment">
+                      <span className="cd-value" style={{ color: textColor }}>{String(cdH).padStart(2,"0")}</span>
+                      <span className="cd-label" style={{ color: fontColor ? fontColor : (isDark ? "#8899aa" : "#888") }}>Hrs</span>
+                    </div>
+                  )}
+                  {cdH > 0 && <span className="cd-sep" style={{ color: textColor }}>:</span>}
+                  <div className="cd-segment">
+                    <span className="cd-value" style={{ color: textColor }}>{String(cdM).padStart(2,"0")}</span>
+                    <span className="cd-label" style={{ color: fontColor ? fontColor : (isDark ? "#8899aa" : "#888") }}>Min</span>
                   </div>
-                ) : (
-                  <>
-                    {cdDone ? (
-                      <div className="cd-done" style={{ color: textColor }}>🎉 Time's up!</div>
+                  <span className="cd-sep" style={{ color: textColor }}>:</span>
+                  <div className="cd-segment">
+                    <span className="cd-value" style={{ color: textColor }}>{String(cdS).padStart(2,"0")}</span>
+                    <span className="cd-label" style={{ color: fontColor ? fontColor : (isDark ? "#8899aa" : "#888") }}>Sec</span>
+                  </div>
+                  <span className="cd-sep cd-sep-small" style={{ color: textColor }}>.</span>
+                  <div className="cd-segment">
+                    <span className="cd-value cd-value-small" style={{ color: textColor }}>{String(cdMs).padStart(2,"0")}</span>
+                    <span className="cd-label" style={{ color: fontColor ? fontColor : (isDark ? "#8899aa" : "#888") }}>cs</span>
+                  </div>
+                </div>
+                <div className="pomo-controls">
+                  <button className="pomo-btn pomo-play" onClick={() => setCountdownRunning(r => !r)}
+                    style={{ color: textColor, borderColor: isDark ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.15)" }}>
+                    {countdownRunning ? (
+                      <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
                     ) : (
-                      <div className="cd-display">
-                        {[{ v: cdDays, l: "Days" }, { v: cdHours, l: "Hours" }, { v: cdMins, l: "Mins" }, { v: cdSecs, l: "Secs" }].map(({ v, l }, i) => (
-                          <div key={l} className="cd-segment">
-                            <span className="cd-value" style={{ color: textColor }}>{String(v).padStart(2, "0")}</span>
-                            <span className="cd-label" style={{ color: fontColor ? fontColor : (isDark ? "#8899aa" : "#888") }}>{l}</span>
-                            {i < 3 && <span className="cd-sep" style={{ color: textColor }}>:</span>}
-                          </div>
-                        ))}
-                      </div>
+                      <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M8 5v14l11-7z"/></svg>
                     )}
-                    <button className="pomo-btn pomo-reset"
-                      onClick={() => { setCountdownSavedTarget(""); setCountdownTarget(""); }}
-                      style={{ color: textColor, borderColor: isDark ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.15)" }}>
-                      <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>
-                    </button>
-                  </>
-                )}
+                  </button>
+                  <button className="pomo-btn pomo-reset" onClick={() => { setCountdownRunning(false); setCountdownElapsed(0); }}
+                    style={{ color: textColor, borderColor: isDark ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.15)" }}>
+                    <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>
+                  </button>
+                </div>
               </>
             )}
 
