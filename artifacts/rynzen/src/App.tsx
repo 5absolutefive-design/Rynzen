@@ -284,6 +284,9 @@ export default function App() {
   const [pomodoroRunning, setPomodoroRunning] = useState(false);
   const [pomodoroTask, setPomodoroTask] = useState("");
   const [pomodoroFocus, setPomodoroFocus] = useState(false);
+  const [pomodoroTimeEditing, setPomodoroTimeEditing] = useState(false);
+  const [pomodoroTimeInputVal, setPomodoroTimeInputVal] = useState("");
+  const pomodoroTimeInputRef = useRef<HTMLInputElement>(null);
 
   const [countdownEnabled, setCountdownEnabled] = useState(false);
   const [countdownElapsed, setCountdownElapsed] = useState(0);
@@ -579,51 +582,91 @@ export default function App() {
           </div>
         )}
 
-        {(pomodoroEnabled || countdownEnabled) && (
+        {(true || countdownEnabled) && (
           <div className="pomodoro-card" style={{ background: isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.055)", borderColor: isDark ? "rgba(255,255,255,0.09)" : "rgba(0,0,0,0.08)" }}>
 
-            {pomodoroEnabled && (
-              <>
-                <div className="pomo-tabs">
-                  {([["pomodoro","Pomodoro"],["break","Break"],["longbreak","Long break"]] as const).map(([m,label]) => (
-                    <button key={m} className={`pomo-tab${pomodoroMode === m ? " active" : ""}`}
-                      onClick={() => handlePomodoroMode(m)}
-                      style={{ color: pomodoroMode === m ? "#fff" : (fontColor || (isDark ? "#bbc" : "#666")), background: pomodoroMode === m ? (isDark ? "rgba(255,255,255,0.15)" : "rgba(0,0,0,0.12)") : "transparent" }}>
-                      {label}
-                    </button>
-                  ))}
+            <>
+              <div className="pomo-tabs">
+                {([["pomodoro","Pomodoro"],["break","Break"],["longbreak","Long break"]] as const).map(([m,label]) => (
+                  <button key={m} className={`pomo-tab${pomodoroMode === m ? " active" : ""}`}
+                    onClick={() => handlePomodoroMode(m)}
+                    style={{ color: pomodoroMode === m ? "#fff" : (fontColor || (isDark ? "#bbc" : "#666")), background: pomodoroMode === m ? (isDark ? "rgba(255,255,255,0.15)" : "rgba(0,0,0,0.12)") : "transparent" }}>
+                    {label}
+                  </button>
+                ))}
+              </div>
+              {pomodoroTimeEditing ? (
+                <div className="pomo-time-edit-wrap">
+                  <input
+                    ref={pomodoroTimeInputRef}
+                    type="number"
+                    min={1}
+                    max={99}
+                    value={pomodoroTimeInputVal}
+                    className="pomo-time-edit-input"
+                    style={{ color: textColor, borderColor: isDark ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.25)", background: isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)" }}
+                    onChange={(e) => setPomodoroTimeInputVal(e.target.value)}
+                    onBlur={() => {
+                      const mins = Math.max(1, Math.min(99, parseInt(pomodoroTimeInputVal) || 1));
+                      setPomodoroSeconds(mins * 60);
+                      setPomodoroRunning(false);
+                      setPomodoroTimeEditing(false);
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        const mins = Math.max(1, Math.min(99, parseInt(pomodoroTimeInputVal) || 1));
+                        setPomodoroSeconds(mins * 60);
+                        setPomodoroRunning(false);
+                        setPomodoroTimeEditing(false);
+                      }
+                      if (e.key === "Escape") setPomodoroTimeEditing(false);
+                    }}
+                    autoFocus
+                  />
+                  <span className="pomo-time-edit-unit" style={{ color: fontColor ? fontColor : (isDark ? "#bbc" : "#666") }}>min</span>
                 </div>
-                <div className="pomo-time" style={{ color: textColor }}>
+              ) : (
+                <div
+                  className="pomo-time pomo-time-clickable"
+                  style={{ color: textColor, cursor: pomodoroRunning ? "default" : "pointer" }}
+                  onClick={() => {
+                    if (!pomodoroRunning) {
+                      setPomodoroTimeInputVal(String(Math.floor(pomodoroSeconds / 60)));
+                      setPomodoroTimeEditing(true);
+                    }
+                  }}
+                  title={pomodoroRunning ? "" : "Click to edit time"}
+                >
                   {String(Math.floor(pomodoroSeconds / 60)).padStart(2,"0")}:{String(pomodoroSeconds % 60).padStart(2,"0")}
                 </div>
-                <div className="pomo-controls">
-                  <button className="pomo-btn pomo-play" onClick={() => setPomodoroRunning(r => !r)}
-                    style={{ color: textColor, borderColor: isDark ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.15)" }}>
-                    {pomodoroRunning ? (
-                      <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
-                    ) : (
-                      <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M8 5v14l11-7z"/></svg>
-                    )}
-                  </button>
-                  <button className="pomo-btn pomo-reset" onClick={() => { setPomodoroRunning(false); handlePomodoroMode(pomodoroMode); }}
-                    style={{ color: textColor, borderColor: isDark ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.15)" }}>
-                    <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>
-                  </button>
-                  <div className="pomo-focus-wrap">
-                    <button className={`toggle${pomodoroFocus ? " on" : ""}`} onClick={() => setPomodoroFocus(f => !f)} aria-label="Focus mode" />
-                    <span className="pomo-focus-label" style={{ color: fontColor ? fontColor : (isDark ? "#bbc" : "#666") }}>Focus</span>
-                  </div>
+              )}
+              <div className="pomo-controls">
+                <button className="pomo-btn pomo-play" onClick={() => setPomodoroRunning(r => !r)}
+                  style={{ color: textColor, borderColor: isDark ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.15)" }}>
+                  {pomodoroRunning ? (
+                    <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                  ) : (
+                    <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M8 5v14l11-7z"/></svg>
+                  )}
+                </button>
+                <button className="pomo-btn pomo-reset" onClick={() => { setPomodoroRunning(false); handlePomodoroMode(pomodoroMode); }}
+                  style={{ color: textColor, borderColor: isDark ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.15)" }}>
+                  <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>
+                </button>
+                <div className="pomo-focus-wrap">
+                  <button className={`toggle${pomodoroFocus ? " on" : ""}`} onClick={() => setPomodoroFocus(f => !f)} aria-label="Focus mode" />
+                  <span className="pomo-focus-label" style={{ color: fontColor ? fontColor : (isDark ? "#bbc" : "#666") }}>Focus</span>
                 </div>
-                <input
-                  className="pomo-task-input"
-                  type="text"
-                  placeholder="What are you working on?"
-                  value={pomodoroTask}
-                  onChange={(e) => setPomodoroTask(e.target.value)}
-                  style={{ background: isDark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.06)", color: textColor, borderColor: isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)" }}
-                />
-              </>
-            )}
+              </div>
+              <input
+                className="pomo-task-input"
+                type="text"
+                placeholder="What are you working on?"
+                value={pomodoroTask}
+                onChange={(e) => setPomodoroTask(e.target.value)}
+                style={{ background: isDark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.06)", color: textColor, borderColor: isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)" }}
+              />
+            </>
 
             {countdownEnabled && (
               <>
