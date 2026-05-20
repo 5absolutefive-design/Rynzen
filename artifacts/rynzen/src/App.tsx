@@ -283,6 +283,7 @@ export default function App() {
   const [addUrlError, setAddUrlError] = useState("");
   const [selectingSet, setSelectingSet] = useState<string | null>(null);
   const [selectedInSet, setSelectedInSet] = useState<Set<string>>(new Set());
+  const [selectedLibIds, setSelectedLibIds] = useState<Set<string>>(new Set());
   const [editingSetId, setEditingSetId] = useState<string | null>(null);
   const [editingSetName, setEditingSetName] = useState("");
 
