@@ -1347,7 +1347,7 @@ export default function App() {
           </div>
 
           <div className="settings-row" style={{ borderTop: `1px solid ${rowBorder}` }}>
-            <span className="settings-row-label">Countdown</span>
+            <span className="settings-row-label">Stopwatch</span>
             <button className={`toggle${countdownEnabled ? " on" : ""}`} onClick={() => { setCountdownEnabled(v => { if (!v) setPomodoroEnabled(false); return !v; }); }} aria-label="Enable countdown" />
           </div>
 
