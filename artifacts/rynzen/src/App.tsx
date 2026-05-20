@@ -1399,7 +1399,7 @@ export default function App() {
 
           {/* App Library */}
           <div className="settings-row" style={{ borderTop: `1px solid ${rowBorder}` }}>
-            <span className="settings-row-label">{t.importBookmarks}</span>
+            <span className="settings-row-label">APP Set name</span>
             <button
               className="import-bm-btn"
               style={{ background: isDark ? "#3a3a6a" : "#4285F4", color: "#fff" }}
