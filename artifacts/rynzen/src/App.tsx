@@ -695,7 +695,8 @@ export default function App() {
     if (!layoutMode || activeLayoutEl !== el) return null;
     return RH_LIST.map(h => (
       <div key={h} className={`lrh lrh-${h}`}
-        onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); handleResizeMouseDown(el, h, e); }} />
+        onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); handleResizeMouseDown(el, h, e); }}
+        onClick={(e) => { e.preventDefault(); e.stopPropagation(); }} />
     ));
   };
 
@@ -730,7 +731,8 @@ export default function App() {
         {clockEnabled && (
           <div ref={clockRef} className={`clock-area${layoutMode ? " layout-el" + (activeLayoutEl === "clock" ? " layout-el-active" : "") : ""}`}
             style={layoutElStyle("clock")}
-            onMouseDown={layoutMode ? (e) => handleLayoutMouseDown("clock", e) : undefined}>
+            onMouseDown={layoutMode ? (e) => handleLayoutMouseDown("clock", e) : undefined}
+            onClick={layoutMode ? (e) => e.stopPropagation() : undefined}>
             {renderResizeHandles("clock")}
             {(clockShow === "both" || clockShow === "clock") && analogClock ? (
               <AnalogClock
@@ -781,7 +783,8 @@ export default function App() {
           <div ref={pomodoroRef}
             className={`pomodoro-card${layoutMode ? " layout-el" + (activeLayoutEl === "pomodoro" ? " layout-el-active" : "") : ""}`}
             style={layoutElStyle("pomodoro")}
-            onMouseDown={layoutMode ? (e) => handleLayoutMouseDown("pomodoro", e) : undefined}>
+            onMouseDown={layoutMode ? (e) => handleLayoutMouseDown("pomodoro", e) : undefined}
+            onClick={layoutMode ? (e) => e.stopPropagation() : undefined}>
             {renderResizeHandles("pomodoro")}
             {!countdownEnabled && (<>
               {!pomodoroRunning && (
@@ -925,8 +928,10 @@ export default function App() {
         <div ref={searchSectionRef}
           className={`search-section${layoutMode ? " layout-el" + (activeLayoutEl === "search" ? " layout-el-active" : "") : ""}`}
           style={layoutElStyle("search")}
-          onMouseDown={layoutMode ? (e) => handleLayoutMouseDown("search", e) : undefined}>
+          onMouseDown={layoutMode ? (e) => handleLayoutMouseDown("search", e) : undefined}
+          onClick={layoutMode ? (e) => e.stopPropagation() : undefined}>
           {renderResizeHandles("search")}
+          {layoutMode && <div style={{ position: "absolute", inset: 0, zIndex: 10, cursor: "move", borderRadius: "inherit" }} onMouseDown={(e) => handleLayoutMouseDown("search", e)} onClick={(e) => e.stopPropagation()} />}
           <div className="search-bar-row" ref={dropdownRef}>
             <div
               className="search-input-box"
@@ -1000,8 +1005,10 @@ export default function App() {
           <div ref={shortcutsSectionRef}
             className={`shortcuts-section${layoutMode ? " layout-el" + (activeLayoutEl === "shortcuts" ? " layout-el-active" : "") : ""}`}
             style={layoutElStyle("shortcuts")}
-            onMouseDown={layoutMode ? (e) => handleLayoutMouseDown("shortcuts", e) : undefined}>
+            onMouseDown={layoutMode ? (e) => handleLayoutMouseDown("shortcuts", e) : undefined}
+            onClick={layoutMode ? (e) => e.stopPropagation() : undefined}>
             {renderResizeHandles("shortcuts")}
+            {layoutMode && <div style={{ position: "absolute", inset: 0, zIndex: 10, cursor: "move", borderRadius: "inherit" }} onMouseDown={(e) => handleLayoutMouseDown("shortcuts", e)} onClick={(e) => e.stopPropagation()} />}
             <h3 className="shortcuts-title" style={{ color: fontColor ? fontColor : (isDark ? "#667799" : "#9aa0b2") }}>{t.quickAccess}</h3>
             <div className="shortcuts-grid" style={{ gap: quickLinksStyle === "text" ? "8px" : "12px", gridTemplateColumns: `repeat(${quickLinksPerRow}, max-content)` }}>
               {shortcuts.map((s, index) => (
