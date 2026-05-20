@@ -444,8 +444,8 @@ export default function App() {
       color: textColor,
     }}>
       <div className="top-bar">
-        <span className="top-link" style={{ color: isDark ? "#aab" : "#444" }}>{t.gmail}</span>
-        <span className="top-link" style={{ color: isDark ? "#aab" : "#444" }}>{t.images}</span>
+        <span className="top-link" style={{ color: fontColor ? fontColor : (isDark ? "#aab" : "#444") }}>{t.gmail}</span>
+        <span className="top-link" style={{ color: fontColor ? fontColor : (isDark ? "#aab" : "#444") }}>{t.images}</span>
         <div className="avatar">S</div>
       </div>
 
@@ -490,7 +490,7 @@ export default function App() {
               </div>
             ) : null}
             {(clockShow === "both" || clockShow === "date") && (
-              <div className="clock-date" style={{ color: isDark ? "#8899aa" : "#666", fontSize: `${10 + (dateSizeNum / 100) * 18}px` }}>
+              <div className="clock-date" style={{ color: fontColor ? fontColor : (isDark ? "#8899aa" : "#666"), fontSize: `${10 + (dateSizeNum / 100) * 18}px` }}>
                 {getDateStr()}
               </div>
             )}
@@ -569,7 +569,7 @@ export default function App() {
 
         {showShortcuts && (
           <div className="shortcuts-section">
-            <h3 className="shortcuts-title" style={{ color: isDark ? "#667799" : "#9aa0b2" }}>{t.quickAccess}</h3>
+            <h3 className="shortcuts-title" style={{ color: fontColor ? fontColor : (isDark ? "#667799" : "#9aa0b2") }}>{t.quickAccess}</h3>
             <div className="shortcuts-grid" style={{ gap: quickLinksStyle === "text" ? "8px" : "12px", gridTemplateColumns: `repeat(${quickLinksPerRow}, max-content)` }}>
               {shortcuts.map((s, index) => (
                 <a key={s.name} href={dragIndex !== null ? undefined : s.url}
@@ -586,7 +586,7 @@ export default function App() {
                     style={{ width: qlFaviconSize, height: qlFaviconSize, objectFit: "contain", borderRadius: quickLinksIconRadius, flexShrink: 0 }}
                   />
                   {quickLinksStyle === "text" && (
-                    <span className="shortcut-label" style={{ color: isDark ? "#c8cce0" : "#444" }}>{s.name}</span>
+                    <span className="shortcut-label" style={{ color: fontColor ? fontColor : (isDark ? "#c8cce0" : "#444") }}>{s.name}</span>
                   )}
                 </a>
               ))}
