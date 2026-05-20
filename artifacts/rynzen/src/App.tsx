@@ -691,14 +691,7 @@ export default function App() {
   }
 
   const RH_LIST = ["nw","n","ne","e","se","s","sw","w"] as const;
-  const renderResizeHandles = (el: string) => {
-    if (!layoutMode || activeLayoutEl !== el) return null;
-    return RH_LIST.map(h => (
-      <div key={h} className={`lrh lrh-${h}`}
-        onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); handleResizeMouseDown(el, h, e); }}
-        onClick={(e) => { e.preventDefault(); e.stopPropagation(); }} />
-    ));
-  };
+  const renderResizeHandles = (_el: string) => null;
 
   return (
     <div className={`app-shell${showSettings ? " sidebar-open" : ""}`}>
