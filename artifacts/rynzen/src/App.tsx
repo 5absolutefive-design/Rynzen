@@ -582,10 +582,11 @@ export default function App() {
           </div>
         )}
 
-        {(true || countdownEnabled) && (
+        {(pomodoroEnabled || countdownEnabled) && (
           <div className="pomodoro-card">
 
             {!countdownEnabled && (<>
+              {!pomodoroRunning && (
               <div className="pomo-tabs">
                 {([["pomodoro","Pomodoro"],["break","Break"],["longbreak","Long break"]] as const).map(([m,label]) => (
                   <button key={m} className={`pomo-tab${pomodoroMode === m ? " active" : ""}`}
@@ -595,6 +596,7 @@ export default function App() {
                   </button>
                 ))}
               </div>
+              )}
               <div className="pomo-time" style={{ color: textColor }}>
                 {/* Hours — shown while paused/editing so user can click it; hidden when running and hours=0 */}
                 {(!pomodoroRunning || Math.floor(pomodoroSeconds / 3600) > 0) && (<>
@@ -664,6 +666,7 @@ export default function App() {
                   <span className="pomo-focus-label" style={{ color: fontColor ? fontColor : (isDark ? "#bbc" : "#666") }}>Focus</span>
                 </div>
               </div>
+              {(!pomodoroRunning || pomodoroTask.trim()) && (
               <input
                 className="pomo-task-input"
                 type="text"
@@ -672,6 +675,7 @@ export default function App() {
                 onChange={(e) => setPomodoroTask(e.target.value)}
                 style={{ background: isDark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.06)", color: textColor, borderColor: isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)" }}
               />
+              )}
             </>)}
 
             {countdownEnabled && (
