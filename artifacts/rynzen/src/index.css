@@ -1242,24 +1242,23 @@ body {
   line-height: 1;
 }
 
-.pomo-time-clickable:hover {
-  opacity: 0.75;
-  text-decoration: underline dotted;
-  text-underline-offset: 6px;
+.pomo-part-clickable {
+  cursor: pointer;
+  border-radius: 6px;
+  transition: background 0.15s;
+  padding: 0 2px;
 }
 
-.pomo-time-edit-wrap {
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
+.pomo-part-clickable:hover {
+  background: rgba(128,128,128,0.18);
 }
 
-.pomo-time-edit-input {
+.pomo-inline-input {
   font-size: 3.6rem;
   font-weight: 700;
   letter-spacing: 0.04em;
   line-height: 1;
-  width: 3ch;
+  width: 2.2ch;
   border: none;
   border-bottom: 2px solid;
   background: transparent;
@@ -1268,16 +1267,10 @@ body {
   -moz-appearance: textfield;
 }
 
-.pomo-time-edit-input::-webkit-outer-spin-button,
-.pomo-time-edit-input::-webkit-inner-spin-button {
+.pomo-inline-input::-webkit-outer-spin-button,
+.pomo-inline-input::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
-}
-
-.pomo-time-edit-unit {
-  font-size: 1rem;
-  font-weight: 500;
-  opacity: 0.65;
 }
 
 .pomo-controls {
