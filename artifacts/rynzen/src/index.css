@@ -1091,6 +1091,24 @@ body {
 .font-color-dot:hover { transform: scale(1.2); }
 .font-color-dot.active { transform: scale(1.15); }
 
+.bg-color-swatches {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 6px;
+}
+
+.bg-color-dot {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  cursor: pointer;
+  padding: 0;
+  transition: transform 0.12s;
+}
+
+.bg-color-dot:hover { transform: scale(1.15); }
+.bg-color-dot.active { transform: scale(1.1); }
+
 .font-color-custom-row {
   display: flex;
   align-items: center;

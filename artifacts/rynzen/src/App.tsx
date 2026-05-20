@@ -244,7 +244,7 @@ export default function App() {
   const [timezone, setTimezone] = useState("Automatic");
   const [clockShow, setClockShow] = useState<"both" | "clock" | "date">("both");
 
-  const [bgColor] = useState("#f5f4f0");
+  const [bgColor, setBgColor] = useState("#f5f4f0");
   const [showShortcuts, setShowShortcuts] = useState(true);
   const [quickLinksOpenNewTab, setQuickLinksOpenNewTab] = useState(true);
   const [quickLinksShowGroups, setQuickLinksShowGroups] = useState(false);
@@ -522,7 +522,7 @@ export default function App() {
   return (
     <div className={`app-shell${showSettings ? " sidebar-open" : ""}`}>
     <div className="app-root" style={{
-      background: (bgType === "images" && bgImageSelected) ? undefined : (isDark ? "#1a1a2e" : bgColor),
+      background: (bgType === "images" && bgImageSelected) ? undefined : (bgType === "color") ? bgColor : (isDark ? "#1a1a2e" : "#f5f4f0"),
       backgroundImage: (bgType === "images" && bgImageSelected) ? `url(${bgImageSelected}?w=1920&h=1080&fit=crop&q=90)` : undefined,
       backgroundSize: (bgType === "images" && bgImageSelected) ? "cover" : undefined,
       backgroundPosition: (bgType === "images" && bgImageSelected) ? "center" : undefined,
@@ -1160,6 +1160,38 @@ export default function App() {
               <option value="gradient">{t.bgGradient}</option>
             </select>
           </div>
+
+          {bgType === "color" && (
+            <div className="bg-color-panel" style={{ borderTop: `1px solid ${rowBorder}`, padding: "14px 16px", display: "flex", flexDirection: "column", gap: 12 }}>
+              <div className="bg-color-swatches">
+                {[
+                  "#f5f4f0","#ffffff","#1a1a2e","#0f0f1a","#12121f","#2d2d44",
+                  "#1e3a5f","#0d2137","#1a3a2a","#0f2e1a","#3a1a1a","#2e1a3a",
+                  "#e8f4fd","#fef9e7","#f0fef4","#fdf0f8","#fff3e0","#e8eaf6",
+                  "#37474f","#4a4a6a","#5d4037","#1b5e20","#0d47a1","#4a148c",
+                  "#b71c1c","#e65100","#f57f17","#33691e","#006064","#880e4f",
+                ].map(c => (
+                  <button
+                    key={c}
+                    className={`bg-color-dot${bgColor === c ? " active" : ""}`}
+                    style={{ background: c, outline: bgColor === c ? "2px solid #5a7aff" : `1px solid ${isDark ? "rgba(255,255,255,0.15)" : "rgba(0,0,0,0.12)"}`, outlineOffset: bgColor === c ? 2 : 0 }}
+                    onClick={() => setBgColor(c)}
+                    title={c}
+                  />
+                ))}
+              </div>
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <span style={{ fontSize: "0.75rem", opacity: 0.6, color: isDark ? "#c8cce0" : "#555" }}>Custom</span>
+                <input
+                  type="color"
+                  value={bgColor}
+                  onChange={(e) => setBgColor(e.target.value)}
+                  style={{ width: 36, height: 28, border: "none", borderRadius: 6, cursor: "pointer", padding: 2, background: "none" }}
+                />
+                <span style={{ fontSize: "0.72rem", fontFamily: "monospace", opacity: 0.55, color: isDark ? "#c8cce0" : "#555" }}>{bgColor}</span>
+              </div>
+            </div>
+          )}
 
           {bgType === "images" && (
             <div className="bg-image-panel" style={{ borderTop: `1px solid ${rowBorder}` }}>
