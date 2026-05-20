@@ -206,6 +206,42 @@ function AnalogClock({ now, tz, size, shape, face, hands, isDark, bgOpacity, bor
   );
 }
 
+function parseBookmarksHtml(html: string): Array<{ name: string; items: Array<{ name: string; url: string; domain: string }> }> {
+  function getDomain(url: string): string {
+    try { return new URL(url).hostname.replace(/^www\./, ""); } catch { return ""; }
+  }
+  const groups: Array<{ name: string; items: Array<{ name: string; url: string; domain: string }> }> = [];
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(html, "text/html");
+
+  function walkDl(dl: Element, folderName: string) {
+    const items: Array<{ name: string; url: string; domain: string }> = [];
+    const children = Array.from(dl.children);
+    for (let i = 0; i < children.length; i++) {
+      const child = children[i];
+      const h3 = child.querySelector(":scope > h3");
+      if (h3) {
+        const subName = h3.textContent?.trim() || "Folder";
+        const next = children[i + 1];
+        if (next && next.tagName === "DL") { walkDl(next, subName); i++; }
+        continue;
+      }
+      const a = child.querySelector(":scope > a") as HTMLAnchorElement | null;
+      if (a) {
+        const url = a.getAttribute("href") || "";
+        if (url.startsWith("http")) {
+          items.push({ name: a.textContent?.trim() || url, url, domain: getDomain(url) });
+        }
+      }
+    }
+    if (items.length > 0) groups.push({ name: folderName, items });
+  }
+
+  const rootDl = doc.querySelector("body > dl") || doc.querySelector("dl");
+  if (rootDl) walkDl(rootDl, "Bookmarks");
+  return groups;
+}
+
 export default function App() {
   const [query, setQuery] = useState("");
   const [selectedEngine, setSelectedEngine] = useState<SearchEngine>(engines[0]);
@@ -254,6 +290,10 @@ export default function App() {
   const [quickLinksSize, setQuickLinksSize] = useState<"small" | "medium" | "large">("medium");
   const [newLinkTitle, setNewLinkTitle] = useState("");
   const [newLinkUrl, setNewLinkUrl] = useState("");
+  const [showImportModal, setShowImportModal] = useState(false);
+  const [importGroups, setImportGroups] = useState<Array<{ name: string; items: Array<{ name: string; url: string; domain: string }> }>>([]);
+  const [selectedImportUrls, setSelectedImportUrls] = useState<Set<string>>(new Set());
+  const importFileRef = useRef<HTMLInputElement>(null);
 
   const [bgType, setBgType] = useState<"none" | "images" | "color" | "gradient">("none");
   const [bgImageSelected, setBgImageSelected] = useState("");
@@ -1361,6 +1401,39 @@ export default function App() {
             </div>
           </div>
 
+          {/* Import bookmarks */}
+          <div className="settings-row" style={{ borderTop: `1px solid ${rowBorder}` }}>
+            <span className="settings-row-label">{t.importBookmarks}</span>
+            <button
+              className="import-bm-btn"
+              style={{ background: isDark ? "#3a3a6a" : "#4285F4", color: "#fff" }}
+              onClick={() => importFileRef.current?.click()}
+            >
+              {t.importBtn}
+            </button>
+            <input
+              ref={importFileRef}
+              type="file"
+              accept=".html,.htm"
+              style={{ display: "none" }}
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                  const html = ev.target?.result as string;
+                  const parsed = parseBookmarksHtml(html);
+                  setImportGroups(parsed);
+                  const allUrls = new Set(parsed.flatMap(g => g.items.map(it => it.url)));
+                  setSelectedImportUrls(allUrls);
+                  setShowImportModal(true);
+                };
+                reader.readAsText(file);
+                e.target.value = "";
+              }}
+            />
+          </div>
+
         </div>
 
         {/* ── Search Bar Card ── */}
@@ -1771,6 +1844,131 @@ export default function App() {
             </span>
           </div>
         </div>
+
+      {/* ── Import Bookmarks Modal ── */}
+      {showImportModal && (
+        <div className="bm-modal-overlay" onClick={() => setShowImportModal(false)}>
+          <div className="bm-modal" style={{ background: isDark ? "#1a1a30" : "#ffffff", color: themeColor }} onClick={(e) => e.stopPropagation()}>
+
+            {/* Header */}
+            <div className="bm-modal-header" style={{ borderBottom: `1px solid ${rowBorder}` }}>
+              <div>
+                <p className="bm-modal-title">Import bookmarks</p>
+                <p className="bm-modal-sub" style={{ color: isDark ? "rgba(255,255,255,0.45)" : "rgba(0,0,0,0.45)" }}>
+                  Select the bookmarks you want to add to Quick Access
+                </p>
+              </div>
+              <button className="bm-close-btn" style={{ color: themeColor }} onClick={() => setShowImportModal(false)}>
+                <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+              </button>
+            </div>
+
+            {/* Body */}
+            <div className="bm-modal-body">
+              {importGroups.length === 0 ? (
+                <div className="bm-empty" style={{ color: isDark ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.35)" }}>
+                  No bookmarks found. Make sure the file is a browser bookmark export (HTML format).
+                </div>
+              ) : (
+                importGroups.map((group) => {
+                  const groupUrls = group.items.map(it => it.url);
+                  const allSelected = groupUrls.every(u => selectedImportUrls.has(u));
+                  const someSelected = groupUrls.some(u => selectedImportUrls.has(u));
+                  return (
+                    <div key={group.name} className="bm-group">
+                      <div className="bm-group-header" style={{ borderBottom: `1px solid ${rowBorder}` }}>
+                        <span className="bm-group-name" style={{ color: isDark ? "rgba(255,255,255,0.7)" : "rgba(0,0,0,0.55)" }}>{group.name}</span>
+                        <button
+                          className="bm-select-all-btn"
+                          style={{ color: "#4285F4" }}
+                          onClick={() => {
+                            setSelectedImportUrls(prev => {
+                              const next = new Set(prev);
+                              if (allSelected) { groupUrls.forEach(u => next.delete(u)); }
+                              else { groupUrls.forEach(u => next.add(u)); }
+                              return next;
+                            });
+                          }}
+                        >
+                          {allSelected ? "Deselect all" : someSelected ? "Select all" : "Select all"}
+                        </button>
+                      </div>
+                      <div className="bm-items">
+                        {group.items.map((item) => {
+                          const isSelected = selectedImportUrls.has(item.url);
+                          return (
+                            <div
+                              key={item.url}
+                              className={`bm-item${isSelected ? " bm-item-selected" : ""}`}
+                              style={{
+                                background: isSelected ? (isDark ? "rgba(66,133,244,0.12)" : "rgba(66,133,244,0.08)") : "transparent",
+                                borderColor: isSelected ? "rgba(66,133,244,0.35)" : "transparent",
+                              }}
+                              onClick={() => {
+                                setSelectedImportUrls(prev => {
+                                  const next = new Set(prev);
+                                  if (next.has(item.url)) next.delete(item.url);
+                                  else next.add(item.url);
+                                  return next;
+                                });
+                              }}
+                            >
+                              <img
+                                src={`https://www.google.com/s2/favicons?domain=${item.domain}&sz=32`}
+                                alt=""
+                                className="bm-item-favicon"
+                                onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+                              />
+                              <div className="bm-item-info">
+                                <span className="bm-item-name" style={{ color: themeColor }}>{item.name}</span>
+                                <span className="bm-item-url" style={{ color: isDark ? "rgba(255,255,255,0.35)" : "rgba(0,0,0,0.35)" }}>{item.domain}</span>
+                              </div>
+                              <div className={`bm-item-check${isSelected ? " checked" : ""}`} style={{ borderColor: isSelected ? "#4285F4" : (isDark ? "rgba(255,255,255,0.25)" : "rgba(0,0,0,0.2)"), background: isSelected ? "#4285F4" : "transparent" }}>
+                                {isSelected && <svg viewBox="0 0 24 24" fill="#fff" width="12" height="12"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+
+            {/* Footer */}
+            {importGroups.length > 0 && (
+              <div className="bm-modal-footer" style={{ borderTop: `1px solid ${rowBorder}` }}>
+                <span className="bm-footer-count" style={{ color: isDark ? "rgba(255,255,255,0.5)" : "rgba(0,0,0,0.45)" }}>
+                  {selectedImportUrls.size} selected
+                </span>
+                <div style={{ display: "flex", gap: 8 }}>
+                  <button className="bm-footer-btn bm-footer-cancel" style={{ background: isDark ? "#2a2a44" : "#f0f0f5", color: themeColor }} onClick={() => setShowImportModal(false)}>
+                    Cancel
+                  </button>
+                  <button
+                    className="bm-footer-btn bm-footer-add"
+                    style={{ background: selectedImportUrls.size === 0 ? (isDark ? "#2a2a44" : "#ccc") : "#4285F4", color: selectedImportUrls.size === 0 ? (isDark ? "rgba(255,255,255,0.3)" : "#999") : "#fff", cursor: selectedImportUrls.size === 0 ? "not-allowed" : "pointer" }}
+                    disabled={selectedImportUrls.size === 0}
+                    onClick={() => {
+                      const toAdd = importGroups.flatMap(g => g.items).filter(it => selectedImportUrls.has(it.url));
+                      setShortcuts(prev => {
+                        const existingUrls = new Set(prev.map(s => s.url));
+                        const newItems = toAdd.filter(it => !existingUrls.has(it.url));
+                        return [...prev, ...newItems];
+                      });
+                      setShowImportModal(false);
+                    }}
+                  >
+                    Add to Quick Access
+                  </button>
+                </div>
+              </div>
+            )}
+
+          </div>
+        </div>
+      )}
 
     </div>
     </div>
