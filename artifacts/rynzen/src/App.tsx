@@ -66,6 +66,36 @@ const BG_FOLDERS = [
   },
 ];
 
+function playPomodoroAlarm(tune: string, volume: number) {
+  try {
+    const ctx = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
+    const master = ctx.createGain();
+    master.gain.value = volume / 100;
+    master.connect(ctx.destination);
+    const configs: { freq: number; type: OscillatorType; delay: number; duration: number }[] =
+      tune === "Digital"
+        ? [{ freq: 880, type: "square", delay: 0, duration: 0.12 }, { freq: 880, type: "square", delay: 0.18, duration: 0.12 }, { freq: 880, type: "square", delay: 0.36, duration: 0.12 }]
+        : tune === "Bell"
+        ? [{ freq: 523, type: "sine", delay: 0, duration: 1 }, { freq: 659, type: "sine", delay: 0.35, duration: 0.9 }, { freq: 784, type: "sine", delay: 0.7, duration: 0.8 }]
+        : tune === "Chime"
+        ? [{ freq: 784, type: "sine", delay: 0, duration: 0.7 }, { freq: 988, type: "sine", delay: 0.2, duration: 0.7 }, { freq: 1175, type: "sine", delay: 0.4, duration: 0.7 }, { freq: 1319, type: "sine", delay: 0.6, duration: 0.7 }]
+        : [{ freq: 392, type: "sine", delay: 0, duration: 0.5 }, { freq: 523, type: "sine", delay: 0.3, duration: 0.5 }, { freq: 659, type: "sine", delay: 0.6, duration: 0.6 }];
+    configs.forEach(({ freq, type, delay, duration }) => {
+      const osc = ctx.createOscillator();
+      const g = ctx.createGain();
+      osc.type = type;
+      osc.frequency.value = freq;
+      g.gain.setValueAtTime(0, ctx.currentTime + delay);
+      g.gain.linearRampToValueAtTime(0.9, ctx.currentTime + delay + 0.015);
+      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + delay + duration);
+      osc.connect(g);
+      g.connect(master);
+      osc.start(ctx.currentTime + delay);
+      osc.stop(ctx.currentTime + delay + duration + 0.05);
+    });
+  } catch { /* ignore */ }
+}
+
 const engines: SearchEngine[] = [
   { name: "Google", domain: "google.com", color: "#4285F4", searchUrl: "https://www.google.com/search?q=", homeUrl: "https://www.google.com" },
   { name: "YouTube", domain: "youtube.com", color: "#FF0000", searchUrl: "https://www.youtube.com/results?search_query=", homeUrl: "https://www.youtube.com" },
@@ -242,6 +272,19 @@ export default function App() {
   const [fontColorOpen, setFontColorOpen] = useState(false);
   const fontColorRef = useRef<HTMLDivElement>(null);
 
+  const [pomodoroEnabled, setPomodoroEnabled] = useState(false);
+  const [pomodoroSound, setPomodoroSound] = useState(true);
+  const [pomodoroTune, setPomodoroTune] = useState("Marimba");
+  const [pomodoroVolume, setPomodoroVolume] = useState(80);
+  const [pomodoroDefaultTime, setPomodoroDefaultTime] = useState(25);
+  const [pomodoroBreakTime, setPomodoroBreakTime] = useState(5);
+  const [pomodoroLongBreakTime, setPomodoroLongBreakTime] = useState(20);
+  const [pomodoroMode, setPomodoroMode] = useState<"pomodoro" | "break" | "longbreak">("pomodoro");
+  const [pomodoroSeconds, setPomodoroSeconds] = useState(25 * 60);
+  const [pomodoroRunning, setPomodoroRunning] = useState(false);
+  const [pomodoroTask, setPomodoroTask] = useState("");
+  const [pomodoroFocus, setPomodoroFocus] = useState(false);
+
   const [engineColorEffect] = useState(true);
 
   const inputRef = useRef<HTMLInputElement>(null);
@@ -255,6 +298,29 @@ export default function App() {
     const timer = setInterval(() => setNow(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
+
+  useEffect(() => {
+    if (!pomodoroRunning) return;
+    const interval = setInterval(() => {
+      setPomodoroSeconds(s => {
+        if (s <= 1) {
+          setPomodoroRunning(false);
+          if (pomodoroSound) playPomodoroAlarm(pomodoroTune, pomodoroVolume);
+          return 0;
+        }
+        return s - 1;
+      });
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [pomodoroRunning, pomodoroSound, pomodoroTune, pomodoroVolume]);
+
+  function handlePomodoroMode(mode: "pomodoro" | "break" | "longbreak") {
+    setPomodoroMode(mode);
+    setPomodoroRunning(false);
+    if (mode === "pomodoro") setPomodoroSeconds(pomodoroDefaultTime * 60);
+    else if (mode === "break") setPomodoroSeconds(pomodoroBreakTime * 60);
+    else setPomodoroSeconds(pomodoroLongBreakTime * 60);
+  }
 
   useEffect(() => {
     const mq = window.matchMedia("(prefers-color-scheme: dark)");
@@ -494,6 +560,49 @@ export default function App() {
                 {getDateStr()}
               </div>
             )}
+          </div>
+        )}
+
+        {pomodoroEnabled && (
+          <div className="pomodoro-card" style={{ background: isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.055)", borderColor: isDark ? "rgba(255,255,255,0.09)" : "rgba(0,0,0,0.08)" }}>
+            <div className="pomo-tabs">
+              {([["pomodoro","Pomodoro"],["break","Break"],["longbreak","Long break"]] as const).map(([m,label]) => (
+                <button key={m} className={`pomo-tab${pomodoroMode === m ? " active" : ""}`}
+                  onClick={() => handlePomodoroMode(m)}
+                  style={{ color: pomodoroMode === m ? "#fff" : (fontColor || (isDark ? "#bbc" : "#666")), background: pomodoroMode === m ? (isDark ? "rgba(255,255,255,0.15)" : "rgba(0,0,0,0.12)") : "transparent" }}>
+                  {label}
+                </button>
+              ))}
+            </div>
+            <div className="pomo-time" style={{ color: textColor }}>
+              {String(Math.floor(pomodoroSeconds / 60)).padStart(2,"0")}:{String(pomodoroSeconds % 60).padStart(2,"0")}
+            </div>
+            <div className="pomo-controls">
+              <button className="pomo-btn pomo-play" onClick={() => setPomodoroRunning(r => !r)}
+                style={{ color: textColor, borderColor: isDark ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.15)" }}>
+                {pomodoroRunning ? (
+                  <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                ) : (
+                  <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M8 5v14l11-7z"/></svg>
+                )}
+              </button>
+              <button className="pomo-btn pomo-reset" onClick={() => { setPomodoroRunning(false); handlePomodoroMode(pomodoroMode); }}
+                style={{ color: textColor, borderColor: isDark ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.15)" }}>
+                <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>
+              </button>
+              <div className="pomo-focus-wrap">
+                <button className={`toggle${pomodoroFocus ? " on" : ""}`} onClick={() => setPomodoroFocus(f => !f)} aria-label="Focus mode" />
+                <span className="pomo-focus-label" style={{ color: fontColor ? fontColor : (isDark ? "#bbc" : "#666") }}>Focus</span>
+              </div>
+            </div>
+            <input
+              className="pomo-task-input"
+              type="text"
+              placeholder="What are you working on?"
+              value={pomodoroTask}
+              onChange={(e) => setPomodoroTask(e.target.value)}
+              style={{ background: isDark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.06)", color: textColor, borderColor: isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)" }}
+            />
           </div>
         )}
 
@@ -1109,6 +1218,82 @@ export default function App() {
                   </div>
                 </div>
               )}
+            </div>
+          </div>
+
+        </div>
+
+        {/* ── Pomodoro Card ── */}
+        <p className="settings-section-label" style={{ marginTop: 12 }}>Pomodoro timer</p>
+        <div className="settings-card" style={{ background: cardBg }}>
+
+          <div className="settings-row">
+            <span className="settings-row-label">Enable</span>
+            <button className={`toggle${pomodoroEnabled ? " on" : ""}`} onClick={() => setPomodoroEnabled(!pomodoroEnabled)} aria-label="Enable pomodoro" />
+          </div>
+
+          <div className={`settings-row${!pomodoroEnabled ? " settings-row-dimmed" : ""}`} style={{ borderTop: `1px solid ${rowBorder}` }}>
+            <span className="settings-row-label">Play sound on alarm</span>
+            <button className={`toggle${pomodoroSound ? " on" : ""}`} onClick={() => setPomodoroSound(!pomodoroSound)} disabled={!pomodoroEnabled} aria-label="Play sound" />
+          </div>
+
+          <div className={`settings-row${!pomodoroEnabled || !pomodoroSound ? " settings-row-dimmed" : ""}`} style={{ borderTop: `1px solid ${rowBorder}` }}>
+            <span className="settings-row-label">Alarm tune</span>
+            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+              <select className="settings-select" value={pomodoroTune}
+                onChange={(e) => setPomodoroTune(e.target.value)}
+                disabled={!pomodoroEnabled || !pomodoroSound}
+                style={{ background: selectBg, color: selectColor, borderColor: selectBorder }}>
+                <option>Marimba</option>
+                <option>Digital</option>
+                <option>Bell</option>
+                <option>Chime</option>
+              </select>
+              <button
+                onClick={() => playPomodoroAlarm(pomodoroTune, pomodoroVolume)}
+                disabled={!pomodoroEnabled || !pomodoroSound}
+                title="Preview sound"
+                style={{ background: "none", border: "none", cursor: "pointer", color: themeColor, opacity: (!pomodoroEnabled || !pomodoroSound) ? 0.35 : 1, fontSize: 16, lineHeight: 1, padding: "2px 4px" }}>
+                🔊
+              </button>
+            </div>
+          </div>
+
+          <div className={`settings-row settings-row-col${!pomodoroEnabled || !pomodoroSound ? " settings-row-dimmed" : ""}`} style={{ borderTop: `1px solid ${rowBorder}` }}>
+            <span className="settings-row-label">Alarm volume</span>
+            <div className="settings-slider-row">
+              <input type="range" className="settings-slider" min={0} max={100} value={pomodoroVolume}
+                onChange={(e) => setPomodoroVolume(Number(e.target.value))} disabled={!pomodoroEnabled || !pomodoroSound} />
+            </div>
+          </div>
+
+          <div className={`settings-row${!pomodoroEnabled ? " settings-row-dimmed" : ""}`} style={{ borderTop: `1px solid ${rowBorder}` }}>
+            <span className="settings-row-label">Default time</span>
+            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+              <input type="number" min={1} max={99} value={pomodoroDefaultTime} disabled={!pomodoroEnabled}
+                onChange={(e) => { const v = Math.max(1, Math.min(99, Number(e.target.value))); setPomodoroDefaultTime(v); if (pomodoroMode === "pomodoro" && !pomodoroRunning) setPomodoroSeconds(v * 60); }}
+                className="pomo-time-input" style={{ background: selectBg, color: selectColor, borderColor: selectBorder }} />
+              <span style={{ fontSize: "0.8rem", opacity: 0.6 }}>mins</span>
+            </div>
+          </div>
+
+          <div className={`settings-row${!pomodoroEnabled ? " settings-row-dimmed" : ""}`} style={{ borderTop: `1px solid ${rowBorder}` }}>
+            <span className="settings-row-label">Break time</span>
+            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+              <input type="number" min={1} max={99} value={pomodoroBreakTime} disabled={!pomodoroEnabled}
+                onChange={(e) => { const v = Math.max(1, Math.min(99, Number(e.target.value))); setPomodoroBreakTime(v); if (pomodoroMode === "break" && !pomodoroRunning) setPomodoroSeconds(v * 60); }}
+                className="pomo-time-input" style={{ background: selectBg, color: selectColor, borderColor: selectBorder }} />
+              <span style={{ fontSize: "0.8rem", opacity: 0.6 }}>mins</span>
+            </div>
+          </div>
+
+          <div className={`settings-row${!pomodoroEnabled ? " settings-row-dimmed" : ""}`} style={{ borderTop: `1px solid ${rowBorder}` }}>
+            <span className="settings-row-label">Long break time</span>
+            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+              <input type="number" min={1} max={99} value={pomodoroLongBreakTime} disabled={!pomodoroEnabled}
+                onChange={(e) => { const v = Math.max(1, Math.min(99, Number(e.target.value))); setPomodoroLongBreakTime(v); if (pomodoroMode === "longbreak" && !pomodoroRunning) setPomodoroSeconds(v * 60); }}
+                className="pomo-time-input" style={{ background: selectBg, color: selectColor, borderColor: selectBorder }} />
+              <span style={{ fontSize: "0.8rem", opacity: 0.6 }}>mins</span>
             </div>
           </div>
 
