@@ -294,6 +294,13 @@ export default function App() {
 
   const [engineColorEffect] = useState(true);
 
+  // Search bar settings
+  const [searchBarEnabled, setSearchBarEnabled] = useState(true);
+  const [searchSuggestionsEnabled, setSearchSuggestionsEnabled] = useState(true);
+  const [searchBarWidth, setSearchBarWidth] = useState(70);
+  const [searchBarBgOpacity, setSearchBarBgOpacity] = useState(100);
+  const [searchBarPlaceholder, setSearchBarPlaceholder] = useState("");
+
   // Page Layout mode
   type LayoutPos = { x: number; y: number; w?: number; h?: number };
   type LayoutSlotKey = "main" | "A1" | "B2" | "C3";
@@ -918,9 +925,10 @@ export default function App() {
           </div>
         )}
 
+        {searchBarEnabled && (
         <div ref={searchSectionRef}
           className={`search-section${layoutMode ? " layout-el" + (activeLayoutEl === "search" ? " layout-el-active" : "") : ""}`}
-          style={layoutElStyle("search")}
+          style={{ ...layoutElStyle("search"), maxWidth: `${searchBarWidth}%`, width: "100%" }}
           onMouseDown={layoutMode ? (e) => handleLayoutMouseDown("search", e) : undefined}
           onClick={layoutMode ? (e) => e.stopPropagation() : undefined}>
           {renderResizeHandles("search")}
@@ -933,7 +941,9 @@ export default function App() {
                 boxShadow: engineColorEffect
                   ? `0 0 0 3px ${selectedEngine.color}22, 0 2px 8px rgba(0,0,0,0.07)`
                   : `0 2px 8px rgba(0,0,0,0.07)`,
-                background: isDark ? "#252540" : "#ffffff",
+                background: isDark
+                  ? `rgba(37,37,64,${searchBarBgOpacity / 100})`
+                  : `rgba(255,255,255,${searchBarBgOpacity / 100})`,
               }}
             >
               <div className="engine-pill" onClick={() => setShowDropdown(!showDropdown)} title={selectedEngine.name}>
@@ -944,10 +954,10 @@ export default function App() {
                 ref={inputRef}
                 type="text"
                 className="search-input"
-                placeholder={`${t.searchPlaceholder} ${selectedEngine.name}...`}
+                placeholder={searchBarPlaceholder || `${t.searchPlaceholder} ${selectedEngine.name}...`}
                 value={query}
-                onChange={(e) => { setQuery(e.target.value); setShowSuggestions(e.target.value.length > 0); }}
-                onFocus={() => setShowSuggestions(query.length > 0)}
+                onChange={(e) => { setQuery(e.target.value); setShowSuggestions(searchSuggestionsEnabled && e.target.value.length > 0); }}
+                onFocus={() => setShowSuggestions(searchSuggestionsEnabled && query.length > 0)}
                 onKeyDown={handleKeyDown}
                 autoComplete="off"
                 style={{ color: textColor }}
@@ -993,6 +1003,7 @@ export default function App() {
             )}
           </div>
         </div>
+        )}
 
         {showShortcuts && (
           <div ref={shortcutsSectionRef}
@@ -1347,6 +1358,64 @@ export default function App() {
                   {t[s]}
                 </button>
               ))}
+            </div>
+          </div>
+
+        </div>
+
+        {/* ── Search Bar Card ── */}
+        <p className="settings-section-label" style={{ marginTop: 12 }}>Search bar</p>
+        <div className="settings-card" style={{ background: cardBg }}>
+
+          <div className="settings-row">
+            <span className="settings-row-label">Enable</span>
+            <button className={`toggle${searchBarEnabled ? " on" : ""}`} onClick={() => setSearchBarEnabled(!searchBarEnabled)} aria-label="Enable search bar" />
+          </div>
+
+          <div className={`settings-row${!searchBarEnabled ? " settings-row-dimmed" : ""}`} style={{ borderTop: `1px solid ${rowBorder}` }}>
+            <span className="settings-row-label">Suggestions</span>
+            <button className={`toggle${searchSuggestionsEnabled ? " on" : ""}`} onClick={() => setSearchSuggestionsEnabled(!searchSuggestionsEnabled)} disabled={!searchBarEnabled} aria-label="Search suggestions" />
+          </div>
+
+          <div className={`settings-row${!searchBarEnabled ? " settings-row-dimmed" : ""}`} style={{ borderTop: `1px solid ${rowBorder}` }}>
+            <span className="settings-row-label">Search engine</span>
+            <select className="settings-select" value={selectedEngine.name} disabled={!searchBarEnabled}
+              onChange={(e) => { const eng = engines.find(en => en.name === e.target.value); if (eng) setSelectedEngine(eng); }}
+              style={{ background: selectBg, color: selectColor, borderColor: selectBorder }}>
+              {engines.map(en => <option key={en.name} value={en.name}>{en.name}</option>)}
+            </select>
+          </div>
+
+          <div className={`settings-row settings-row-col${!searchBarEnabled ? " settings-row-dimmed" : ""}`} style={{ borderTop: `1px solid ${rowBorder}` }}>
+            <span className="settings-row-label">Placeholder text</span>
+            <input
+              type="text"
+              className="ql-input"
+              placeholder={`Search with ${selectedEngine.name}...`}
+              value={searchBarPlaceholder}
+              onChange={(e) => setSearchBarPlaceholder(e.target.value)}
+              disabled={!searchBarEnabled}
+              style={{ background: isDark ? "#252540" : "#f0f0f5", color: themeColor, borderColor: isDark ? "#3a3a5c" : "#dde0e8", width: "100%", marginTop: 6 }}
+            />
+          </div>
+
+          <div className={`settings-row settings-row-col${!searchBarEnabled ? " settings-row-dimmed" : ""}`} style={{ borderTop: `1px solid ${rowBorder}` }}>
+            <span className="settings-row-label">Width</span>
+            <div className="settings-slider-row">
+              <input type="range" className="settings-slider" min={30} max={100} value={searchBarWidth}
+                onChange={(e) => setSearchBarWidth(Number(e.target.value))} disabled={!searchBarEnabled} />
+              <span style={{ fontSize: 11, opacity: 0.6, minWidth: 28, textAlign: "right" }}>{searchBarWidth}%</span>
+            </div>
+          </div>
+
+          <div className={`settings-row settings-row-col${!searchBarEnabled ? " settings-row-dimmed" : ""}`} style={{ borderTop: `1px solid ${rowBorder}` }}>
+            <span className="settings-row-label">Background</span>
+            <div className="settings-slider-row">
+              <input type="range" className="settings-slider" min={0} max={100} value={searchBarBgOpacity}
+                onChange={(e) => setSearchBarBgOpacity(Number(e.target.value))} disabled={!searchBarEnabled} />
+              <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16" style={{ opacity: 0.5, flexShrink: 0 }}>
+                <path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9c0-.46-.04-.92-.1-1.36-.98 1.37-2.58 2.26-4.4 2.26-2.98 0-5.4-2.42-5.4-5.4 0-1.81.89-3.42 2.26-4.4-.44-.06-.9-.1-1.36-.1z"/>
+              </svg>
             </div>
           </div>
 
