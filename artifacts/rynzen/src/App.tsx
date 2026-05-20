@@ -211,12 +211,21 @@ function getDomain(url: string): string {
 }
 
 type AppLibItem = { id: string; name: string; url: string; domain: string };
+type AppSet = { id: string; name: string; apps: AppLibItem[] };
 
-function loadAppLibrary(): AppLibItem[] {
+function genId() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
+
+function loadAppSets(): AppSet[] {
   try {
-    const raw = localStorage.getItem("rynzen-app-library");
-    return raw ? JSON.parse(raw) : [];
-  } catch { return []; }
+    const raw = localStorage.getItem("rynzen-app-sets");
+    if (raw) return JSON.parse(raw);
+    const oldRaw = localStorage.getItem("rynzen-app-library");
+    if (oldRaw) {
+      const apps: AppLibItem[] = JSON.parse(oldRaw);
+      if (apps.length > 0) return [{ id: "default", name: "My Apps", apps }];
+    }
+  } catch {}
+  return [{ id: "default", name: "My Apps", apps: [] }];
 }
 
 export default function App() {
@@ -268,11 +277,14 @@ export default function App() {
   const [newLinkTitle, setNewLinkTitle] = useState("");
   const [newLinkUrl, setNewLinkUrl] = useState("");
   const [showLibraryModal, setShowLibraryModal] = useState(false);
-  const [appLibrary, setAppLibrary] = useState<AppLibItem[]>(() => loadAppLibrary());
-  const [selectedLibIds, setSelectedLibIds] = useState<Set<string>>(new Set());
-  const [libNewUrl, setLibNewUrl] = useState("");
-  const [libNewTitle, setLibNewTitle] = useState("");
-  const [libUrlError, setLibUrlError] = useState("");
+  const [appSets, setAppSets] = useState<AppSet[]>(() => loadAppSets());
+  const [addingToSet, setAddingToSet] = useState<string | null>(null);
+  const [addUrlValue, setAddUrlValue] = useState("");
+  const [addUrlError, setAddUrlError] = useState("");
+  const [selectingSet, setSelectingSet] = useState<string | null>(null);
+  const [selectedInSet, setSelectedInSet] = useState<Set<string>>(new Set());
+  const [editingSetId, setEditingSetId] = useState<string | null>(null);
+  const [editingSetName, setEditingSetName] = useState("");
 
   const [bgType, setBgType] = useState<"none" | "images" | "color" | "gradient">("none");
   const [bgImageSelected, setBgImageSelected] = useState("");
@@ -283,8 +295,8 @@ export default function App() {
   }, [bgType]);
 
   useEffect(() => {
-    try { localStorage.setItem("rynzen-app-library", JSON.stringify(appLibrary)); } catch { /* ignore */ }
-  }, [appLibrary]);
+    try { localStorage.setItem("rynzen-app-sets", JSON.stringify(appSets)); } catch { /* ignore */ }
+  }, [appSets]);
 
   const [appliedFontFamily, setAppliedFontFamily] = useState("");
   const [fontFamilyInput, setFontFamilyInput] = useState("");
@@ -1809,165 +1821,206 @@ export default function App() {
 
       {/* ── App Library Modal ── */}
       {showLibraryModal && (
-        <div className="bm-modal-overlay" onClick={() => setShowLibraryModal(false)}>
-          <div className="bm-modal" style={{ background: isDark ? "#1a1a30" : "#ffffff", color: themeColor }} onClick={(e) => e.stopPropagation()}>
+        <div className="al-overlay" onClick={() => { setShowLibraryModal(false); setAddingToSet(null); setSelectingSet(null); setSelectedInSet(new Set()); setEditingSetId(null); }}>
+          <div className="al-modal" style={{ background: isDark ? "#16162a" : "#efefef", color: themeColor }} onClick={(e) => e.stopPropagation()}>
 
-            {/* Header */}
-            <div className="bm-modal-header" style={{ borderBottom: `1px solid ${rowBorder}` }}>
-              <div>
-                <p className="bm-modal-title">App Library</p>
-                <p className="bm-modal-sub" style={{ color: isDark ? "rgba(255,255,255,0.45)" : "rgba(0,0,0,0.45)" }}>
-                  Save your apps, then select which ones to show in Quick Access
-                </p>
-              </div>
-              <button className="bm-close-btn" style={{ color: themeColor }} onClick={() => setShowLibraryModal(false)}>
-                <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
-              </button>
-            </div>
-
-            {/* Add new app form */}
-            <div className="bm-add-form" style={{ borderBottom: `1px solid ${rowBorder}`, background: isDark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.02)" }}>
-              <p className="bm-add-label" style={{ color: isDark ? "rgba(255,255,255,0.55)" : "rgba(0,0,0,0.45)" }}>Add a new app</p>
-              <div className="bm-add-row">
-                <input
-                  type="text"
-                  className="bm-add-input"
-                  placeholder="https://youtube.com"
-                  value={libNewUrl}
-                  style={{ background: isDark ? "#252540" : "#f4f4f8", color: themeColor, borderColor: libUrlError ? "#e74c3c" : (isDark ? "#3a3a5c" : "#dde0e8") }}
-                  onChange={(e) => { setLibNewUrl(e.target.value); setLibUrlError(""); }}
-                  onKeyDown={(e) => { if (e.key === "Enter") document.getElementById("lib-add-btn")?.click(); }}
-                />
-                <input
-                  type="text"
-                  className="bm-add-input bm-add-input-name"
-                  placeholder="Name (optional)"
-                  value={libNewTitle}
-                  style={{ background: isDark ? "#252540" : "#f4f4f8", color: themeColor, borderColor: isDark ? "#3a3a5c" : "#dde0e8" }}
-                  onChange={(e) => setLibNewTitle(e.target.value)}
-                  onKeyDown={(e) => { if (e.key === "Enter") document.getElementById("lib-add-btn")?.click(); }}
-                />
+            {/* ── Header ── */}
+            <div className="al-header">
+              <span className="al-title" style={{ color: themeColor }}>App Library</span>
+              <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
                 <button
-                  id="lib-add-btn"
-                  className="bm-add-btn"
-                  style={{ background: "#4285F4", color: "#fff" }}
+                  className="al-add-set-btn"
                   onClick={() => {
-                    let url = libNewUrl.trim();
-                    if (!url) { setLibUrlError("Enter a URL"); return; }
-                    if (!/^https?:\/\//i.test(url)) url = "https://" + url;
-                    let domain = "";
-                    try { domain = new URL(url).hostname.replace(/^www\./, ""); } catch { setLibUrlError("Invalid URL"); return; }
-                    const name = libNewTitle.trim() || domain.split(".")[0].replace(/-/g, " ").replace(/\b\w/g, c => c.toUpperCase());
-                    const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
-                    setAppLibrary(prev => [...prev, { id, name, url, domain }]);
-                    setLibNewUrl("");
-                    setLibNewTitle("");
-                    setLibUrlError("");
+                    const id = genId();
+                    setAppSets(prev => [...prev, { id, name: "New Set", apps: [] }]);
+                    setEditingSetId(id);
+                    setEditingSetName("New Set");
                   }}
                 >
-                  <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
-                  Add
+                  + APP SET
+                </button>
+                <button className="bm-close-btn" style={{ color: themeColor }} onClick={() => setShowLibraryModal(false)}>
+                  <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
                 </button>
               </div>
-              {libUrlError && <p className="bm-url-error">{libUrlError}</p>}
             </div>
 
-            {/* App grid */}
-            <div className="bm-modal-body">
-              {appLibrary.length === 0 ? (
-                <div className="bm-empty" style={{ color: isDark ? "rgba(255,255,255,0.35)" : "rgba(0,0,0,0.3)" }}>
-                  <svg viewBox="0 0 24 24" fill="currentColor" width="36" height="36" style={{ opacity: 0.25, marginBottom: 10 }}><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg>
-                  <p>No apps saved yet.</p>
-                  <p style={{ fontSize: "0.75rem", marginTop: 4 }}>Add apps above using their URL, then select which to show in Quick Access.</p>
-                </div>
-              ) : (
-                <>
-                  <div className="bm-select-bar" style={{ borderBottom: `1px solid ${rowBorder}` }}>
-                    <span style={{ fontSize: "0.75rem", color: isDark ? "rgba(255,255,255,0.45)" : "rgba(0,0,0,0.4)" }}>
-                      {appLibrary.length} app{appLibrary.length !== 1 ? "s" : ""} saved
-                    </span>
-                    <button
-                      className="bm-select-all-btn"
-                      style={{ color: "#4285F4" }}
-                      onClick={() => {
-                        const all = new Set(appLibrary.map(a => a.id));
-                        const isAllSelected = appLibrary.every(a => selectedLibIds.has(a.id));
-                        setSelectedLibIds(isAllSelected ? new Set() : all);
-                      }}
-                    >
-                      {appLibrary.every(a => selectedLibIds.has(a.id)) ? "Deselect all" : "Select all"}
-                    </button>
+            {/* ── Sets body ── */}
+            <div className="al-body">
+              {appSets.map((set) => (
+                <div key={set.id} className="al-set-card" style={{ borderColor: isDark ? "rgba(34,211,238,0.45)" : "rgba(6,182,212,0.6)", background: isDark ? "rgba(255,255,255,0.03)" : "rgba(255,255,255,0.7)" }}>
+
+                  {/* Set name row */}
+                  <div className="al-set-header">
+                    {editingSetId === set.id ? (
+                      <input
+                        className="al-set-name-input"
+                        style={{ color: themeColor, background: "transparent", borderColor: isDark ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.15)" }}
+                        value={editingSetName}
+                        autoFocus
+                        onChange={(e) => setEditingSetName(e.target.value)}
+                        onBlur={() => { setAppSets(prev => prev.map(s => s.id === set.id ? { ...s, name: editingSetName.trim() || "Set" } : s)); setEditingSetId(null); }}
+                        onKeyDown={(e) => { if (e.key === "Enter" || e.key === "Escape") (e.target as HTMLInputElement).blur(); }}
+                      />
+                    ) : (
+                      <span
+                        className="al-set-name"
+                        style={{ color: themeColor }}
+                        title="Click to rename"
+                        onClick={() => { setEditingSetId(set.id); setEditingSetName(set.name); }}
+                      >{set.name}</span>
+                    )}
+                    <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+                      {appSets.length > 1 && (
+                        <button
+                          className="al-set-del-btn"
+                          style={{ color: isDark ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.3)" }}
+                          title="Delete set"
+                          onClick={() => { setAppSets(prev => prev.filter(s => s.id !== set.id)); if (selectingSet === set.id) { setSelectingSet(null); setSelectedInSet(new Set()); } if (addingToSet === set.id) setAddingToSet(null); }}
+                        >
+                          <svg viewBox="0 0 24 24" fill="currentColor" width="13" height="13"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+                        </button>
+                      )}
+                      <button
+                        className="al-select-btn"
+                        style={{
+                          borderColor: selectingSet === set.id ? "#22d3ee" : (isDark ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.18)"),
+                          color: selectingSet === set.id ? "#22d3ee" : themeColor,
+                          background: selectingSet === set.id ? (isDark ? "rgba(34,211,238,0.1)" : "rgba(6,182,212,0.08)") : "transparent",
+                        }}
+                        onClick={() => { if (selectingSet === set.id) { setSelectingSet(null); setSelectedInSet(new Set()); } else { setSelectingSet(set.id); setSelectedInSet(new Set()); } }}
+                      >
+                        {selectingSet === set.id ? "Cancel" : "Select"}
+                      </button>
+                    </div>
                   </div>
-                  <div className="bm-app-grid">
-                    {appLibrary.map((app) => {
-                      const isSel = selectedLibIds.has(app.id);
+
+                  {/* App icon grid */}
+                  <div className="al-app-grid">
+                    {set.apps.map((app) => {
+                      const isSel = selectingSet === set.id && selectedInSet.has(app.id);
                       return (
                         <div
                           key={app.id}
-                          className={`bm-app-card${isSel ? " bm-app-card-sel" : ""}`}
-                          style={{
-                            background: isSel ? (isDark ? "rgba(66,133,244,0.18)" : "rgba(66,133,244,0.1)") : (isDark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.03)"),
-                            borderColor: isSel ? "#4285F4" : (isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.08)"),
+                          className={`al-app-item${isSel ? " al-app-sel" : ""}`}
+                          style={{ background: isDark ? "#252540" : "#e2e2e9", borderColor: isSel ? "#22d3ee" : "transparent" }}
+                          title={app.name}
+                          onClick={() => {
+                            if (selectingSet === set.id) {
+                              setSelectedInSet(prev => { const n = new Set(prev); if (n.has(app.id)) n.delete(app.id); else n.add(app.id); return n; });
+                            }
                           }}
-                          onClick={() => setSelectedLibIds(prev => {
-                            const next = new Set(prev);
-                            if (next.has(app.id)) next.delete(app.id); else next.add(app.id);
-                            return next;
-                          })}
                         >
                           {isSel && (
-                            <div className="bm-app-checkmark">
-                              <svg viewBox="0 0 24 24" fill="#fff" width="11" height="11"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
+                            <div className="al-check">
+                              <svg viewBox="0 0 24 24" fill="#fff" width="10" height="10"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
                             </div>
                           )}
-                          <button
-                            className="bm-app-delete"
-                            style={{ color: isDark ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.25)" }}
-                            onClick={(e) => { e.stopPropagation(); setAppLibrary(prev => prev.filter(a => a.id !== app.id)); setSelectedLibIds(prev => { const n = new Set(prev); n.delete(app.id); return n; }); }}
-                            title="Remove from library"
-                          >
-                            <svg viewBox="0 0 24 24" fill="currentColor" width="12" height="12"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
-                          </button>
+                          {selectingSet !== set.id && (
+                            <button
+                              className="al-app-del"
+                              style={{ color: isDark ? "rgba(255,255,255,0.5)" : "rgba(0,0,0,0.4)" }}
+                              onClick={(e) => { e.stopPropagation(); setAppSets(prev => prev.map(s => s.id === set.id ? { ...s, apps: s.apps.filter(a => a.id !== app.id) } : s)); }}
+                            >×</button>
+                          )}
                           <img
                             src={`https://www.google.com/s2/favicons?domain=${app.domain}&sz=64`}
                             alt={app.name}
-                            className="bm-app-icon"
+                            className="al-app-icon"
                           />
-                          <span className="bm-app-name" style={{ color: themeColor }}>{app.name}</span>
-                          <span className="bm-app-domain" style={{ color: isDark ? "rgba(255,255,255,0.35)" : "rgba(0,0,0,0.35)" }}>{app.domain}</span>
+                          <span className="al-app-label" style={{ color: isDark ? "rgba(255,255,255,0.75)" : "rgba(0,0,0,0.65)" }}>{app.name}</span>
                         </div>
                       );
                     })}
+
+                    {/* + Add button (only when not in select mode) */}
+                    {selectingSet !== set.id && addingToSet !== set.id && (
+                      <button
+                        className="al-add-app-tile"
+                        style={{ background: isDark ? "#252540" : "#e2e2e9", borderColor: isDark ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.1)" }}
+                        onClick={() => { setAddingToSet(set.id); setAddUrlValue(""); setAddUrlError(""); }}
+                      >
+                        <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22" style={{ opacity: 0.5 }}><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+                      </button>
+                    )}
                   </div>
-                </>
-              )}
+
+                  {/* Inline URL input (shown when + clicked) */}
+                  {addingToSet === set.id && (
+                    <div className="al-inline-add" style={{ borderTop: `1px solid ${isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.07)"}` }}>
+                      <input
+                        type="text"
+                        className="al-inline-input"
+                        placeholder="Paste app URL, e.g. youtube.com"
+                        value={addUrlValue}
+                        autoFocus
+                        style={{ background: isDark ? "#1c1c34" : "#fff", color: themeColor, borderColor: addUrlError ? "#e74c3c" : (isDark ? "#3a3a5c" : "#d0d3de") }}
+                        onChange={(e) => { setAddUrlValue(e.target.value); setAddUrlError(""); }}
+                        onKeyDown={(e) => {
+                          if (e.key === "Escape") { setAddingToSet(null); }
+                          if (e.key === "Enter") {
+                            let url = addUrlValue.trim();
+                            if (!url) { setAddUrlError("Enter a URL"); return; }
+                            if (!/^https?:\/\//i.test(url)) url = "https://" + url;
+                            let domain = "";
+                            try { domain = new URL(url).hostname.replace(/^www\./, ""); } catch { setAddUrlError("Invalid URL"); return; }
+                            const name = domain.split(".")[0].replace(/-/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+                            const id = genId();
+                            setAppSets(prev => prev.map(s => s.id === set.id ? { ...s, apps: [...s.apps, { id, name, url, domain }] } : s));
+                            setAddingToSet(null); setAddUrlValue("");
+                          }
+                        }}
+                      />
+                      <button
+                        className="al-inline-save"
+                        onClick={() => {
+                          let url = addUrlValue.trim();
+                          if (!url) { setAddUrlError("Enter a URL"); return; }
+                          if (!/^https?:\/\//i.test(url)) url = "https://" + url;
+                          let domain = "";
+                          try { domain = new URL(url).hostname.replace(/^www\./, ""); } catch { setAddUrlError("Invalid URL"); return; }
+                          const name = domain.split(".")[0].replace(/-/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+                          const id = genId();
+                          setAppSets(prev => prev.map(s => s.id === set.id ? { ...s, apps: [...s.apps, { id, name, url, domain }] } : s));
+                          setAddingToSet(null); setAddUrlValue("");
+                        }}
+                      >Save</button>
+                      <button className="al-inline-cancel" style={{ color: isDark ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.35)" }} onClick={() => setAddingToSet(null)}>Cancel</button>
+                      {addUrlError && <span className="al-url-error">{addUrlError}</span>}
+                    </div>
+                  )}
+
+                  {/* Select mode footer */}
+                  {selectingSet === set.id && (
+                    <div className="al-sel-footer" style={{ borderTop: `1px solid ${isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.07)"}` }}>
+                      <span style={{ fontSize: "0.75rem", color: isDark ? "rgba(255,255,255,0.5)" : "rgba(0,0,0,0.45)" }}>
+                        {selectedInSet.size > 0 ? `${selectedInSet.size} selected` : "Tap apps to select"}
+                      </span>
+                      <button
+                        className="al-sel-add-btn"
+                        style={{ background: selectedInSet.size === 0 ? (isDark ? "#2a2a44" : "#d8d8e0") : "#22d3ee", color: selectedInSet.size === 0 ? (isDark ? "rgba(255,255,255,0.25)" : "#aaa") : "#fff" }}
+                        disabled={selectedInSet.size === 0}
+                        onClick={() => {
+                          const toAdd = set.apps.filter(a => selectedInSet.has(a.id));
+                          setShortcuts(prev => {
+                            const existingUrls = new Set(prev.map(s => s.url));
+                            return [...prev, ...toAdd.filter(a => !existingUrls.has(a.url)).map(a => ({ name: a.name, url: a.url, domain: a.domain }))];
+                          });
+                          setSelectingSet(null); setSelectedInSet(new Set()); setShowLibraryModal(false);
+                        }}
+                      >Add to Quick Access</button>
+                    </div>
+                  )}
+
+                </div>
+              ))}
             </div>
 
-            {/* Footer */}
-            <div className="bm-modal-footer" style={{ borderTop: `1px solid ${rowBorder}` }}>
-              <span className="bm-footer-count" style={{ color: isDark ? "rgba(255,255,255,0.5)" : "rgba(0,0,0,0.45)" }}>
-                {selectedLibIds.size > 0 ? `${selectedLibIds.size} selected` : "Select apps to add"}
-              </span>
-              <div style={{ display: "flex", gap: 8 }}>
-                <button className="bm-footer-btn bm-footer-cancel" style={{ background: isDark ? "#2a2a44" : "#f0f0f5", color: themeColor }} onClick={() => setShowLibraryModal(false)}>
-                  Close
-                </button>
-                <button
-                  className="bm-footer-btn bm-footer-add"
-                  style={{ background: selectedLibIds.size === 0 ? (isDark ? "#2a2a44" : "#e0e0e0") : "#4285F4", color: selectedLibIds.size === 0 ? (isDark ? "rgba(255,255,255,0.25)" : "#aaa") : "#fff" }}
-                  disabled={selectedLibIds.size === 0}
-                  onClick={() => {
-                    const toAdd = appLibrary.filter(a => selectedLibIds.has(a.id));
-                    setShortcuts(prev => {
-                      const existingUrls = new Set(prev.map(s => s.url));
-                      return [...prev, ...toAdd.filter(a => !existingUrls.has(a.url)).map(a => ({ name: a.name, url: a.url, domain: a.domain }))];
-                    });
-                    setShowLibraryModal(false);
-                  }}
-                >
-                  Add to Quick Access
-                </button>
-              </div>
+            {/* ── Footer ── */}
+            <div className="al-footer" style={{ borderTop: `1px solid ${rowBorder}` }}>
+              <button className="al-done-btn" style={{ background: isDark ? "#2a2a44" : "#e0e0ea", color: themeColor }} onClick={() => setShowLibraryModal(false)}>
+                Done
+              </button>
             </div>
 
           </div>

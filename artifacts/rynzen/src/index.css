@@ -1909,3 +1909,294 @@ body {
 .bm-footer-btn:hover:not(:disabled) { opacity: 0.85; }
 .bm-footer-cancel { cursor: pointer; }
 .bm-footer-add { cursor: pointer; }
+
+/* ════════════════════════════════
+   App Library Modal  (.al-*)
+   ════════════════════════════════ */
+.al-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 3000;
+  background: rgba(0,0,0,0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: bm-fade-in 0.15s ease;
+}
+.al-modal {
+  width: 100%;
+  max-width: 660px;
+  max-height: 82vh;
+  border-radius: 20px;
+  box-shadow: 0 28px 72px rgba(0,0,0,0.38);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: bm-slide-up 0.2s ease;
+}
+
+/* Header */
+.al-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 20px 14px;
+  flex-shrink: 0;
+}
+.al-title {
+  font-size: 1.25rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+.al-add-set-btn {
+  background: transparent;
+  border: 1.5px solid #22d3ee;
+  color: #22d3ee;
+  border-radius: 8px;
+  padding: 5px 12px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: background 0.15s, opacity 0.15s;
+}
+.al-add-set-btn:hover { background: rgba(34,211,238,0.12); }
+
+/* Body (scrollable sets list) */
+.al-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 4px 16px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.al-body::-webkit-scrollbar { width: 5px; }
+.al-body::-webkit-scrollbar-track { background: transparent; }
+.al-body::-webkit-scrollbar-thumb { background: rgba(128,128,128,0.3); border-radius: 3px; }
+
+/* Set card */
+.al-set-card {
+  border: 1.5px solid;
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+/* Set header row */
+.al-set-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px 8px;
+  gap: 8px;
+}
+.al-set-name {
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  border-bottom: 1px dashed transparent;
+  transition: border-color 0.15s;
+}
+.al-set-name:hover { border-bottom-color: currentColor; }
+.al-set-name-input {
+  font-size: 0.88rem;
+  font-weight: 700;
+  border: none;
+  border-bottom: 1.5px solid;
+  outline: none;
+  padding: 0 2px;
+  min-width: 0;
+  width: 120px;
+}
+.al-set-del-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 3px;
+  line-height: 0;
+  transition: color 0.15s;
+}
+.al-set-del-btn:hover { color: #e74c3c !important; }
+.al-select-btn {
+  font-size: 0.72rem;
+  font-weight: 700;
+  border: 1.5px solid;
+  border-radius: 6px;
+  padding: 3px 10px;
+  cursor: pointer;
+  letter-spacing: 0.03em;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+/* App icon grid */
+.al-app-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(68px, 1fr));
+  gap: 8px;
+  padding: 4px 10px 12px;
+}
+
+/* App tile */
+.al-app-item {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  padding: 10px 6px 8px;
+  border-radius: 12px;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: transform 0.1s, border-color 0.12s;
+  user-select: none;
+}
+.al-app-item:hover { transform: translateY(-2px); }
+.al-app-sel { border-color: #22d3ee !important; }
+.al-app-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  object-fit: contain;
+}
+.al-app-label {
+  font-size: 0.65rem;
+  font-weight: 500;
+  text-align: center;
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.2;
+}
+.al-check {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #22d3ee;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.al-app-del {
+  position: absolute;
+  top: 2px;
+  right: 3px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+  line-height: 1;
+  padding: 1px 3px;
+  opacity: 0;
+  transition: opacity 0.15s, color 0.15s;
+  font-weight: 700;
+}
+.al-app-item:hover .al-app-del { opacity: 1; }
+.al-app-del:hover { color: #e74c3c !important; }
+
+/* + Add tile */
+.al-add-app-tile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  border: 1.5px dashed;
+  aspect-ratio: 1;
+  min-height: 68px;
+  cursor: pointer;
+  transition: opacity 0.15s, transform 0.1s;
+  background: none;
+}
+.al-add-app-tile:hover { opacity: 0.7; transform: scale(1.04); }
+
+/* Inline add URL row */
+.al-inline-add {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 10px 10px 10px;
+  flex-wrap: wrap;
+}
+.al-inline-input {
+  flex: 1;
+  min-width: 0;
+  border: 1.5px solid;
+  border-radius: 8px;
+  padding: 7px 10px;
+  font-size: 0.82rem;
+  outline: none;
+  transition: border-color 0.15s;
+}
+.al-inline-input:focus { border-color: #22d3ee !important; }
+.al-inline-save {
+  background: #22d3ee;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 7px 14px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: opacity 0.15s;
+}
+.al-inline-save:hover { opacity: 0.85; }
+.al-inline-cancel {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.78rem;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: opacity 0.15s;
+}
+.al-inline-cancel:hover { opacity: 0.6; }
+.al-url-error {
+  width: 100%;
+  font-size: 0.7rem;
+  color: #e74c3c;
+  padding: 0 2px;
+}
+
+/* Select-mode footer inside set card */
+.al-sel-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 9px 12px;
+}
+.al-sel-add-btn {
+  border: none;
+  border-radius: 8px;
+  padding: 6px 14px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.al-sel-add-btn:disabled { cursor: not-allowed; }
+.al-sel-add-btn:hover:not(:disabled) { opacity: 0.85; }
+
+/* Modal footer */
+.al-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 12px 20px;
+  flex-shrink: 0;
+}
+.al-done-btn {
+  border: none;
+  border-radius: 9px;
+  padding: 8px 22px;
+  font-size: 0.84rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.al-done-btn:hover { opacity: 0.8; }
