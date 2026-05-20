@@ -1342,13 +1342,13 @@ export default function App() {
         <div className="settings-card" style={{ background: cardBg }}>
 
           <div className="settings-row">
-            <span className="settings-row-label">Timer</span>
-            <button className={`toggle${pomodoroEnabled ? " on" : ""}`} onClick={() => { setPomodoroEnabled(v => { if (!v) setCountdownEnabled(false); return !v; }); }} aria-label="Enable timer" />
+            <span className="settings-row-label">Stopwatch</span>
+            <button className={`toggle${countdownEnabled ? " on" : ""}`} onClick={() => { setCountdownEnabled(v => { if (!v) setPomodoroEnabled(false); return !v; }); }} aria-label="Enable countdown" />
           </div>
 
           <div className="settings-row" style={{ borderTop: `1px solid ${rowBorder}` }}>
-            <span className="settings-row-label">Stopwatch</span>
-            <button className={`toggle${countdownEnabled ? " on" : ""}`} onClick={() => { setCountdownEnabled(v => { if (!v) setPomodoroEnabled(false); return !v; }); }} aria-label="Enable countdown" />
+            <span className="settings-row-label">Timer</span>
+            <button className={`toggle${pomodoroEnabled ? " on" : ""}`} onClick={() => { setPomodoroEnabled(v => { if (!v) setCountdownEnabled(false); return !v; }); }} aria-label="Enable timer" />
           </div>
 
           <div className={`settings-row${!pomodoroEnabled ? " settings-row-dimmed" : ""}`} style={{ borderTop: `1px solid ${rowBorder}` }}>
