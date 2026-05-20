@@ -1572,3 +1572,45 @@ body {
 .layout-open-btn:hover {
   opacity: 0.85;
 }
+
+/* Layout slot selector grid */
+.layout-slot-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  padding: 10px 12px;
+}
+
+.layout-slot-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  border: 2px solid;
+  border-radius: 9px;
+  padding: 10px 6px 8px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, transform 0.1s;
+  background: none;
+  min-height: 56px;
+}
+.layout-slot-box:hover {
+  transform: translateY(-1px);
+}
+.layout-slot-box:active {
+  transform: translateY(0);
+}
+
+.layout-slot-name {
+  font-size: 0.88rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.layout-slot-badge {
+  font-size: 0.62rem;
+  font-weight: 500;
+  opacity: 0.65;
+  white-space: nowrap;
+}

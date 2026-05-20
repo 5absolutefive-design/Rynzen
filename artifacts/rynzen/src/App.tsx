@@ -295,17 +295,27 @@ export default function App() {
   const [engineColorEffect] = useState(true);
 
   // Page Layout mode
-  const [layoutMode, setLayoutMode] = useState(false);
   type LayoutPos = { x: number; y: number };
-  const [layoutPositions, setLayoutPositions] = useState<Record<string, LayoutPos | null>>({
-    clock: null, search: null, shortcuts: null, pomodoro: null,
+  type LayoutSlotKey = "main" | "A1" | "B2" | "C3";
+  type SlotData = Record<string, LayoutPos | null>;
+  const emptySlotData = (): SlotData => ({ clock: null, search: null, shortcuts: null, pomodoro: null });
+
+  const [layoutMode, setLayoutMode] = useState(false);
+  const [layoutPositions, setLayoutPositions] = useState<SlotData>(emptySlotData);
+
+  const [activeSlot, setActiveSlot] = useState<LayoutSlotKey>(() => {
+    try { return (localStorage.getItem("rynzen-active-slot") as LayoutSlotKey) || "main"; } catch { return "main"; }
   });
-  const [persistedPositions, setPersistedPositions] = useState<Record<string, LayoutPos | null>>(() => {
+  const [layoutSlots, setLayoutSlots] = useState<Record<"A1"|"B2"|"C3", SlotData>>(() => {
     try {
-      const saved = localStorage.getItem("rynzen-layout-positions");
-      return saved ? JSON.parse(saved) : { clock: null, search: null, shortcuts: null, pomodoro: null };
-    } catch { return { clock: null, search: null, shortcuts: null, pomodoro: null }; }
+      const saved = localStorage.getItem("rynzen-layout-slots");
+      return saved ? JSON.parse(saved) : { A1: emptySlotData(), B2: emptySlotData(), C3: emptySlotData() };
+    } catch { return { A1: emptySlotData(), B2: emptySlotData(), C3: emptySlotData() }; }
   });
+
+  const persistedPositions: SlotData = activeSlot === "main"
+    ? emptySlotData()
+    : (layoutSlots[activeSlot as "A1"|"B2"|"C3"] ?? emptySlotData());
   const [activeLayoutEl, setActiveLayoutEl] = useState<string | null>(null);
   const layoutDragRef = useRef<{ el: string; startMX: number; startMY: number; startElX: number; startElY: number } | null>(null);
   const mainRef = useRef<HTMLElement>(null);
@@ -484,19 +494,28 @@ export default function App() {
   }
 
   function exitLayoutMode() {
-    const saved = { ...layoutPositions };
-    setPersistedPositions(saved);
-    try { localStorage.setItem("rynzen-layout-positions", JSON.stringify(saved)); } catch { /* ignore */ }
+    if (activeSlot !== "main") {
+      const saved = { ...layoutPositions };
+      const updated = { ...layoutSlots, [activeSlot]: saved } as Record<"A1"|"B2"|"C3", SlotData>;
+      setLayoutSlots(updated);
+      try { localStorage.setItem("rynzen-layout-slots", JSON.stringify(updated)); } catch { /* ignore */ }
+    }
     setLayoutMode(false);
     setActiveLayoutEl(null);
     layoutDragRef.current = null;
   }
 
   function resetLayout() {
-    const empty = { clock: null, search: null, shortcuts: null, pomodoro: null };
-    setLayoutPositions(empty);
-    setPersistedPositions(empty);
-    try { localStorage.removeItem("rynzen-layout-positions"); } catch { /* ignore */ }
+    if (activeSlot === "main") return;
+    const updated = { ...layoutSlots, [activeSlot]: emptySlotData() } as Record<"A1"|"B2"|"C3", SlotData>;
+    setLayoutSlots(updated);
+    setLayoutPositions(emptySlotData());
+    try { localStorage.setItem("rynzen-layout-slots", JSON.stringify(updated)); } catch { /* ignore */ }
+  }
+
+  function selectSlot(slot: LayoutSlotKey) {
+    setActiveSlot(slot);
+    try { localStorage.setItem("rynzen-active-slot", slot); } catch { /* ignore */ }
   }
 
   const handleLayoutMouseDown = useCallback((el: string, e: React.MouseEvent) => {
@@ -600,7 +619,7 @@ export default function App() {
   const selectColor = themeColor;
   const selectBorder = isDark ? "#3a3a5c" : "#dde0e8";
 
-  const hasPersistedLayout = Object.values(persistedPositions).some(p => p !== null);
+  const hasPersistedLayout = activeSlot !== "main" && Object.values(persistedPositions).some(p => p !== null);
 
   function layoutElStyle(key: string): React.CSSProperties {
     if (layoutMode) {
@@ -1574,21 +1593,43 @@ export default function App() {
         {/* ── Page Layout Card ── */}
         <p className="settings-section-label" style={{ marginTop: 12 }}>Page layout</p>
         <div className="settings-card" style={{ background: cardBg }}>
-          <div className="settings-row">
-            <span className="settings-row-label" style={{ fontSize: "0.85rem" }}>Open layout toolbox</span>
-            <button
-              className="layout-open-btn"
-              onClick={enterLayoutMode}
-              style={{ background: isDark ? "#4285F4" : "#4285F4", color: "#fff" }}
-            >
-              Open
-            </button>
+          <div className="layout-slot-grid">
+            {(["main", "A1", "B2", "C3"] as LayoutSlotKey[]).map(slot => (
+              <button
+                key={slot}
+                className={`layout-slot-box${activeSlot === slot ? " layout-slot-active" : ""}`}
+                style={{
+                  background: activeSlot === slot ? (isDark ? "#2a2a50" : "#e8eeff") : (isDark ? "#1a1a36" : "#f5f5fa"),
+                  borderColor: activeSlot === slot ? "#4285F4" : (isDark ? "#3a3a5c" : "#d0d0e0"),
+                  color: activeSlot === slot ? "#4285F4" : (isDark ? "#aab" : "#555"),
+                }}
+                onClick={() => selectSlot(slot)}
+              >
+                <span className="layout-slot-name">{slot === "main" ? "Main" : slot}</span>
+                {slot === "main" && <span className="layout-slot-badge">Default</span>}
+              </button>
+            ))}
           </div>
+          {activeSlot !== "main" && (
+            <div className="settings-row" style={{ borderTop: `1px solid ${rowBorder}` }}>
+              <span className="settings-row-label" style={{ fontSize: "0.85rem" }}>
+                Edit layout <span style={{ opacity: 0.55, fontSize: "0.78rem" }}>({activeSlot})</span>
+              </span>
+              <button
+                className="layout-open-btn"
+                onClick={enterLayoutMode}
+                style={{ background: "#4285F4", color: "#fff" }}
+              >
+                Open
+              </button>
+            </div>
+          )}
           <div className="settings-row" style={{ borderTop: `1px solid ${rowBorder}`, opacity: 0.55 }}>
             <span className="settings-row-label" style={{ fontSize: "0.78rem", lineHeight: 1.4 }}>
-              Click any element on the page to select it, then drag to reposition.
+              {activeSlot === "main"
+                ? "Select A1, B2 or C3 to create a custom layout."
+                : "Click any element on the page to select it, then drag to reposition."}
             </span>
-            <span style={{ fontSize: "0.75rem" }}>?</span>
           </div>
         </div>
 
