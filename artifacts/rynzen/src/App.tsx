@@ -285,6 +285,10 @@ export default function App() {
   const [pomodoroTask, setPomodoroTask] = useState("");
   const [pomodoroFocus, setPomodoroFocus] = useState(false);
 
+  const [countdownEnabled, setCountdownEnabled] = useState(false);
+  const [countdownTarget, setCountdownTarget] = useState("");
+  const [countdownSavedTarget, setCountdownSavedTarget] = useState("");
+
   const [engineColorEffect] = useState(true);
 
   const inputRef = useRef<HTMLInputElement>(null);
@@ -341,6 +345,13 @@ export default function App() {
   const fontSizePx = 12 + Math.round((fontSizeNum / 100) * 16);
   const textColor = fontColor || (isDark ? "#e8e8f0" : "#1a1a2e");
   const themeColor = isDark ? "#e8e8f0" : "#1a1a2e";
+
+  const cdRemaining = countdownSavedTarget ? Math.max(0, new Date(countdownSavedTarget).getTime() - now.getTime()) : 0;
+  const cdDays = Math.floor(cdRemaining / 86400000);
+  const cdHours = Math.floor((cdRemaining % 86400000) / 3600000);
+  const cdMins = Math.floor((cdRemaining % 3600000) / 60000);
+  const cdSecs = Math.floor((cdRemaining % 60000) / 1000);
+  const cdDone = countdownSavedTarget && cdRemaining === 0;
 
   useEffect(() => {
     const weightMap: Record<string, string> = { light: "300", normal: "400", "semi-bold": "600", bold: "700" };
@@ -563,46 +574,97 @@ export default function App() {
           </div>
         )}
 
-        {pomodoroEnabled && (
+        {(pomodoroEnabled || countdownEnabled) && (
           <div className="pomodoro-card" style={{ background: isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.055)", borderColor: isDark ? "rgba(255,255,255,0.09)" : "rgba(0,0,0,0.08)" }}>
-            <div className="pomo-tabs">
-              {([["pomodoro","Pomodoro"],["break","Break"],["longbreak","Long break"]] as const).map(([m,label]) => (
-                <button key={m} className={`pomo-tab${pomodoroMode === m ? " active" : ""}`}
-                  onClick={() => handlePomodoroMode(m)}
-                  style={{ color: pomodoroMode === m ? "#fff" : (fontColor || (isDark ? "#bbc" : "#666")), background: pomodoroMode === m ? (isDark ? "rgba(255,255,255,0.15)" : "rgba(0,0,0,0.12)") : "transparent" }}>
-                  {label}
-                </button>
-              ))}
-            </div>
-            <div className="pomo-time" style={{ color: textColor }}>
-              {String(Math.floor(pomodoroSeconds / 60)).padStart(2,"0")}:{String(pomodoroSeconds % 60).padStart(2,"0")}
-            </div>
-            <div className="pomo-controls">
-              <button className="pomo-btn pomo-play" onClick={() => setPomodoroRunning(r => !r)}
-                style={{ color: textColor, borderColor: isDark ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.15)" }}>
-                {pomodoroRunning ? (
-                  <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+
+            {pomodoroEnabled && (
+              <>
+                <div className="pomo-tabs">
+                  {([["pomodoro","Pomodoro"],["break","Break"],["longbreak","Long break"]] as const).map(([m,label]) => (
+                    <button key={m} className={`pomo-tab${pomodoroMode === m ? " active" : ""}`}
+                      onClick={() => handlePomodoroMode(m)}
+                      style={{ color: pomodoroMode === m ? "#fff" : (fontColor || (isDark ? "#bbc" : "#666")), background: pomodoroMode === m ? (isDark ? "rgba(255,255,255,0.15)" : "rgba(0,0,0,0.12)") : "transparent" }}>
+                      {label}
+                    </button>
+                  ))}
+                </div>
+                <div className="pomo-time" style={{ color: textColor }}>
+                  {String(Math.floor(pomodoroSeconds / 60)).padStart(2,"0")}:{String(pomodoroSeconds % 60).padStart(2,"0")}
+                </div>
+                <div className="pomo-controls">
+                  <button className="pomo-btn pomo-play" onClick={() => setPomodoroRunning(r => !r)}
+                    style={{ color: textColor, borderColor: isDark ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.15)" }}>
+                    {pomodoroRunning ? (
+                      <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                    ) : (
+                      <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M8 5v14l11-7z"/></svg>
+                    )}
+                  </button>
+                  <button className="pomo-btn pomo-reset" onClick={() => { setPomodoroRunning(false); handlePomodoroMode(pomodoroMode); }}
+                    style={{ color: textColor, borderColor: isDark ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.15)" }}>
+                    <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>
+                  </button>
+                  <div className="pomo-focus-wrap">
+                    <button className={`toggle${pomodoroFocus ? " on" : ""}`} onClick={() => setPomodoroFocus(f => !f)} aria-label="Focus mode" />
+                    <span className="pomo-focus-label" style={{ color: fontColor ? fontColor : (isDark ? "#bbc" : "#666") }}>Focus</span>
+                  </div>
+                </div>
+                <input
+                  className="pomo-task-input"
+                  type="text"
+                  placeholder="What are you working on?"
+                  value={pomodoroTask}
+                  onChange={(e) => setPomodoroTask(e.target.value)}
+                  style={{ background: isDark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.06)", color: textColor, borderColor: isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)" }}
+                />
+              </>
+            )}
+
+            {countdownEnabled && (
+              <>
+                <div className="cd-header" style={{ color: fontColor ? fontColor : (isDark ? "#bbc" : "#666") }}>Countdown</div>
+                {!countdownSavedTarget ? (
+                  <div className="cd-setup">
+                    <input
+                      type="datetime-local"
+                      className="cd-datetime-input"
+                      value={countdownTarget}
+                      onChange={(e) => setCountdownTarget(e.target.value)}
+                      style={{ background: isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)", color: textColor, borderColor: isDark ? "rgba(255,255,255,0.15)" : "rgba(0,0,0,0.12)" }}
+                    />
+                    <button
+                      className="cd-save-btn"
+                      onClick={() => { if (countdownTarget) setCountdownSavedTarget(countdownTarget); }}
+                      disabled={!countdownTarget}
+                      style={{ background: isDark ? "rgba(90,122,255,0.3)" : "rgba(90,122,255,0.15)", color: textColor, opacity: countdownTarget ? 1 : 0.4 }}>
+                      Save
+                    </button>
+                  </div>
                 ) : (
-                  <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M8 5v14l11-7z"/></svg>
+                  <>
+                    {cdDone ? (
+                      <div className="cd-done" style={{ color: textColor }}>🎉 Time's up!</div>
+                    ) : (
+                      <div className="cd-display">
+                        {[{ v: cdDays, l: "Days" }, { v: cdHours, l: "Hours" }, { v: cdMins, l: "Mins" }, { v: cdSecs, l: "Secs" }].map(({ v, l }, i) => (
+                          <div key={l} className="cd-segment">
+                            <span className="cd-value" style={{ color: textColor }}>{String(v).padStart(2, "0")}</span>
+                            <span className="cd-label" style={{ color: fontColor ? fontColor : (isDark ? "#8899aa" : "#888") }}>{l}</span>
+                            {i < 3 && <span className="cd-sep" style={{ color: textColor }}>:</span>}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    <button className="pomo-btn pomo-reset"
+                      onClick={() => { setCountdownSavedTarget(""); setCountdownTarget(""); }}
+                      style={{ color: textColor, borderColor: isDark ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.15)" }}>
+                      <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>
+                    </button>
+                  </>
                 )}
-              </button>
-              <button className="pomo-btn pomo-reset" onClick={() => { setPomodoroRunning(false); handlePomodoroMode(pomodoroMode); }}
-                style={{ color: textColor, borderColor: isDark ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.15)" }}>
-                <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>
-              </button>
-              <div className="pomo-focus-wrap">
-                <button className={`toggle${pomodoroFocus ? " on" : ""}`} onClick={() => setPomodoroFocus(f => !f)} aria-label="Focus mode" />
-                <span className="pomo-focus-label" style={{ color: fontColor ? fontColor : (isDark ? "#bbc" : "#666") }}>Focus</span>
-              </div>
-            </div>
-            <input
-              className="pomo-task-input"
-              type="text"
-              placeholder="What are you working on?"
-              value={pomodoroTask}
-              onChange={(e) => setPomodoroTask(e.target.value)}
-              style={{ background: isDark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.06)", color: textColor, borderColor: isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)" }}
-            />
+              </>
+            )}
+
           </div>
         )}
 
@@ -1228,8 +1290,13 @@ export default function App() {
         <div className="settings-card" style={{ background: cardBg }}>
 
           <div className="settings-row">
-            <span className="settings-row-label">Enable</span>
-            <button className={`toggle${pomodoroEnabled ? " on" : ""}`} onClick={() => setPomodoroEnabled(!pomodoroEnabled)} aria-label="Enable pomodoro" />
+            <span className="settings-row-label">Timer</span>
+            <button className={`toggle${pomodoroEnabled ? " on" : ""}`} onClick={() => { setPomodoroEnabled(v => { if (!v) setCountdownEnabled(false); return !v; }); }} aria-label="Enable timer" />
+          </div>
+
+          <div className="settings-row" style={{ borderTop: `1px solid ${rowBorder}` }}>
+            <span className="settings-row-label">Countdown</span>
+            <button className={`toggle${countdownEnabled ? " on" : ""}`} onClick={() => { setCountdownEnabled(v => { if (!v) setPomodoroEnabled(false); return !v; }); }} aria-label="Enable countdown" />
           </div>
 
           <div className={`settings-row${!pomodoroEnabled ? " settings-row-dimmed" : ""}`} style={{ borderTop: `1px solid ${rowBorder}` }}>
