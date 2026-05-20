@@ -206,40 +206,17 @@ function AnalogClock({ now, tz, size, shape, face, hands, isDark, bgOpacity, bor
   );
 }
 
-function parseBookmarksHtml(html: string): Array<{ name: string; items: Array<{ name: string; url: string; domain: string }> }> {
-  function getDomain(url: string): string {
-    try { return new URL(url).hostname.replace(/^www\./, ""); } catch { return ""; }
-  }
-  const groups: Array<{ name: string; items: Array<{ name: string; url: string; domain: string }> }> = [];
-  const parser = new DOMParser();
-  const doc = parser.parseFromString(html, "text/html");
+function getDomain(url: string): string {
+  try { return new URL(url).hostname.replace(/^www\./, ""); } catch { return ""; }
+}
 
-  function walkDl(dl: Element, folderName: string) {
-    const items: Array<{ name: string; url: string; domain: string }> = [];
-    const children = Array.from(dl.children);
-    for (let i = 0; i < children.length; i++) {
-      const child = children[i];
-      const h3 = child.querySelector(":scope > h3");
-      if (h3) {
-        const subName = h3.textContent?.trim() || "Folder";
-        const next = children[i + 1];
-        if (next && next.tagName === "DL") { walkDl(next, subName); i++; }
-        continue;
-      }
-      const a = child.querySelector(":scope > a") as HTMLAnchorElement | null;
-      if (a) {
-        const url = a.getAttribute("href") || "";
-        if (url.startsWith("http")) {
-          items.push({ name: a.textContent?.trim() || url, url, domain: getDomain(url) });
-        }
-      }
-    }
-    if (items.length > 0) groups.push({ name: folderName, items });
-  }
+type AppLibItem = { id: string; name: string; url: string; domain: string };
 
-  const rootDl = doc.querySelector("body > dl") || doc.querySelector("dl");
-  if (rootDl) walkDl(rootDl, "Bookmarks");
-  return groups;
+function loadAppLibrary(): AppLibItem[] {
+  try {
+    const raw = localStorage.getItem("rynzen-app-library");
+    return raw ? JSON.parse(raw) : [];
+  } catch { return []; }
 }
 
 export default function App() {
@@ -290,10 +267,12 @@ export default function App() {
   const [quickLinksSize, setQuickLinksSize] = useState<"small" | "medium" | "large">("medium");
   const [newLinkTitle, setNewLinkTitle] = useState("");
   const [newLinkUrl, setNewLinkUrl] = useState("");
-  const [showImportModal, setShowImportModal] = useState(false);
-  const [importGroups, setImportGroups] = useState<Array<{ name: string; items: Array<{ name: string; url: string; domain: string }> }>>([]);
-  const [selectedImportUrls, setSelectedImportUrls] = useState<Set<string>>(new Set());
-  const importFileRef = useRef<HTMLInputElement>(null);
+  const [showLibraryModal, setShowLibraryModal] = useState(false);
+  const [appLibrary, setAppLibrary] = useState<AppLibItem[]>(() => loadAppLibrary());
+  const [selectedLibIds, setSelectedLibIds] = useState<Set<string>>(new Set());
+  const [libNewUrl, setLibNewUrl] = useState("");
+  const [libNewTitle, setLibNewTitle] = useState("");
+  const [libUrlError, setLibUrlError] = useState("");
 
   const [bgType, setBgType] = useState<"none" | "images" | "color" | "gradient">("none");
   const [bgImageSelected, setBgImageSelected] = useState("");
@@ -302,6 +281,10 @@ export default function App() {
   useEffect(() => {
     if (bgType !== "images") { setBgImageSelected(""); setBgImageFolder(null); }
   }, [bgType]);
+
+  useEffect(() => {
+    try { localStorage.setItem("rynzen-app-library", JSON.stringify(appLibrary)); } catch { /* ignore */ }
+  }, [appLibrary]);
 
   const [appliedFontFamily, setAppliedFontFamily] = useState("");
   const [fontFamilyInput, setFontFamilyInput] = useState("");
@@ -1401,37 +1384,16 @@ export default function App() {
             </div>
           </div>
 
-          {/* Import bookmarks */}
+          {/* App Library */}
           <div className="settings-row" style={{ borderTop: `1px solid ${rowBorder}` }}>
             <span className="settings-row-label">{t.importBookmarks}</span>
             <button
               className="import-bm-btn"
               style={{ background: isDark ? "#3a3a6a" : "#4285F4", color: "#fff" }}
-              onClick={() => importFileRef.current?.click()}
+              onClick={() => { setSelectedLibIds(new Set()); setShowLibraryModal(true); }}
             >
               {t.importBtn}
             </button>
-            <input
-              ref={importFileRef}
-              type="file"
-              accept=".html,.htm"
-              style={{ display: "none" }}
-              onChange={(e) => {
-                const file = e.target.files?.[0];
-                if (!file) return;
-                const reader = new FileReader();
-                reader.onload = (ev) => {
-                  const html = ev.target?.result as string;
-                  const parsed = parseBookmarksHtml(html);
-                  setImportGroups(parsed);
-                  const allUrls = new Set(parsed.flatMap(g => g.items.map(it => it.url)));
-                  setSelectedImportUrls(allUrls);
-                  setShowImportModal(true);
-                };
-                reader.readAsText(file);
-                e.target.value = "";
-              }}
-            />
           </div>
 
         </div>
@@ -1845,126 +1807,168 @@ export default function App() {
           </div>
         </div>
 
-      {/* ── Import Bookmarks Modal ── */}
-      {showImportModal && (
-        <div className="bm-modal-overlay" onClick={() => setShowImportModal(false)}>
+      {/* ── App Library Modal ── */}
+      {showLibraryModal && (
+        <div className="bm-modal-overlay" onClick={() => setShowLibraryModal(false)}>
           <div className="bm-modal" style={{ background: isDark ? "#1a1a30" : "#ffffff", color: themeColor }} onClick={(e) => e.stopPropagation()}>
 
             {/* Header */}
             <div className="bm-modal-header" style={{ borderBottom: `1px solid ${rowBorder}` }}>
               <div>
-                <p className="bm-modal-title">Import bookmarks</p>
+                <p className="bm-modal-title">App Library</p>
                 <p className="bm-modal-sub" style={{ color: isDark ? "rgba(255,255,255,0.45)" : "rgba(0,0,0,0.45)" }}>
-                  Select the bookmarks you want to add to Quick Access
+                  Save your apps, then select which ones to show in Quick Access
                 </p>
               </div>
-              <button className="bm-close-btn" style={{ color: themeColor }} onClick={() => setShowImportModal(false)}>
+              <button className="bm-close-btn" style={{ color: themeColor }} onClick={() => setShowLibraryModal(false)}>
                 <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
               </button>
             </div>
 
-            {/* Body */}
+            {/* Add new app form */}
+            <div className="bm-add-form" style={{ borderBottom: `1px solid ${rowBorder}`, background: isDark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.02)" }}>
+              <p className="bm-add-label" style={{ color: isDark ? "rgba(255,255,255,0.55)" : "rgba(0,0,0,0.45)" }}>Add a new app</p>
+              <div className="bm-add-row">
+                <input
+                  type="text"
+                  className="bm-add-input"
+                  placeholder="https://youtube.com"
+                  value={libNewUrl}
+                  style={{ background: isDark ? "#252540" : "#f4f4f8", color: themeColor, borderColor: libUrlError ? "#e74c3c" : (isDark ? "#3a3a5c" : "#dde0e8") }}
+                  onChange={(e) => { setLibNewUrl(e.target.value); setLibUrlError(""); }}
+                  onKeyDown={(e) => { if (e.key === "Enter") document.getElementById("lib-add-btn")?.click(); }}
+                />
+                <input
+                  type="text"
+                  className="bm-add-input bm-add-input-name"
+                  placeholder="Name (optional)"
+                  value={libNewTitle}
+                  style={{ background: isDark ? "#252540" : "#f4f4f8", color: themeColor, borderColor: isDark ? "#3a3a5c" : "#dde0e8" }}
+                  onChange={(e) => setLibNewTitle(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === "Enter") document.getElementById("lib-add-btn")?.click(); }}
+                />
+                <button
+                  id="lib-add-btn"
+                  className="bm-add-btn"
+                  style={{ background: "#4285F4", color: "#fff" }}
+                  onClick={() => {
+                    let url = libNewUrl.trim();
+                    if (!url) { setLibUrlError("Enter a URL"); return; }
+                    if (!/^https?:\/\//i.test(url)) url = "https://" + url;
+                    let domain = "";
+                    try { domain = new URL(url).hostname.replace(/^www\./, ""); } catch { setLibUrlError("Invalid URL"); return; }
+                    const name = libNewTitle.trim() || domain.split(".")[0].replace(/-/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+                    const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+                    setAppLibrary(prev => [...prev, { id, name, url, domain }]);
+                    setLibNewUrl("");
+                    setLibNewTitle("");
+                    setLibUrlError("");
+                  }}
+                >
+                  <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+                  Add
+                </button>
+              </div>
+              {libUrlError && <p className="bm-url-error">{libUrlError}</p>}
+            </div>
+
+            {/* App grid */}
             <div className="bm-modal-body">
-              {importGroups.length === 0 ? (
-                <div className="bm-empty" style={{ color: isDark ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.35)" }}>
-                  No bookmarks found. Make sure the file is a browser bookmark export (HTML format).
+              {appLibrary.length === 0 ? (
+                <div className="bm-empty" style={{ color: isDark ? "rgba(255,255,255,0.35)" : "rgba(0,0,0,0.3)" }}>
+                  <svg viewBox="0 0 24 24" fill="currentColor" width="36" height="36" style={{ opacity: 0.25, marginBottom: 10 }}><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg>
+                  <p>No apps saved yet.</p>
+                  <p style={{ fontSize: "0.75rem", marginTop: 4 }}>Add apps above using their URL, then select which to show in Quick Access.</p>
                 </div>
               ) : (
-                importGroups.map((group) => {
-                  const groupUrls = group.items.map(it => it.url);
-                  const allSelected = groupUrls.every(u => selectedImportUrls.has(u));
-                  const someSelected = groupUrls.some(u => selectedImportUrls.has(u));
-                  return (
-                    <div key={group.name} className="bm-group">
-                      <div className="bm-group-header" style={{ borderBottom: `1px solid ${rowBorder}` }}>
-                        <span className="bm-group-name" style={{ color: isDark ? "rgba(255,255,255,0.7)" : "rgba(0,0,0,0.55)" }}>{group.name}</span>
-                        <button
-                          className="bm-select-all-btn"
-                          style={{ color: "#4285F4" }}
-                          onClick={() => {
-                            setSelectedImportUrls(prev => {
-                              const next = new Set(prev);
-                              if (allSelected) { groupUrls.forEach(u => next.delete(u)); }
-                              else { groupUrls.forEach(u => next.add(u)); }
-                              return next;
-                            });
+                <>
+                  <div className="bm-select-bar" style={{ borderBottom: `1px solid ${rowBorder}` }}>
+                    <span style={{ fontSize: "0.75rem", color: isDark ? "rgba(255,255,255,0.45)" : "rgba(0,0,0,0.4)" }}>
+                      {appLibrary.length} app{appLibrary.length !== 1 ? "s" : ""} saved
+                    </span>
+                    <button
+                      className="bm-select-all-btn"
+                      style={{ color: "#4285F4" }}
+                      onClick={() => {
+                        const all = new Set(appLibrary.map(a => a.id));
+                        const isAllSelected = appLibrary.every(a => selectedLibIds.has(a.id));
+                        setSelectedLibIds(isAllSelected ? new Set() : all);
+                      }}
+                    >
+                      {appLibrary.every(a => selectedLibIds.has(a.id)) ? "Deselect all" : "Select all"}
+                    </button>
+                  </div>
+                  <div className="bm-app-grid">
+                    {appLibrary.map((app) => {
+                      const isSel = selectedLibIds.has(app.id);
+                      return (
+                        <div
+                          key={app.id}
+                          className={`bm-app-card${isSel ? " bm-app-card-sel" : ""}`}
+                          style={{
+                            background: isSel ? (isDark ? "rgba(66,133,244,0.18)" : "rgba(66,133,244,0.1)") : (isDark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.03)"),
+                            borderColor: isSel ? "#4285F4" : (isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.08)"),
                           }}
+                          onClick={() => setSelectedLibIds(prev => {
+                            const next = new Set(prev);
+                            if (next.has(app.id)) next.delete(app.id); else next.add(app.id);
+                            return next;
+                          })}
                         >
-                          {allSelected ? "Deselect all" : someSelected ? "Select all" : "Select all"}
-                        </button>
-                      </div>
-                      <div className="bm-items">
-                        {group.items.map((item) => {
-                          const isSelected = selectedImportUrls.has(item.url);
-                          return (
-                            <div
-                              key={item.url}
-                              className={`bm-item${isSelected ? " bm-item-selected" : ""}`}
-                              style={{
-                                background: isSelected ? (isDark ? "rgba(66,133,244,0.12)" : "rgba(66,133,244,0.08)") : "transparent",
-                                borderColor: isSelected ? "rgba(66,133,244,0.35)" : "transparent",
-                              }}
-                              onClick={() => {
-                                setSelectedImportUrls(prev => {
-                                  const next = new Set(prev);
-                                  if (next.has(item.url)) next.delete(item.url);
-                                  else next.add(item.url);
-                                  return next;
-                                });
-                              }}
-                            >
-                              <img
-                                src={`https://www.google.com/s2/favicons?domain=${item.domain}&sz=32`}
-                                alt=""
-                                className="bm-item-favicon"
-                                onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
-                              />
-                              <div className="bm-item-info">
-                                <span className="bm-item-name" style={{ color: themeColor }}>{item.name}</span>
-                                <span className="bm-item-url" style={{ color: isDark ? "rgba(255,255,255,0.35)" : "rgba(0,0,0,0.35)" }}>{item.domain}</span>
-                              </div>
-                              <div className={`bm-item-check${isSelected ? " checked" : ""}`} style={{ borderColor: isSelected ? "#4285F4" : (isDark ? "rgba(255,255,255,0.25)" : "rgba(0,0,0,0.2)"), background: isSelected ? "#4285F4" : "transparent" }}>
-                                {isSelected && <svg viewBox="0 0 24 24" fill="#fff" width="12" height="12"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>}
-                              </div>
+                          {isSel && (
+                            <div className="bm-app-checkmark">
+                              <svg viewBox="0 0 24 24" fill="#fff" width="11" height="11"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
                             </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  );
-                })
+                          )}
+                          <button
+                            className="bm-app-delete"
+                            style={{ color: isDark ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.25)" }}
+                            onClick={(e) => { e.stopPropagation(); setAppLibrary(prev => prev.filter(a => a.id !== app.id)); setSelectedLibIds(prev => { const n = new Set(prev); n.delete(app.id); return n; }); }}
+                            title="Remove from library"
+                          >
+                            <svg viewBox="0 0 24 24" fill="currentColor" width="12" height="12"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+                          </button>
+                          <img
+                            src={`https://www.google.com/s2/favicons?domain=${app.domain}&sz=64`}
+                            alt={app.name}
+                            className="bm-app-icon"
+                          />
+                          <span className="bm-app-name" style={{ color: themeColor }}>{app.name}</span>
+                          <span className="bm-app-domain" style={{ color: isDark ? "rgba(255,255,255,0.35)" : "rgba(0,0,0,0.35)" }}>{app.domain}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </>
               )}
             </div>
 
             {/* Footer */}
-            {importGroups.length > 0 && (
-              <div className="bm-modal-footer" style={{ borderTop: `1px solid ${rowBorder}` }}>
-                <span className="bm-footer-count" style={{ color: isDark ? "rgba(255,255,255,0.5)" : "rgba(0,0,0,0.45)" }}>
-                  {selectedImportUrls.size} selected
-                </span>
-                <div style={{ display: "flex", gap: 8 }}>
-                  <button className="bm-footer-btn bm-footer-cancel" style={{ background: isDark ? "#2a2a44" : "#f0f0f5", color: themeColor }} onClick={() => setShowImportModal(false)}>
-                    Cancel
-                  </button>
-                  <button
-                    className="bm-footer-btn bm-footer-add"
-                    style={{ background: selectedImportUrls.size === 0 ? (isDark ? "#2a2a44" : "#ccc") : "#4285F4", color: selectedImportUrls.size === 0 ? (isDark ? "rgba(255,255,255,0.3)" : "#999") : "#fff", cursor: selectedImportUrls.size === 0 ? "not-allowed" : "pointer" }}
-                    disabled={selectedImportUrls.size === 0}
-                    onClick={() => {
-                      const toAdd = importGroups.flatMap(g => g.items).filter(it => selectedImportUrls.has(it.url));
-                      setShortcuts(prev => {
-                        const existingUrls = new Set(prev.map(s => s.url));
-                        const newItems = toAdd.filter(it => !existingUrls.has(it.url));
-                        return [...prev, ...newItems];
-                      });
-                      setShowImportModal(false);
-                    }}
-                  >
-                    Add to Quick Access
-                  </button>
-                </div>
+            <div className="bm-modal-footer" style={{ borderTop: `1px solid ${rowBorder}` }}>
+              <span className="bm-footer-count" style={{ color: isDark ? "rgba(255,255,255,0.5)" : "rgba(0,0,0,0.45)" }}>
+                {selectedLibIds.size > 0 ? `${selectedLibIds.size} selected` : "Select apps to add"}
+              </span>
+              <div style={{ display: "flex", gap: 8 }}>
+                <button className="bm-footer-btn bm-footer-cancel" style={{ background: isDark ? "#2a2a44" : "#f0f0f5", color: themeColor }} onClick={() => setShowLibraryModal(false)}>
+                  Close
+                </button>
+                <button
+                  className="bm-footer-btn bm-footer-add"
+                  style={{ background: selectedLibIds.size === 0 ? (isDark ? "#2a2a44" : "#e0e0e0") : "#4285F4", color: selectedLibIds.size === 0 ? (isDark ? "rgba(255,255,255,0.25)" : "#aaa") : "#fff" }}
+                  disabled={selectedLibIds.size === 0}
+                  onClick={() => {
+                    const toAdd = appLibrary.filter(a => selectedLibIds.has(a.id));
+                    setShortcuts(prev => {
+                      const existingUrls = new Set(prev.map(s => s.url));
+                      return [...prev, ...toAdd.filter(a => !existingUrls.has(a.url)).map(a => ({ name: a.name, url: a.url, domain: a.domain }))];
+                    });
+                    setShowLibraryModal(false);
+                  }}
+                >
+                  Add to Quick Access
+                </button>
               </div>
-            )}
+            </div>
 
           </div>
         </div>
