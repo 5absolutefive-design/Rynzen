@@ -1207,15 +1207,11 @@ body {
 .pomodoro-card {
   margin: 0 auto 18px;
   width: 320px;
-  border-radius: 16px;
-  border: 1px solid;
   padding: 18px 20px 16px;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 14px;
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
 }
 
 .pomo-tabs {
