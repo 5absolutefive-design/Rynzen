@@ -1517,8 +1517,11 @@ body {
   background: #2a6de0;
 }
 
-.layout-mode-active {
+.layout-has-absolute {
   position: relative !important;
+}
+
+.layout-mode-active {
   cursor: default;
 }
 

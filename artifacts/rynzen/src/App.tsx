@@ -300,6 +300,12 @@ export default function App() {
   const [layoutPositions, setLayoutPositions] = useState<Record<string, LayoutPos | null>>({
     clock: null, search: null, shortcuts: null, pomodoro: null,
   });
+  const [persistedPositions, setPersistedPositions] = useState<Record<string, LayoutPos | null>>(() => {
+    try {
+      const saved = localStorage.getItem("rynzen-layout-positions");
+      return saved ? JSON.parse(saved) : { clock: null, search: null, shortcuts: null, pomodoro: null };
+    } catch { return { clock: null, search: null, shortcuts: null, pomodoro: null }; }
+  });
   const [activeLayoutEl, setActiveLayoutEl] = useState<string | null>(null);
   const layoutDragRef = useRef<{ el: string; startMX: number; startMY: number; startElX: number; startElY: number } | null>(null);
   const mainRef = useRef<HTMLElement>(null);
@@ -459,16 +465,18 @@ export default function App() {
   function enterLayoutMode() {
     const mainRect = mainRef.current?.getBoundingClientRect();
     if (!mainRect) return;
-    const getPos = (el: HTMLElement | null): LayoutPos | null => {
+    const getPos = (el: HTMLElement | null, key: string): LayoutPos | null => {
+      // If a persisted position exists, use it directly
+      if (persistedPositions[key]) return persistedPositions[key];
       if (!el) return null;
       const r = el.getBoundingClientRect();
       return { x: r.left - mainRect.left, y: r.top - mainRect.top };
     };
     setLayoutPositions({
-      clock: getPos(clockRef.current),
-      search: getPos(searchSectionRef.current),
-      shortcuts: getPos(shortcutsSectionRef.current),
-      pomodoro: getPos(pomodoroRef.current),
+      clock: getPos(clockRef.current, "clock"),
+      search: getPos(searchSectionRef.current, "search"),
+      shortcuts: getPos(shortcutsSectionRef.current, "shortcuts"),
+      pomodoro: getPos(pomodoroRef.current, "pomodoro"),
     });
     setLayoutMode(true);
     setShowSettings(false);
@@ -476,10 +484,19 @@ export default function App() {
   }
 
   function exitLayoutMode() {
+    const saved = { ...layoutPositions };
+    setPersistedPositions(saved);
+    try { localStorage.setItem("rynzen-layout-positions", JSON.stringify(saved)); } catch { /* ignore */ }
     setLayoutMode(false);
     setActiveLayoutEl(null);
-    setLayoutPositions({ clock: null, search: null, shortcuts: null, pomodoro: null });
     layoutDragRef.current = null;
+  }
+
+  function resetLayout() {
+    const empty = { clock: null, search: null, shortcuts: null, pomodoro: null };
+    setLayoutPositions(empty);
+    setPersistedPositions(empty);
+    try { localStorage.removeItem("rynzen-layout-positions"); } catch { /* ignore */ }
   }
 
   const handleLayoutMouseDown = useCallback((el: string, e: React.MouseEvent) => {
@@ -583,12 +600,17 @@ export default function App() {
   const selectColor = themeColor;
   const selectBorder = isDark ? "#3a3a5c" : "#dde0e8";
 
+  const hasPersistedLayout = Object.values(persistedPositions).some(p => p !== null);
+
   function layoutElStyle(key: string): React.CSSProperties {
-    if (!layoutMode) return {};
-    const pos = layoutPositions[key];
-    return pos
-      ? { position: "absolute", left: pos.x, top: pos.y, zIndex: activeLayoutEl === key ? 10 : 5 }
-      : {};
+    if (layoutMode) {
+      const pos = layoutPositions[key];
+      return pos
+        ? { position: "absolute", left: pos.x, top: pos.y, zIndex: activeLayoutEl === key ? 10 : 5 }
+        : {};
+    }
+    const pos = persistedPositions[key];
+    return pos ? { position: "absolute", left: pos.x, top: pos.y, zIndex: 5 } : {};
   }
 
   return (
@@ -607,7 +629,7 @@ export default function App() {
             <span>Page Layout — Click any element to select and drag it</span>
           </div>
           <div className="layout-mode-banner-right">
-            <button className="layout-reset-btn" onClick={() => setLayoutPositions({ clock: null, search: null, shortcuts: null, pomodoro: null })}>Reset</button>
+            <button className="layout-reset-btn" onClick={resetLayout}>Reset</button>
             <button className="layout-done-btn" onClick={exitLayoutMode}>Done</button>
           </div>
         </div>
@@ -618,7 +640,7 @@ export default function App() {
         <div className="avatar">S</div>
       </div>
 
-      <main ref={mainRef} className={`main-content${layoutMode ? " layout-mode-active" : ""}`} onClick={() => { if (layoutMode) setActiveLayoutEl(null); }}>
+      <main ref={mainRef} className={`main-content${(layoutMode || hasPersistedLayout) ? " layout-has-absolute" : ""}${layoutMode ? " layout-mode-active" : ""}`} onClick={() => { if (layoutMode) setActiveLayoutEl(null); }}>
         {clockEnabled && (
           <div ref={clockRef} className={`clock-area${layoutMode ? " layout-el" + (activeLayoutEl === "clock" ? " layout-el-active" : "") : ""}`}
             style={layoutElStyle("clock")}
