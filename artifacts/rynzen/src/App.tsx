@@ -301,6 +301,7 @@ export default function App() {
   const emptySlotData = (): SlotData => ({ clock: null, search: null, shortcuts: null, pomodoro: null });
 
   const [layoutMode, setLayoutMode] = useState(false);
+  const [pendingLayoutMode, setPendingLayoutMode] = useState(false);
   const [layoutPositions, setLayoutPositions] = useState<SlotData>(emptySlotData);
 
   const [activeSlot, setActiveSlot] = useState<LayoutSlotKey>(() => {
@@ -473,25 +474,35 @@ export default function App() {
   function handleDragEnd() { setDragIndex(null); setOverIndex(null); }
 
   function enterLayoutMode() {
-    const mainRect = mainRef.current?.getBoundingClientRect();
-    if (!mainRect) return;
-    const getPos = (el: HTMLElement | null, key: string): LayoutPos | null => {
-      // If a persisted position exists, use it directly
-      if (persistedPositions[key]) return persistedPositions[key];
-      if (!el) return null;
-      const r = el.getBoundingClientRect();
-      return { x: r.left - mainRect.left, y: r.top - mainRect.top };
-    };
-    setLayoutPositions({
-      clock: getPos(clockRef.current, "clock"),
-      search: getPos(searchSectionRef.current, "search"),
-      shortcuts: getPos(shortcutsSectionRef.current, "shortcuts"),
-      pomodoro: getPos(pomodoroRef.current, "pomodoro"),
-    });
-    setLayoutMode(true);
     setShowSettings(false);
     setActiveLayoutEl(null);
+    setPendingLayoutMode(true);
   }
+
+  useEffect(() => {
+    if (!pendingLayoutMode) return;
+    // Wait for sidebar close transition (0.32s) before measuring DOM
+    const timer = setTimeout(() => {
+      const mainRect = mainRef.current?.getBoundingClientRect();
+      if (!mainRect) { setPendingLayoutMode(false); return; }
+      const slotData = activeSlot === "main" ? emptySlotData() : (layoutSlots[activeSlot as "A1"|"B2"|"C3"] ?? emptySlotData());
+      const getPos = (el: HTMLElement | null, key: string): LayoutPos | null => {
+        if (slotData[key]) return slotData[key];
+        if (!el) return null;
+        const r = el.getBoundingClientRect();
+        return { x: r.left - mainRect.left, y: r.top - mainRect.top };
+      };
+      setLayoutPositions({
+        clock: getPos(clockRef.current, "clock"),
+        search: getPos(searchSectionRef.current, "search"),
+        shortcuts: getPos(shortcutsSectionRef.current, "shortcuts"),
+        pomodoro: getPos(pomodoroRef.current, "pomodoro"),
+      });
+      setLayoutMode(true);
+      setPendingLayoutMode(false);
+    }, 340);
+    return () => clearTimeout(timer);
+  }, [pendingLayoutMode]);
 
   function exitLayoutMode() {
     if (activeSlot !== "main") {
