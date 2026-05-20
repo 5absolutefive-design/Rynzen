@@ -113,6 +113,8 @@ body {
   display: flex;
   flex-direction: column;
   gap: 16px;
+  position: relative;
+  z-index: 10;
 }
 
 /* Premium search bar row */
