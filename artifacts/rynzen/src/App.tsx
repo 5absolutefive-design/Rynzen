@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 
 interface SearchEngine {
   name: string;
@@ -170,7 +170,7 @@ function AnalogClock({ now, tz, size, shape, face, hands, isDark, bgOpacity, bor
   const baseFace = isDark ? "30,30,60" : "248,248,244";
   const faceAlpha = bgOpacity / 100;
   const faceColor = `rgba(${baseFace},${faceAlpha})`;
-  const strokeColor = textColor;
+  const strokeColor = isDark ? "#e8e8f0" : "#1a1a2e";
   const borderAlpha = (borderOpacity / 100) * 0.9;
   const thinStroke = hands === "thin" ? 1.5 : hands === "classic" ? 3 : 2;
   const hourLen = r * 0.55, minLen = r * 0.75, secLen = r * 0.85;
@@ -293,6 +293,20 @@ export default function App() {
   const [countdownRunning, setCountdownRunning] = useState(false);
 
   const [engineColorEffect] = useState(true);
+
+  // Page Layout mode
+  const [layoutMode, setLayoutMode] = useState(false);
+  type LayoutPos = { x: number; y: number };
+  const [layoutPositions, setLayoutPositions] = useState<Record<string, LayoutPos | null>>({
+    clock: null, search: null, shortcuts: null, pomodoro: null,
+  });
+  const [activeLayoutEl, setActiveLayoutEl] = useState<string | null>(null);
+  const layoutDragRef = useRef<{ el: string; startMX: number; startMY: number; startElX: number; startElY: number } | null>(null);
+  const mainRef = useRef<HTMLElement>(null);
+  const clockRef = useRef<HTMLDivElement>(null);
+  const searchSectionRef = useRef<HTMLDivElement>(null);
+  const shortcutsSectionRef = useRef<HTMLDivElement>(null);
+  const pomodoroRef = useRef<HTMLDivElement>(null);
 
   const inputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -442,6 +456,56 @@ export default function App() {
 
   function handleDragEnd() { setDragIndex(null); setOverIndex(null); }
 
+  function enterLayoutMode() {
+    const mainRect = mainRef.current?.getBoundingClientRect();
+    if (!mainRect) return;
+    const getPos = (el: HTMLElement | null): LayoutPos | null => {
+      if (!el) return null;
+      const r = el.getBoundingClientRect();
+      return { x: r.left - mainRect.left, y: r.top - mainRect.top };
+    };
+    setLayoutPositions({
+      clock: getPos(clockRef.current),
+      search: getPos(searchSectionRef.current),
+      shortcuts: getPos(shortcutsSectionRef.current),
+      pomodoro: getPos(pomodoroRef.current),
+    });
+    setLayoutMode(true);
+    setShowSettings(false);
+    setActiveLayoutEl(null);
+  }
+
+  function exitLayoutMode() {
+    setLayoutMode(false);
+    setActiveLayoutEl(null);
+    setLayoutPositions({ clock: null, search: null, shortcuts: null, pomodoro: null });
+    layoutDragRef.current = null;
+  }
+
+  const handleLayoutMouseDown = useCallback((el: string, e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setActiveLayoutEl(el);
+    const pos = layoutPositions[el];
+    if (!pos) return;
+    layoutDragRef.current = { el, startMX: e.clientX, startMY: e.clientY, startElX: pos.x, startElY: pos.y };
+    const onMove = (ev: MouseEvent) => {
+      const d = layoutDragRef.current;
+      if (!d) return;
+      setLayoutPositions(prev => ({
+        ...prev,
+        [d.el]: { x: d.startElX + (ev.clientX - d.startMX), y: d.startElY + (ev.clientY - d.startMY) },
+      }));
+    };
+    const onUp = () => {
+      layoutDragRef.current = null;
+      document.removeEventListener("mousemove", onMove);
+      document.removeEventListener("mouseup", onUp);
+    };
+    document.addEventListener("mousemove", onMove);
+    document.addEventListener("mouseup", onUp);
+  }, [layoutPositions]);
+
   function handleAddLink() {
     if (!newLinkUrl.trim()) return;
     let url = newLinkUrl.trim();
@@ -519,6 +583,14 @@ export default function App() {
   const selectColor = themeColor;
   const selectBorder = isDark ? "#3a3a5c" : "#dde0e8";
 
+  function layoutElStyle(key: string): React.CSSProperties {
+    if (!layoutMode) return {};
+    const pos = layoutPositions[key];
+    return pos
+      ? { position: "absolute", left: pos.x, top: pos.y, zIndex: activeLayoutEl === key ? 10 : 5 }
+      : {};
+  }
+
   return (
     <div className={`app-shell${showSettings ? " sidebar-open" : ""}`}>
     <div className="app-root" style={{
@@ -528,15 +600,29 @@ export default function App() {
       backgroundPosition: (bgType === "images" && bgImageSelected) ? "center" : undefined,
       color: textColor,
     }}>
+      {layoutMode && (
+        <div className="layout-mode-banner">
+          <div className="layout-mode-banner-left">
+            <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M3 3h8v8H3zm10 0h8v8h-8zM3 13h8v8H3zm13 2v-2h-2v2h-2v2h2v2h2v-2h2v-2z"/></svg>
+            <span>Page Layout — Click any element to select and drag it</span>
+          </div>
+          <div className="layout-mode-banner-right">
+            <button className="layout-reset-btn" onClick={() => setLayoutPositions({ clock: null, search: null, shortcuts: null, pomodoro: null })}>Reset</button>
+            <button className="layout-done-btn" onClick={exitLayoutMode}>Done</button>
+          </div>
+        </div>
+      )}
       <div className="top-bar">
         <span className="top-link" style={{ color: fontColor ? fontColor : (isDark ? "#aab" : "#444") }}>{t.gmail}</span>
         <span className="top-link" style={{ color: fontColor ? fontColor : (isDark ? "#aab" : "#444") }}>{t.images}</span>
         <div className="avatar">S</div>
       </div>
 
-      <main className="main-content">
+      <main ref={mainRef} className={`main-content${layoutMode ? " layout-mode-active" : ""}`} onClick={() => { if (layoutMode) setActiveLayoutEl(null); }}>
         {clockEnabled && (
-          <div className="clock-area">
+          <div ref={clockRef} className={`clock-area${layoutMode ? " layout-el" + (activeLayoutEl === "clock" ? " layout-el-active" : "") : ""}`}
+            style={layoutElStyle("clock")}
+            onMouseDown={layoutMode ? (e) => handleLayoutMouseDown("clock", e) : undefined}>
             {(clockShow === "both" || clockShow === "clock") && analogClock ? (
               <AnalogClock
                 now={now}
@@ -583,7 +669,10 @@ export default function App() {
         )}
 
         {(pomodoroEnabled || countdownEnabled) && (
-          <div className="pomodoro-card">
+          <div ref={pomodoroRef}
+            className={`pomodoro-card${layoutMode ? " layout-el" + (activeLayoutEl === "pomodoro" ? " layout-el-active" : "") : ""}`}
+            style={layoutElStyle("pomodoro")}
+            onMouseDown={layoutMode ? (e) => handleLayoutMouseDown("pomodoro", e) : undefined}>
 
             {!countdownEnabled && (<>
               {!pomodoroRunning && (
@@ -724,7 +813,10 @@ export default function App() {
           </div>
         )}
 
-        <div className="search-section">
+        <div ref={searchSectionRef}
+          className={`search-section${layoutMode ? " layout-el" + (activeLayoutEl === "search" ? " layout-el-active" : "") : ""}`}
+          style={layoutElStyle("search")}
+          onMouseDown={layoutMode ? (e) => handleLayoutMouseDown("search", e) : undefined}>
           <div className="search-bar-row" ref={dropdownRef}>
             <div
               className="search-input-box"
@@ -795,7 +887,10 @@ export default function App() {
         </div>
 
         {showShortcuts && (
-          <div className="shortcuts-section">
+          <div ref={shortcutsSectionRef}
+            className={`shortcuts-section${layoutMode ? " layout-el" + (activeLayoutEl === "shortcuts" ? " layout-el-active" : "") : ""}`}
+            style={layoutElStyle("shortcuts")}
+            onMouseDown={layoutMode ? (e) => handleLayoutMouseDown("shortcuts", e) : undefined}>
             <h3 className="shortcuts-title" style={{ color: fontColor ? fontColor : (isDark ? "#667799" : "#9aa0b2") }}>{t.quickAccess}</h3>
             <div className="shortcuts-grid" style={{ gap: quickLinksStyle === "text" ? "8px" : "12px", gridTemplateColumns: `repeat(${quickLinksPerRow}, max-content)` }}>
               {shortcuts.map((s, index) => (
@@ -1452,6 +1547,27 @@ export default function App() {
             </div>
           </div>
 
+        </div>
+
+        {/* ── Page Layout Card ── */}
+        <p className="settings-section-label" style={{ marginTop: 12 }}>Page layout</p>
+        <div className="settings-card" style={{ background: cardBg }}>
+          <div className="settings-row">
+            <span className="settings-row-label" style={{ fontSize: "0.85rem" }}>Open layout toolbox</span>
+            <button
+              className="layout-open-btn"
+              onClick={enterLayoutMode}
+              style={{ background: isDark ? "#4285F4" : "#4285F4", color: "#fff" }}
+            >
+              Open
+            </button>
+          </div>
+          <div className="settings-row" style={{ borderTop: `1px solid ${rowBorder}`, opacity: 0.55 }}>
+            <span className="settings-row-label" style={{ fontSize: "0.78rem", lineHeight: 1.4 }}>
+              Click any element on the page to select it, then drag to reposition.
+            </span>
+            <span style={{ fontSize: "0.75rem" }}>?</span>
+          </div>
         </div>
 
     </div>

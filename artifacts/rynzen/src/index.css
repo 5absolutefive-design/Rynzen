@@ -1454,3 +1454,118 @@ body {
   font-weight: 700;
   letter-spacing: 0.02em;
 }
+
+/* ── Page Layout Mode ── */
+.layout-mode-banner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 2000;
+  background: rgba(40, 40, 80, 0.96);
+  backdrop-filter: blur(12px);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 20px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.25);
+  gap: 12px;
+}
+
+.layout-mode-banner-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  opacity: 0.92;
+}
+
+.layout-mode-banner-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.layout-reset-btn {
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: #fff;
+  border-radius: 7px;
+  padding: 5px 14px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.layout-reset-btn:hover {
+  background: rgba(255,255,255,0.2);
+}
+
+.layout-done-btn {
+  background: #4285F4;
+  border: none;
+  color: #fff;
+  border-radius: 7px;
+  padding: 5px 16px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.layout-done-btn:hover {
+  background: #2a6de0;
+}
+
+.layout-mode-active {
+  position: relative !important;
+  cursor: default;
+}
+
+.layout-mode-active::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 18px,
+    rgba(66, 133, 244, 0.035) 18px,
+    rgba(66, 133, 244, 0.035) 20px
+  );
+  pointer-events: none;
+  z-index: 0;
+}
+
+.layout-el {
+  cursor: move !important;
+  user-select: none !important;
+  transition: box-shadow 0.15s, outline 0.15s;
+  border-radius: 10px;
+}
+
+.layout-el:hover {
+  outline: 2px dashed rgba(66, 133, 244, 0.55);
+  outline-offset: 6px;
+}
+
+.layout-el-active {
+  outline: 2.5px solid #4285F4 !important;
+  outline-offset: 6px;
+  box-shadow: 0 0 0 6px rgba(66, 133, 244, 0.12);
+}
+
+/* Open button in layout card */
+.layout-open-btn {
+  border: none;
+  border-radius: 7px;
+  padding: 4px 14px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s;
+  flex-shrink: 0;
+}
+.layout-open-btn:hover {
+  opacity: 0.85;
+}
