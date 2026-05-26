@@ -497,6 +497,41 @@ export default function App() {
     else if (e.key === "Escape") setShowSuggestions(false);
   }
 
+  function resolveCollisions(
+    newPos: { x: number; y: number },
+    name: string,
+    positions: Record<string, { x: number; y: number }>,
+    iconSize: number,
+    bounds: { left: number; right: number; top: number } | null,
+  ): { x: number; y: number } {
+    const PAD = iconSize;
+    let pos = { ...newPos };
+    for (let iter = 0; iter < 20; iter++) {
+      let moved = false;
+      for (const [otherName, otherPos] of Object.entries(positions)) {
+        if (otherName === name) continue;
+        const dx = pos.x - otherPos.x;
+        const dy = pos.y - otherPos.y;
+        const overlapX = PAD - Math.abs(dx);
+        const overlapY = PAD - Math.abs(dy);
+        if (overlapX > 0 && overlapY > 0) {
+          if (overlapX <= overlapY) {
+            pos.x += dx >= 0 ? overlapX : -overlapX;
+          } else {
+            pos.y += dy >= 0 ? overlapY : -overlapY;
+          }
+          moved = true;
+        }
+      }
+      if (!moved) break;
+    }
+    if (bounds) {
+      pos.x = Math.max(bounds.left, Math.min(bounds.right, pos.x));
+      pos.y = Math.max(pos.y, bounds.top);
+    }
+    return pos;
+  }
+
   function handleShortcutMouseDown(e: React.MouseEvent, name: string) {
     if (e.button !== 0) return;
     e.preventDefault();
@@ -559,8 +594,13 @@ export default function App() {
         const rawY = e.clientY - freeDragRef.current.offsetY;
         const { x, y } = clampToBounds(rawX, rawY);
         const name = freeDragRef.current.name;
+        const iconSize = dragBoundsRef.current?.iconW ?? 60;
+        const savedBounds = dragBoundsRef.current
+          ? { left: dragBoundsRef.current.left, right: dragBoundsRef.current.right, top: dragBoundsRef.current.top }
+          : null;
         setShortcutPositions(prev => {
-          const updated = { ...prev, [name]: { x, y } };
+          const resolved = resolveCollisions({ x, y }, name, prev, iconSize, savedBounds);
+          const updated = { ...prev, [name]: resolved };
           try { localStorage.setItem("rynzen-shortcut-positions", JSON.stringify(updated)); } catch { /* ignore */ }
           return updated;
         });
