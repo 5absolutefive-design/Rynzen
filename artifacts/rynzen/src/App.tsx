@@ -506,7 +506,7 @@ export default function App() {
   ): { x: number; y: number } {
     const PAD = iconSize;
     let pos = { ...newPos };
-    for (let iter = 0; iter < 20; iter++) {
+    for (let iter = 0; iter < 30; iter++) {
       let moved = false;
       for (const [otherName, otherPos] of Object.entries(positions)) {
         if (otherName === name) continue;
@@ -515,10 +515,14 @@ export default function App() {
         const overlapX = PAD - Math.abs(dx);
         const overlapY = PAD - Math.abs(dy);
         if (overlapX > 0 && overlapY > 0) {
-          if (overlapX <= overlapY) {
-            pos.x += dx >= 0 ? overlapX : -overlapX;
+          const pushX = dx >= 0 ? overlapX : -overlapX;
+          const pushY = dy >= 0 ? overlapY : -overlapY;
+          const wouldViolateBoundsY = bounds && (pos.y + pushY < bounds.top);
+          if (overlapX <= overlapY || wouldViolateBoundsY) {
+            pos.x += pushX;
           } else {
-            pos.y += dy >= 0 ? overlapY : -overlapY;
+            pos.y += pushY;
+            if (bounds && pos.y < bounds.top) pos.y = bounds.top;
           }
           moved = true;
         }
