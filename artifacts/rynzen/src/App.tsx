@@ -1136,19 +1136,6 @@ export default function App() {
         )}
       </main>
 
-      {/* Free-positioned shortcuts overlay */}
-      {/* Boundary red lines — shown when dragging icon hits left/right limit */}
-      {freeDragState && dragBoundsRef.current && (
-        <>
-          {boundaryHit.left && (
-            <div className="drag-boundary-line" style={{ left: dragBoundsRef.current.left, top: dragBoundsRef.current.top }} />
-          )}
-          {boundaryHit.right && (
-            <div className="drag-boundary-line" style={{ left: dragBoundsRef.current.right + dragBoundsRef.current.iconW, top: dragBoundsRef.current.top }} />
-          )}
-        </>
-      )}
-
       {showShortcuts && shortcuts.filter(s => shortcutPositions[s.name] || freeDragState?.name === s.name).map((s) => {
         const pos = freeDragState?.name === s.name ? freeDragState : shortcutPositions[s.name];
         if (!pos) return null;
