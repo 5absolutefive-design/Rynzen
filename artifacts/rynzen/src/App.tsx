@@ -235,8 +235,11 @@ export default function App() {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [now, setNow] = useState(new Date());
   const [shortcuts, setShortcuts] = useState(initialShortcuts);
-  const [dragIndex, setDragIndex] = useState<number | null>(null);
-  const [overIndex, setOverIndex] = useState<number | null>(null);
+  const [shortcutPositions, setShortcutPositions] = useState<Record<string, {x: number, y: number}>>(() => {
+    try { return JSON.parse(localStorage.getItem("rynzen-shortcut-positions") || "{}"); } catch { return {}; }
+  });
+  const freeDragRef = useRef<{name: string; offsetX: number; offsetY: number; hasMoved: boolean; startX: number; startY: number} | null>(null);
+  const [freeDragState, setFreeDragState] = useState<{name: string, x: number, y: number} | null>(null);
   const [showSettings, setShowSettings] = useState(false);
   const [hideFab, setHideFab] = useState(false);
 
@@ -333,7 +336,7 @@ export default function App() {
   // Search bar settings
   const [searchBarEnabled, setSearchBarEnabled] = useState(true);
   const [searchSuggestionsEnabled, setSearchSuggestionsEnabled] = useState(true);
-  const [searchBarWidth, setSearchBarWidth] = useState(70);
+  const [searchBarWidth, setSearchBarWidth] = useState(40);
   const [searchBarBgOpacity, setSearchBarBgOpacity] = useState(100);
   const [searchBarPlaceholder, setSearchBarPlaceholder] = useState("");
 
@@ -492,30 +495,61 @@ export default function App() {
     else if (e.key === "Escape") setShowSuggestions(false);
   }
 
-  function handleDragStart(e: React.DragEvent, index: number) {
-    setDragIndex(index);
-    e.dataTransfer.effectAllowed = "move";
-    e.dataTransfer.setData("text/plain", String(index));
-  }
-
-  function handleDragOver(e: React.DragEvent, index: number) {
+  function handleShortcutMouseDown(e: React.MouseEvent, name: string) {
+    if (e.button !== 0) return;
     e.preventDefault();
-    e.dataTransfer.dropEffect = "move";
-    setOverIndex(index);
+    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+    const pos = shortcutPositions[name];
+    freeDragRef.current = {
+      name,
+      offsetX: e.clientX - (pos ? pos.x : rect.left),
+      offsetY: e.clientY - (pos ? pos.y : rect.top),
+      hasMoved: false,
+      startX: e.clientX,
+      startY: e.clientY,
+    };
+    if (pos) {
+      setFreeDragState({ name, x: pos.x, y: pos.y });
+    }
   }
 
-  function handleDrop(e: React.DragEvent, index: number) {
-    e.preventDefault();
-    if (dragIndex === null || dragIndex === index) { setDragIndex(null); setOverIndex(null); return; }
-    const updated = [...shortcuts];
-    const [moved] = updated.splice(dragIndex, 1);
-    updated.splice(index, 0, moved);
-    setShortcuts(updated);
-    setDragIndex(null);
-    setOverIndex(null);
-  }
-
-  function handleDragEnd() { setDragIndex(null); setOverIndex(null); }
+  useEffect(() => {
+    function onMove(e: MouseEvent) {
+      if (!freeDragRef.current) return;
+      const dx = e.clientX - freeDragRef.current.startX;
+      const dy = e.clientY - freeDragRef.current.startY;
+      if (!freeDragRef.current.hasMoved && Math.hypot(dx, dy) < 5) return;
+      freeDragRef.current.hasMoved = true;
+      setFreeDragState({
+        name: freeDragRef.current.name,
+        x: e.clientX - freeDragRef.current.offsetX,
+        y: e.clientY - freeDragRef.current.offsetY,
+      });
+    }
+    function onUp(e: MouseEvent) {
+      if (!freeDragRef.current) return;
+      if (freeDragRef.current.hasMoved) {
+        const newPos = {
+          x: e.clientX - freeDragRef.current.offsetX,
+          y: e.clientY - freeDragRef.current.offsetY,
+        };
+        const name = freeDragRef.current.name;
+        setShortcutPositions(prev => {
+          const updated = { ...prev, [name]: newPos };
+          try { localStorage.setItem("rynzen-shortcut-positions", JSON.stringify(updated)); } catch { /* ignore */ }
+          return updated;
+        });
+      }
+      freeDragRef.current = null;
+      setFreeDragState(null);
+    }
+    window.addEventListener("mousemove", onMove);
+    window.addEventListener("mouseup", onUp);
+    return () => {
+      window.removeEventListener("mousemove", onMove);
+      window.removeEventListener("mouseup", onUp);
+    };
+  }, []);
 
   function enterLayoutMode() {
     setShowSettings(false);
@@ -1051,14 +1085,13 @@ export default function App() {
             {layoutMode && <div style={{ position: "absolute", inset: 0, zIndex: 10, cursor: "move", borderRadius: "inherit" }} onMouseDown={(e) => handleLayoutMouseDown("shortcuts", e)} onClick={(e) => e.stopPropagation()} />}
             <h3 className="shortcuts-title" style={{ color: fontColor ? fontColor : (isDark ? "#667799" : "#9aa0b2") }}>{t.quickAccess}</h3>
             <div className="shortcuts-grid" style={{ gap: quickLinksStyle === "text" ? "8px" : "12px", gridTemplateColumns: `repeat(${quickLinksPerRow}, max-content)` }}>
-              {shortcuts.map((s, index) => (
-                <a key={s.name} href={dragIndex !== null ? undefined : s.url}
+              {shortcuts.filter(s => !shortcutPositions[s.name] && freeDragState?.name !== s.name).map((s) => (
+                <a key={s.name} href={s.url}
                   target={quickLinksOpenNewTab ? "_blank" : "_self"} rel="noopener noreferrer"
-                  className={`shortcut-card${quickLinksStyle === "text" ? " shortcut-card--text" : ""}${dragIndex === index ? " dragging" : ""}${overIndex === index && dragIndex !== index ? " drag-over" : ""}`}
-                  draggable onDragStart={(e) => handleDragStart(e, index)} onDragOver={(e) => handleDragOver(e, index)}
-                  onDrop={(e) => handleDrop(e, index)} onDragEnd={handleDragEnd}
-                  onClick={(e) => { if (dragIndex !== null) e.preventDefault(); }}
-                  style={{ cursor: dragIndex !== null ? "grabbing" : "grab" }}
+                  className={`shortcut-card${quickLinksStyle === "text" ? " shortcut-card--text" : ""}`}
+                  onMouseDown={(e) => handleShortcutMouseDown(e, s.name)}
+                  onClick={(e) => { if (freeDragRef.current?.hasMoved) e.preventDefault(); }}
+                  style={{ cursor: "grab" }}
                 >
                   <img
                     src={`https://www.google.com/s2/favicons?domain=${s.domain}&sz=${qlSzParam}`}
@@ -1075,6 +1108,48 @@ export default function App() {
         )}
       </main>
 
+      {/* Free-positioned shortcuts overlay */}
+      {showShortcuts && shortcuts.filter(s => shortcutPositions[s.name] || freeDragState?.name === s.name).map((s) => {
+        const pos = freeDragState?.name === s.name ? freeDragState : shortcutPositions[s.name];
+        if (!pos) return null;
+        const isDraggingThis = freeDragState?.name === s.name;
+        return (
+          <a key={`free-${s.name}`}
+            href={s.url}
+            target={quickLinksOpenNewTab ? "_blank" : "_self"} rel="noopener noreferrer"
+            className={`shortcut-card shortcut-card-free${quickLinksStyle === "text" ? " shortcut-card--text" : ""}${isDraggingThis ? " free-dragging" : ""}`}
+            style={{
+              position: "fixed",
+              left: pos.x,
+              top: pos.y,
+              zIndex: isDraggingThis ? 9999 : 100,
+              cursor: isDraggingThis ? "grabbing" : "grab",
+              userSelect: "none",
+            }}
+            onMouseDown={(e) => handleShortcutMouseDown(e, s.name)}
+            onClick={(e) => { if (freeDragRef.current?.hasMoved) e.preventDefault(); }}
+            onDoubleClick={(e) => {
+              e.preventDefault();
+              setShortcutPositions(prev => {
+                const updated = { ...prev };
+                delete updated[s.name];
+                try { localStorage.setItem("rynzen-shortcut-positions", JSON.stringify(updated)); } catch { /* ignore */ }
+                return updated;
+              });
+            }}
+          >
+            <img
+              src={`https://www.google.com/s2/favicons?domain=${s.domain}&sz=${qlSzParam}`}
+              alt={s.name} title={s.name}
+              style={{ width: qlFaviconSize, height: qlFaviconSize, objectFit: "contain", borderRadius: quickLinksIconRadius, flexShrink: 0 }}
+              draggable={false}
+            />
+            {quickLinksStyle === "text" && (
+              <span className="shortcut-label" style={{ color: fontColor ? fontColor : (isDark ? "#c8cce0" : "#444") }}>{s.name}</span>
+            )}
+          </a>
+        );
+      })}
 
       <div className={`fab-zone${hideFab ? " fab-hidden" : ""}${showSettings ? " fab-invisible" : ""}`}>
         <button id="settings-fab" className="settings-fab" onClick={() => setShowSettings(!showSettings)} title="Customize"
