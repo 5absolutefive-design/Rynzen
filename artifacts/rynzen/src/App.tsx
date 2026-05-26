@@ -107,7 +107,15 @@ const engines: SearchEngine[] = [
   { name: "Amazon", domain: "amazon.com", color: "#FF9900", searchUrl: "https://www.amazon.com/s?k=", homeUrl: "https://www.amazon.com" },
 ];
 
-const initialShortcuts = [
+type Shortcut = {
+  name: string;
+  url: string;
+  domain: string;
+  iconType?: 'favicon' | 'emoji' | 'custom';
+  iconValue?: string;
+};
+
+const initialShortcuts: Shortcut[] = [
   { name: "YouTube", url: "https://www.youtube.com", domain: "youtube.com" },
   { name: "Facebook", url: "https://www.facebook.com", domain: "facebook.com" },
   { name: "Twitter", url: "https://twitter.com", domain: "x.com" },
@@ -234,7 +242,15 @@ export default function App() {
   const [showDropdown, setShowDropdown] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [now, setNow] = useState(new Date());
-  const [shortcuts, setShortcuts] = useState(initialShortcuts);
+  const [shortcuts, setShortcuts] = useState<Shortcut[]>(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem("rynzen-shortcuts") || "null");
+      if (Array.isArray(saved) && saved.length > 0) return saved as Shortcut[];
+    } catch {}
+    return initialShortcuts;
+  });
+  const [iconContextMenu, setIconContextMenu] = useState<{ name: string; x: number; y: number } | null>(null);
+  const [iconEditForm, setIconEditForm] = useState<{ name: string; title: string; url: string; iconType: 'favicon' | 'emoji' | 'custom'; iconValue: string } | null>(null);
   const [shortcutPositions, setShortcutPositions] = useState<Record<string, {x: number, y: number}>>(() => {
     try { return JSON.parse(localStorage.getItem("rynzen-shortcut-positions") || "{}"); } catch { return {}; }
   });
@@ -480,9 +496,24 @@ export default function App() {
       if (fontColorRef.current && !fontColorRef.current.contains(e.target as Node)) {
         setFontColorOpen(false);
       }
+      const iccCard = document.querySelector(".icc-card");
+      if (iccCard && !iccCard.contains(e.target as Node)) {
+        setIconContextMenu(null);
+        setIconEditForm(null);
+      }
+    }
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === "Escape") {
+        setIconContextMenu(null);
+        setIconEditForm(null);
+      }
     }
     document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
   }, []);
 
   function handleSearch(q: string = query) {
@@ -534,6 +565,84 @@ export default function App() {
       pos.y = Math.max(pos.y, bounds.top);
     }
     return pos;
+  }
+
+  function handleIconRightClick(e: React.MouseEvent, name: string) {
+    e.preventDefault();
+    e.stopPropagation();
+    const s = shortcuts.find(sh => sh.name === name);
+    if (!s) return;
+    const x = Math.min(e.clientX, window.innerWidth - 290);
+    const y = Math.min(e.clientY, window.innerHeight - 280);
+    setIconContextMenu({ name, x, y });
+    setIconEditForm({ name, title: s.name, url: s.url, iconType: s.iconType ?? 'favicon', iconValue: s.iconValue ?? '' });
+  }
+
+  function applyIconEdit() {
+    if (!iconEditForm) return;
+    const oldName = iconEditForm.name;
+    const newName = iconEditForm.title.trim() || oldName;
+    setShortcuts(prev => {
+      const updated = prev.map(s => {
+        if (s.name !== oldName) return s;
+        let domain = s.domain;
+        try { domain = new URL(iconEditForm.url).hostname; } catch {}
+        return { ...s, name: newName, url: iconEditForm.url, domain, iconType: iconEditForm.iconType, iconValue: iconEditForm.iconValue };
+      });
+      try { localStorage.setItem("rynzen-shortcuts", JSON.stringify(updated)); } catch {}
+      return updated;
+    });
+    if (newName !== oldName) {
+      setShortcutPositions(prev => {
+        if (!prev[oldName]) return prev;
+        const { [oldName]: pos, ...rest } = prev;
+        const updated = { ...rest, [newName]: pos };
+        try { localStorage.setItem("rynzen-shortcut-positions", JSON.stringify(updated)); } catch {}
+        return updated;
+      });
+    }
+    setIconContextMenu(null);
+    setIconEditForm(null);
+  }
+
+  function deleteShortcut(name: string) {
+    setShortcuts(prev => {
+      const updated = prev.filter(s => s.name !== name);
+      try { localStorage.setItem("rynzen-shortcuts", JSON.stringify(updated)); } catch {}
+      return updated;
+    });
+    setShortcutPositions(prev => {
+      const { [name]: _removed, ...rest } = prev;
+      try { localStorage.setItem("rynzen-shortcut-positions", JSON.stringify(rest)); } catch {}
+      return rest;
+    });
+    setIconContextMenu(null);
+    setIconEditForm(null);
+  }
+
+  function renderShortcutIcon(s: Shortcut) {
+    if (s.iconType === 'emoji' && s.iconValue) {
+      return (
+        <span style={{ fontSize: qlFaviconSize * 0.85, lineHeight: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', width: qlFaviconSize, height: qlFaviconSize, flexShrink: 0 }}>
+          {s.iconValue}
+        </span>
+      );
+    }
+    if (s.iconType === 'custom' && s.iconValue) {
+      return (
+        <img src={s.iconValue} alt={s.name} title={s.name}
+          style={{ width: qlFaviconSize, height: qlFaviconSize, objectFit: "contain", borderRadius: quickLinksIconRadius, flexShrink: 0 }}
+          draggable={false}
+        />
+      );
+    }
+    return (
+      <img src={`https://www.google.com/s2/favicons?domain=${s.domain}&sz=${qlSzParam}`}
+        alt={s.name} title={s.name}
+        style={{ width: qlFaviconSize, height: qlFaviconSize, objectFit: "contain", borderRadius: quickLinksIconRadius, flexShrink: 0 }}
+        draggable={false}
+      />
+    );
   }
 
   function handleShortcutMouseDown(e: React.MouseEvent, name: string) {
@@ -1163,13 +1272,10 @@ export default function App() {
                   onMouseDown={(e) => handleShortcutMouseDown(e, s.name)}
                   onClick={(e) => e.preventDefault()}
                   onDoubleClick={() => { window.open(s.url, quickLinksOpenNewTab ? "_blank" : "_self"); }}
+                  onContextMenu={(e) => handleIconRightClick(e, s.name)}
                   style={{ cursor: "grab" }}
                 >
-                  <img
-                    src={`https://www.google.com/s2/favicons?domain=${s.domain}&sz=${qlSzParam}`}
-                    alt={s.name} title={s.name}
-                    style={{ width: qlFaviconSize, height: qlFaviconSize, objectFit: "contain", borderRadius: quickLinksIconRadius, flexShrink: 0 }}
-                  />
+                  {renderShortcutIcon(s)}
                   {quickLinksStyle === "text" && (
                     <span className="shortcut-label" style={{ color: fontColor ? fontColor : (isDark ? "#c8cce0" : "#444") }}>{s.name}</span>
                   )}
@@ -1198,19 +1304,66 @@ export default function App() {
             onMouseDown={(e) => handleShortcutMouseDown(e, s.name)}
             onClick={(e) => e.preventDefault()}
             onDoubleClick={() => { window.open(s.url, quickLinksOpenNewTab ? "_blank" : "_self"); }}
+            onContextMenu={(e) => handleIconRightClick(e, s.name)}
           >
-            <img
-              src={`https://www.google.com/s2/favicons?domain=${s.domain}&sz=${qlSzParam}`}
-              alt={s.name} title={s.name}
-              style={{ width: qlFaviconSize, height: qlFaviconSize, objectFit: "contain", borderRadius: quickLinksIconRadius, flexShrink: 0 }}
-              draggable={false}
-            />
+            {renderShortcutIcon(s)}
             {quickLinksStyle === "text" && (
               <span className="shortcut-label" style={{ color: fontColor ? fontColor : (isDark ? "#c8cce0" : "#444") }}>{s.name}</span>
             )}
           </a>
         );
       })}
+
+      {iconContextMenu && iconEditForm && (
+        <div
+          className="icc-card"
+          style={{ left: iconContextMenu.x, top: iconContextMenu.y }}
+          onMouseDown={e => e.stopPropagation()}
+          onContextMenu={e => e.preventDefault()}
+        >
+          <div className="icc-row">
+            <label className="icc-label">Name</label>
+            <input className="icc-input" value={iconEditForm.title} onChange={e => setIconEditForm(f => f ? { ...f, title: e.target.value } : f)} />
+          </div>
+          <div className="icc-row">
+            <label className="icc-label">Link</label>
+            <input className="icc-input" value={iconEditForm.url} onChange={e => setIconEditForm(f => f ? { ...f, url: e.target.value } : f)} />
+          </div>
+          <div className="icc-row">
+            <label className="icc-label">Icon</label>
+            <select className="icc-select" value={iconEditForm.iconType} onChange={e => setIconEditForm(f => f ? { ...f, iconType: e.target.value as 'favicon' | 'emoji' | 'custom' } : f)}>
+              <option value="favicon">Website favicon</option>
+              <option value="emoji">Emoji</option>
+              <option value="custom">Custom URL</option>
+            </select>
+          </div>
+          {iconEditForm.iconType === 'emoji' && (
+            <div className="icc-row">
+              <label className="icc-label">Emoji</label>
+              <input className="icc-input icc-input--short" value={iconEditForm.iconValue} onChange={e => setIconEditForm(f => f ? { ...f, iconValue: e.target.value } : f)} placeholder="e.g. 🚀" maxLength={4} />
+            </div>
+          )}
+          {iconEditForm.iconType === 'custom' && (
+            <div className="icc-row">
+              <label className="icc-label">Image URL</label>
+              <input className="icc-input" value={iconEditForm.iconValue} onChange={e => setIconEditForm(f => f ? { ...f, iconValue: e.target.value } : f)} placeholder="https://..." />
+            </div>
+          )}
+          <div className="icc-divider" />
+          <button className="icc-action icc-delete" onClick={() => deleteShortcut(iconEditForm.name)}>
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+            Delete link
+          </button>
+          <button className="icc-action" onClick={() => setIconEditForm(f => f ? { ...f, iconType: 'favicon', iconValue: '' } : f)}>
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M17.65 6.35A7.958 7.958 0 0012 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0112 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+            Refresh icon
+          </button>
+          <button className="icc-action icc-apply" onClick={applyIconEdit}>
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M17 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/></svg>
+            Apply changes
+          </button>
+        </div>
+      )}
 
       <div className={`fab-zone${hideFab ? " fab-hidden" : ""}${showSettings ? " fab-invisible" : ""}`}>
         <button id="settings-fab" className="settings-fab" onClick={() => setShowSettings(!showSettings)} title="Customize"

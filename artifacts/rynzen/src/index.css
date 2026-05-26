@@ -408,6 +408,120 @@ body {
   transform: none;
 }
 
+/* Icon context-menu edit card */
+.icc-card {
+  position: fixed;
+  z-index: 10000;
+  background: #1e1e2e;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 12px;
+  padding: 12px 14px 10px;
+  min-width: 260px;
+  max-width: 290px;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.55);
+  color: #cdd0e0;
+  font-size: 13px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.icc-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.icc-label {
+  width: 62px;
+  flex-shrink: 0;
+  color: #888aaa;
+  font-size: 12px;
+}
+
+.icc-input {
+  flex: 1;
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 6px;
+  color: #dde0f0;
+  font-size: 12px;
+  padding: 5px 8px;
+  outline: none;
+  min-width: 0;
+}
+
+.icc-input:focus {
+  border-color: rgba(120,130,255,0.5);
+  background: rgba(255,255,255,0.1);
+}
+
+.icc-input--short {
+  max-width: 70px;
+  flex: 0 0 70px;
+}
+
+.icc-select {
+  flex: 1;
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 6px;
+  color: #dde0f0;
+  font-size: 12px;
+  padding: 5px 8px;
+  outline: none;
+  cursor: pointer;
+}
+
+.icc-select option {
+  background: #1e1e2e;
+  color: #dde0f0;
+}
+
+.icc-divider {
+  height: 1px;
+  background: rgba(255,255,255,0.08);
+  margin: 2px 0;
+}
+
+.icc-action {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: none;
+  color: #aab0cc;
+  font-size: 13px;
+  padding: 5px 4px;
+  cursor: pointer;
+  border-radius: 6px;
+  text-align: left;
+  transition: background 0.15s, color 0.15s;
+}
+
+.icc-action:hover {
+  background: rgba(255,255,255,0.08);
+  color: #fff;
+}
+
+.icc-delete {
+  color: #f87171;
+}
+
+.icc-delete:hover {
+  background: rgba(248,113,113,0.1);
+  color: #f87171;
+}
+
+.icc-apply {
+  color: #86efac;
+}
+
+.icc-apply:hover {
+  background: rgba(134,239,172,0.1);
+  color: #86efac;
+}
+
 .shortcut-card.free-dragging {
   opacity: 0.92;
   transform: scale(1.08);
