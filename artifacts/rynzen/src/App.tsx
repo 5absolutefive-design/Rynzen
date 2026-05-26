@@ -1331,10 +1331,10 @@ export default function App() {
           </div>
           <div className="icc-row">
             <label className="icc-label">Icon</label>
-            <select className="icc-select" value={iconEditForm.iconType} onChange={e => setIconEditForm(f => f ? { ...f, iconType: e.target.value as 'favicon' | 'emoji' | 'custom' } : f)}>
+            <select className="icc-select" value={iconEditForm.iconType} onChange={e => setIconEditForm(f => f ? { ...f, iconType: e.target.value as 'favicon' | 'emoji' | 'custom', iconValue: '' } : f)}>
               <option value="favicon">Website favicon</option>
               <option value="emoji">Emoji</option>
-              <option value="custom">Custom URL</option>
+              <option value="custom">Local file</option>
             </select>
           </div>
           {iconEditForm.iconType === 'emoji' && (
@@ -1345,8 +1345,33 @@ export default function App() {
           )}
           {iconEditForm.iconType === 'custom' && (
             <div className="icc-row">
-              <label className="icc-label">Image URL</label>
-              <input className="icc-input" value={iconEditForm.iconValue} onChange={e => setIconEditForm(f => f ? { ...f, iconValue: e.target.value } : f)} placeholder="https://..." />
+              <label className="icc-label">Image</label>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1 }}>
+                {iconEditForm.iconValue && (
+                  <img src={iconEditForm.iconValue} alt="preview" style={{ width: 28, height: 28, objectFit: 'contain', borderRadius: 6, flexShrink: 0 }} />
+                )}
+                <button
+                  className="icc-file-btn"
+                  onClick={() => {
+                    const inp = document.createElement('input');
+                    inp.type = 'file';
+                    inp.accept = 'image/*';
+                    inp.onchange = () => {
+                      const file = inp.files?.[0];
+                      if (!file) return;
+                      const reader = new FileReader();
+                      reader.onload = (ev) => {
+                        const result = ev.target?.result as string;
+                        setIconEditForm(f => f ? { ...f, iconValue: result } : f);
+                      };
+                      reader.readAsDataURL(file);
+                    };
+                    inp.click();
+                  }}
+                >
+                  {iconEditForm.iconValue ? 'Change file' : 'Choose file'}
+                </button>
+              </div>
             </div>
           )}
           <div className="icc-divider" />
