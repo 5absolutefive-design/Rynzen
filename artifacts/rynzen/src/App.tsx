@@ -1141,10 +1141,10 @@ export default function App() {
       {freeDragState && dragBoundsRef.current && (
         <>
           {boundaryHit.left && (
-            <div className="drag-boundary-line drag-boundary-left" style={{ left: dragBoundsRef.current.left }} />
+            <div className="drag-boundary-line" style={{ left: dragBoundsRef.current.left, top: dragBoundsRef.current.top }} />
           )}
           {boundaryHit.right && (
-            <div className="drag-boundary-line drag-boundary-right" style={{ left: dragBoundsRef.current.right + dragBoundsRef.current.iconW }} />
+            <div className="drag-boundary-line" style={{ left: dragBoundsRef.current.right + dragBoundsRef.current.iconW, top: dragBoundsRef.current.top }} />
           )}
         </>
       )}
