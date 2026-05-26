@@ -240,6 +240,8 @@ export default function App() {
   });
   const freeDragRef = useRef<{name: string; offsetX: number; offsetY: number; hasMoved: boolean; startX: number; startY: number} | null>(null);
   const [freeDragState, setFreeDragState] = useState<{name: string, x: number, y: number} | null>(null);
+  const dragBoundsRef = useRef<{left: number; right: number; top: number; iconW: number} | null>(null);
+  const [boundaryHit, setBoundaryHit] = useState<{left: boolean; right: boolean}>({left: false, right: false});
   const [showSettings, setShowSettings] = useState(false);
   const [hideFab, setHideFab] = useState(false);
 
@@ -498,51 +500,77 @@ export default function App() {
   function handleShortcutMouseDown(e: React.MouseEvent, name: string) {
     if (e.button !== 0) return;
     e.preventDefault();
-    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+    const iconRect = (e.currentTarget as HTMLElement).getBoundingClientRect();
     const pos = shortcutPositions[name];
     freeDragRef.current = {
       name,
-      offsetX: e.clientX - (pos ? pos.x : rect.left),
-      offsetY: e.clientY - (pos ? pos.y : rect.top),
+      offsetX: e.clientX - (pos ? pos.x : iconRect.left),
+      offsetY: e.clientY - (pos ? pos.y : iconRect.top),
       hasMoved: false,
       startX: e.clientX,
       startY: e.clientY,
     };
+    const searchRect = searchSectionRef.current?.getBoundingClientRect();
+    if (searchRect) {
+      dragBoundsRef.current = {
+        left: searchRect.left,
+        right: searchRect.right - iconRect.width,
+        top: searchRect.bottom,
+        iconW: iconRect.width,
+      };
+    } else {
+      dragBoundsRef.current = null;
+    }
     if (pos) {
       setFreeDragState({ name, x: pos.x, y: pos.y });
     }
   }
 
   useEffect(() => {
+    function clampToBounds(rawX: number, rawY: number): { x: number; y: number; hitLeft: boolean; hitRight: boolean } {
+      const b = dragBoundsRef.current;
+      if (!b) return { x: rawX, y: rawY, hitLeft: false, hitRight: false };
+      let x = rawX;
+      let hitLeft = false;
+      let hitRight = false;
+      if (x < b.left) { x = b.left; hitLeft = true; }
+      if (x > b.right) { x = b.right; hitRight = true; }
+      const y = Math.max(rawY, b.top);
+      return { x, y, hitLeft, hitRight };
+    }
+
     function onMove(e: MouseEvent) {
       if (!freeDragRef.current) return;
       const dx = e.clientX - freeDragRef.current.startX;
       const dy = e.clientY - freeDragRef.current.startY;
       if (!freeDragRef.current.hasMoved && Math.hypot(dx, dy) < 5) return;
       freeDragRef.current.hasMoved = true;
-      setFreeDragState({
-        name: freeDragRef.current.name,
-        x: e.clientX - freeDragRef.current.offsetX,
-        y: e.clientY - freeDragRef.current.offsetY,
-      });
+      const rawX = e.clientX - freeDragRef.current.offsetX;
+      const rawY = e.clientY - freeDragRef.current.offsetY;
+      const { x, y, hitLeft, hitRight } = clampToBounds(rawX, rawY);
+      setFreeDragState({ name: freeDragRef.current.name, x, y });
+      setBoundaryHit({ left: hitLeft, right: hitRight });
     }
+
     function onUp(e: MouseEvent) {
       if (!freeDragRef.current) return;
       if (freeDragRef.current.hasMoved) {
-        const newPos = {
-          x: e.clientX - freeDragRef.current.offsetX,
-          y: e.clientY - freeDragRef.current.offsetY,
-        };
+        const rawX = e.clientX - freeDragRef.current.offsetX;
+        const rawY = e.clientY - freeDragRef.current.offsetY;
+        const { x, y } = clampToBounds(rawX, rawY);
         const name = freeDragRef.current.name;
         setShortcutPositions(prev => {
-          const updated = { ...prev, [name]: newPos };
+          const updated = { ...prev, [name]: { x, y } };
           try { localStorage.setItem("rynzen-shortcut-positions", JSON.stringify(updated)); } catch { /* ignore */ }
           return updated;
         });
       }
       freeDragRef.current = null;
+      dragBoundsRef.current = null;
       setFreeDragState(null);
+      setBoundaryHit({ left: false, right: false });
     }
+
     window.addEventListener("mousemove", onMove);
     window.addEventListener("mouseup", onUp);
     return () => {
@@ -1109,6 +1137,18 @@ export default function App() {
       </main>
 
       {/* Free-positioned shortcuts overlay */}
+      {/* Boundary red lines — shown when dragging icon hits left/right limit */}
+      {freeDragState && dragBoundsRef.current && (
+        <>
+          {boundaryHit.left && (
+            <div className="drag-boundary-line drag-boundary-left" style={{ left: dragBoundsRef.current.left }} />
+          )}
+          {boundaryHit.right && (
+            <div className="drag-boundary-line drag-boundary-right" style={{ left: dragBoundsRef.current.right + dragBoundsRef.current.iconW }} />
+          )}
+        </>
+      )}
+
       {showShortcuts && shortcuts.filter(s => shortcutPositions[s.name] || freeDragState?.name === s.name).map((s) => {
         const pos = freeDragState?.name === s.name ? freeDragState : shortcutPositions[s.name];
         if (!pos) return null;
