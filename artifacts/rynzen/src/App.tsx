@@ -1369,16 +1369,9 @@ export default function App() {
             <label className="icc-label">Icon</label>
             <select className="icc-select" value={iconEditForm.iconType} onChange={e => setIconEditForm(f => f ? { ...f, iconType: e.target.value as 'favicon' | 'emoji' | 'custom', iconValue: '' } : f)}>
               <option value="favicon">Website favicon</option>
-              <option value="emoji">Emoji</option>
               <option value="custom">Local file</option>
             </select>
           </div>
-          {iconEditForm.iconType === 'emoji' && (
-            <div className="icc-row">
-              <label className="icc-label">Emoji</label>
-              <input className="icc-input icc-input--short" value={iconEditForm.iconValue} onChange={e => setIconEditForm(f => f ? { ...f, iconValue: e.target.value } : f)} placeholder="e.g. 🚀" maxLength={4} />
-            </div>
-          )}
           {iconEditForm.iconType === 'custom' && (
             <div className="icc-row">
               <label className="icc-label">Image</label>
