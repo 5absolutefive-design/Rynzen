@@ -1086,11 +1086,11 @@ export default function App() {
             <h3 className="shortcuts-title" style={{ color: fontColor ? fontColor : (isDark ? "#667799" : "#9aa0b2") }}>{t.quickAccess}</h3>
             <div className="shortcuts-grid" style={{ gap: quickLinksStyle === "text" ? "8px" : "12px", gridTemplateColumns: `repeat(${quickLinksPerRow}, max-content)` }}>
               {shortcuts.filter(s => !shortcutPositions[s.name] && freeDragState?.name !== s.name).map((s) => (
-                <a key={s.name} href={s.url}
-                  target={quickLinksOpenNewTab ? "_blank" : "_self"} rel="noopener noreferrer"
+                <a key={s.name}
                   className={`shortcut-card${quickLinksStyle === "text" ? " shortcut-card--text" : ""}`}
                   onMouseDown={(e) => handleShortcutMouseDown(e, s.name)}
-                  onClick={(e) => { if (freeDragRef.current?.hasMoved) e.preventDefault(); }}
+                  onClick={(e) => e.preventDefault()}
+                  onDoubleClick={() => { window.open(s.url, quickLinksOpenNewTab ? "_blank" : "_self"); }}
                   style={{ cursor: "grab" }}
                 >
                   <img
@@ -1115,8 +1115,6 @@ export default function App() {
         const isDraggingThis = freeDragState?.name === s.name;
         return (
           <a key={`free-${s.name}`}
-            href={s.url}
-            target={quickLinksOpenNewTab ? "_blank" : "_self"} rel="noopener noreferrer"
             className={`shortcut-card shortcut-card-free${quickLinksStyle === "text" ? " shortcut-card--text" : ""}${isDraggingThis ? " free-dragging" : ""}`}
             style={{
               position: "fixed",
@@ -1127,16 +1125,8 @@ export default function App() {
               userSelect: "none",
             }}
             onMouseDown={(e) => handleShortcutMouseDown(e, s.name)}
-            onClick={(e) => { if (freeDragRef.current?.hasMoved) e.preventDefault(); }}
-            onDoubleClick={(e) => {
-              e.preventDefault();
-              setShortcutPositions(prev => {
-                const updated = { ...prev };
-                delete updated[s.name];
-                try { localStorage.setItem("rynzen-shortcut-positions", JSON.stringify(updated)); } catch { /* ignore */ }
-                return updated;
-              });
-            }}
+            onClick={(e) => e.preventDefault()}
+            onDoubleClick={() => { window.open(s.url, quickLinksOpenNewTab ? "_blank" : "_self"); }}
           >
             <img
               src={`https://www.google.com/s2/favicons?domain=${s.domain}&sz=${qlSzParam}`}
