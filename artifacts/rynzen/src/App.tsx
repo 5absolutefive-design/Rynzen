@@ -256,7 +256,7 @@ export default function App() {
   });
   const freeDragRef = useRef<{name: string; offsetX: number; offsetY: number; hasMoved: boolean; startX: number; startY: number} | null>(null);
   const [freeDragState, setFreeDragState] = useState<{name: string, x: number, y: number} | null>(null);
-  const dragBoundsRef = useRef<{left: number; right: number; top: number; iconW: number} | null>(null);
+  const dragBoundsRef = useRef<{left: number; right: number; top: number; bottom?: number; mode: 'below' | 'above'; iconW: number} | null>(null);
   const [boundaryHit, setBoundaryHit] = useState<{left: boolean; right: boolean}>({left: false, right: false});
   const [showSettings, setShowSettings] = useState(false);
   const [hideFab, setHideFab] = useState(false);
@@ -533,9 +533,10 @@ export default function App() {
     name: string,
     positions: Record<string, { x: number; y: number }>,
     iconSize: number,
-    bounds: { left: number; right: number; top: number } | null,
+    bounds: { left: number; right: number; top: number; bottom?: number; mode?: 'below' | 'above' } | null,
   ): { x: number; y: number } {
     const PAD = iconSize;
+    const isAbove = bounds?.mode === 'above';
     let pos = { ...newPos };
     for (let iter = 0; iter < 30; iter++) {
       let moved = false;
@@ -548,12 +549,22 @@ export default function App() {
         if (overlapX > 0 && overlapY > 0) {
           const pushX = dx >= 0 ? overlapX : -overlapX;
           const pushY = dy >= 0 ? overlapY : -overlapY;
-          const wouldViolateBoundsY = bounds && (pos.y + pushY < bounds.top);
-          if (overlapX <= overlapY || wouldViolateBoundsY) {
+          const newY = pos.y + pushY;
+          const wouldViolateBounds = isAbove
+            ? (bounds?.bottom !== undefined && newY > bounds.bottom)
+            : (bounds && newY < bounds.top);
+          if (overlapX <= overlapY || wouldViolateBounds) {
             pos.x += pushX;
           } else {
             pos.y += pushY;
-            if (bounds && pos.y < bounds.top) pos.y = bounds.top;
+            if (bounds) {
+              if (isAbove) {
+                if (bounds.bottom !== undefined && pos.y > bounds.bottom) pos.y = bounds.bottom;
+                if (pos.y < 0) pos.y = 0;
+              } else {
+                if (pos.y < bounds.top) pos.y = bounds.top;
+              }
+            }
           }
           moved = true;
         }
@@ -562,7 +573,12 @@ export default function App() {
     }
     if (bounds) {
       pos.x = Math.max(bounds.left, Math.min(bounds.right, pos.x));
-      pos.y = Math.max(pos.y, bounds.top);
+      if (isAbove) {
+        if (bounds.bottom !== undefined) pos.y = Math.min(pos.y, bounds.bottom);
+        pos.y = Math.max(pos.y, 0);
+      } else {
+        pos.y = Math.max(pos.y, bounds.top);
+      }
     }
     return pos;
   }
@@ -660,12 +676,26 @@ export default function App() {
     };
     const searchRect = searchSectionRef.current?.getBoundingClientRect();
     if (searchRect) {
-      dragBoundsRef.current = {
-        left: searchRect.left,
-        right: searchRect.right - iconRect.width,
-        top: searchRect.bottom,
-        iconW: iconRect.width,
-      };
+      const screenMid = window.innerHeight / 2;
+      const searchBarBelowCenter = searchRect.top >= screenMid;
+      if (searchBarBelowCenter) {
+        dragBoundsRef.current = {
+          left: searchRect.left,
+          right: searchRect.right - iconRect.width,
+          top: 0,
+          bottom: searchRect.top - iconRect.height,
+          mode: 'above',
+          iconW: iconRect.width,
+        };
+      } else {
+        dragBoundsRef.current = {
+          left: searchRect.left,
+          right: searchRect.right - iconRect.width,
+          top: searchRect.bottom,
+          mode: 'below',
+          iconW: iconRect.width,
+        };
+      }
     } else {
       dragBoundsRef.current = null;
     }
@@ -683,7 +713,13 @@ export default function App() {
       let hitRight = false;
       if (x < b.left) { x = b.left; hitLeft = true; }
       if (x > b.right) { x = b.right; hitRight = true; }
-      const y = Math.max(rawY, b.top);
+      let y = rawY;
+      if (b.mode === 'above') {
+        if (y < 0) y = 0;
+        if (b.bottom !== undefined && y > b.bottom) y = b.bottom;
+      } else {
+        y = Math.max(rawY, b.top);
+      }
       return { x, y, hitLeft, hitRight };
     }
 
@@ -709,7 +745,7 @@ export default function App() {
         const name = freeDragRef.current.name;
         const iconSize = dragBoundsRef.current?.iconW ?? 60;
         const savedBounds = dragBoundsRef.current
-          ? { left: dragBoundsRef.current.left, right: dragBoundsRef.current.right, top: dragBoundsRef.current.top }
+          ? { left: dragBoundsRef.current.left, right: dragBoundsRef.current.right, top: dragBoundsRef.current.top, bottom: dragBoundsRef.current.bottom, mode: dragBoundsRef.current.mode }
           : null;
         setShortcutPositions(prev => {
           const resolved = resolveCollisions({ x, y }, name, prev, iconSize, savedBounds);
