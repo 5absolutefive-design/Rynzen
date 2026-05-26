@@ -251,13 +251,13 @@ export default function App() {
   });
   const [iconContextMenu, setIconContextMenu] = useState<{ name: string; x: number; y: number } | null>(null);
   const [iconEditForm, setIconEditForm] = useState<{ name: string; title: string; url: string; iconType: 'favicon' | 'emoji' | 'custom'; iconValue: string } | null>(null);
-  const [shortcutPositions, setShortcutPositions] = useState<Record<string, {x: number, y: number}>>(() => {
-    try { return JSON.parse(localStorage.getItem("rynzen-shortcut-positions") || "{}"); } catch { return {}; }
+  const [gridPositions, setGridPositions] = useState<Record<string, {col: number, row: number}>>(() => {
+    try { return JSON.parse(localStorage.getItem("rynzen-shortcut-grid") || "{}"); } catch { return {}; }
   });
-  const freeDragRef = useRef<{name: string; offsetX: number; offsetY: number; hasMoved: boolean; startX: number; startY: number} | null>(null);
-  const [freeDragState, setFreeDragState] = useState<{name: string, x: number, y: number} | null>(null);
-  const dragBoundsRef = useRef<{left: number; right: number; top: number; bottom?: number; mode: 'below' | 'above'; iconW: number} | null>(null);
-  const [boundaryHit, setBoundaryHit] = useState<{left: boolean; right: boolean}>({left: false, right: false});
+  const gridDragRef = useRef<{name: string; startMouseX: number; startMouseY: number; hasMoved: boolean} | null>(null);
+  const [gridDragState, setGridDragState] = useState<{name: string; mouseX: number; mouseY: number} | null>(null);
+  const [dropTargetCell, setDropTargetCell] = useState<{col: number; row: number} | null>(null);
+  const gridContainerRef = useRef<HTMLDivElement>(null);
   const [showSettings, setShowSettings] = useState(false);
   const [hideFab, setHideFab] = useState(false);
 
@@ -528,60 +528,31 @@ export default function App() {
     else if (e.key === "Escape") setShowSuggestions(false);
   }
 
-  function resolveCollisions(
-    newPos: { x: number; y: number },
-    name: string,
-    positions: Record<string, { x: number; y: number }>,
-    iconSize: number,
-    bounds: { left: number; right: number; top: number; bottom?: number; mode?: 'below' | 'above' } | null,
-  ): { x: number; y: number } {
-    const PAD = iconSize;
-    const isAbove = bounds?.mode === 'above';
-    let pos = { ...newPos };
-    for (let iter = 0; iter < 30; iter++) {
-      let moved = false;
-      for (const [otherName, otherPos] of Object.entries(positions)) {
-        if (otherName === name) continue;
-        const dx = pos.x - otherPos.x;
-        const dy = pos.y - otherPos.y;
-        const overlapX = PAD - Math.abs(dx);
-        const overlapY = PAD - Math.abs(dy);
-        if (overlapX > 0 && overlapY > 0) {
-          const pushX = dx >= 0 ? overlapX : -overlapX;
-          const pushY = dy >= 0 ? overlapY : -overlapY;
-          const newY = pos.y + pushY;
-          const wouldViolateBounds = isAbove
-            ? (bounds?.bottom !== undefined && newY > bounds.bottom)
-            : (bounds && newY < bounds.top);
-          if (overlapX <= overlapY || wouldViolateBounds) {
-            pos.x += pushX;
-          } else {
-            pos.y += pushY;
-            if (bounds) {
-              if (isAbove) {
-                if (bounds.bottom !== undefined && pos.y > bounds.bottom) pos.y = bounds.bottom;
-                if (pos.y < 0) pos.y = 0;
-              } else {
-                if (pos.y < bounds.top) pos.y = bounds.top;
-              }
-            }
-          }
-          moved = true;
-        }
+  function getAssignedGridPositions(
+    list: Shortcut[],
+    saved: Record<string, {col: number, row: number}>,
+    cols: number,
+  ): Record<string, {col: number, row: number}> {
+    const result: Record<string, {col: number, row: number}> = {};
+    const occupied = new Set(Object.entries(saved).filter(([n]) => list.some(s => s.name === n)).map(([, p]) => `${p.col},${p.row}`));
+    let nc = 0, nr = 0;
+    function nextEmpty() {
+      while (occupied.has(`${nc},${nr}`)) {
+        nc++;
+        if (nc >= cols) { nc = 0; nr++; }
       }
-      if (!moved) break;
+      const p = { col: nc, row: nr };
+      occupied.add(`${nc},${nr}`);
+      nc++;
+      if (nc >= cols) { nc = 0; nr++; }
+      return p;
     }
-    if (bounds) {
-      pos.x = Math.max(bounds.left, Math.min(bounds.right, pos.x));
-      if (isAbove) {
-        if (bounds.bottom !== undefined) pos.y = Math.min(pos.y, bounds.bottom);
-        pos.y = Math.max(pos.y, 0);
-      } else {
-        pos.y = Math.max(pos.y, bounds.top);
-      }
+    for (const s of list) {
+      result[s.name] = saved[s.name] ?? nextEmpty();
     }
-    return pos;
+    return result;
   }
+
 
   function handleIconRightClick(e: React.MouseEvent, name: string) {
     e.preventDefault();
@@ -609,11 +580,11 @@ export default function App() {
       return updated;
     });
     if (newName !== oldName) {
-      setShortcutPositions(prev => {
+      setGridPositions(prev => {
         if (!prev[oldName]) return prev;
         const { [oldName]: pos, ...rest } = prev;
         const updated = { ...rest, [newName]: pos };
-        try { localStorage.setItem("rynzen-shortcut-positions", JSON.stringify(updated)); } catch {}
+        try { localStorage.setItem("rynzen-shortcut-grid", JSON.stringify(updated)); } catch {}
         return updated;
       });
     }
@@ -627,9 +598,9 @@ export default function App() {
       try { localStorage.setItem("rynzen-shortcuts", JSON.stringify(updated)); } catch {}
       return updated;
     });
-    setShortcutPositions(prev => {
+    setGridPositions(prev => {
       const { [name]: _removed, ...rest } = prev;
-      try { localStorage.setItem("rynzen-shortcut-positions", JSON.stringify(rest)); } catch {}
+      try { localStorage.setItem("rynzen-shortcut-grid", JSON.stringify(rest)); } catch {}
       return rest;
     });
     setIconContextMenu(null);
@@ -664,100 +635,64 @@ export default function App() {
   function handleShortcutMouseDown(e: React.MouseEvent, name: string) {
     if (e.button !== 0) return;
     e.preventDefault();
-    const iconRect = (e.currentTarget as HTMLElement).getBoundingClientRect();
-    const pos = shortcutPositions[name];
-    freeDragRef.current = {
-      name,
-      offsetX: e.clientX - (pos ? pos.x : iconRect.left),
-      offsetY: e.clientY - (pos ? pos.y : iconRect.top),
-      hasMoved: false,
-      startX: e.clientX,
-      startY: e.clientY,
-    };
-    const searchRect = searchSectionRef.current?.getBoundingClientRect();
-    if (searchRect) {
-      const screenMid = window.innerHeight / 2;
-      const searchBarBelowCenter = searchRect.top >= screenMid;
-      if (searchBarBelowCenter) {
-        dragBoundsRef.current = {
-          left: searchRect.left,
-          right: searchRect.right - iconRect.width,
-          top: 0,
-          bottom: searchRect.top - iconRect.height,
-          mode: 'above',
-          iconW: iconRect.width,
-        };
-      } else {
-        dragBoundsRef.current = {
-          left: searchRect.left,
-          right: searchRect.right - iconRect.width,
-          top: searchRect.bottom,
-          mode: 'below',
-          iconW: iconRect.width,
-        };
-      }
-    } else {
-      dragBoundsRef.current = null;
-    }
-    if (pos) {
-      setFreeDragState({ name, x: pos.x, y: pos.y });
-    }
+    gridDragRef.current = { name, startMouseX: e.clientX, startMouseY: e.clientY, hasMoved: false };
   }
 
   useEffect(() => {
-    function clampToBounds(rawX: number, rawY: number): { x: number; y: number; hitLeft: boolean; hitRight: boolean } {
-      const b = dragBoundsRef.current;
-      if (!b) return { x: rawX, y: rawY, hitLeft: false, hitRight: false };
-      let x = rawX;
-      let hitLeft = false;
-      let hitRight = false;
-      if (x < b.left) { x = b.left; hitLeft = true; }
-      if (x > b.right) { x = b.right; hitRight = true; }
-      let y = rawY;
-      if (b.mode === 'above') {
-        if (y < 0) y = 0;
-        if (b.bottom !== undefined && y > b.bottom) y = b.bottom;
-      } else {
-        y = Math.max(rawY, b.top);
-      }
-      return { x, y, hitLeft, hitRight };
-    }
-
     function onMove(e: MouseEvent) {
-      if (!freeDragRef.current) return;
-      const dx = e.clientX - freeDragRef.current.startX;
-      const dy = e.clientY - freeDragRef.current.startY;
-      if (!freeDragRef.current.hasMoved && Math.hypot(dx, dy) < 5) return;
-      freeDragRef.current.hasMoved = true;
-      const rawX = e.clientX - freeDragRef.current.offsetX;
-      const rawY = e.clientY - freeDragRef.current.offsetY;
-      const { x, y, hitLeft, hitRight } = clampToBounds(rawX, rawY);
-      setFreeDragState({ name: freeDragRef.current.name, x, y });
-      setBoundaryHit({ left: hitLeft, right: hitRight });
+      if (!gridDragRef.current) return;
+      const dx = e.clientX - gridDragRef.current.startMouseX;
+      const dy = e.clientY - gridDragRef.current.startMouseY;
+      if (!gridDragRef.current.hasMoved && Math.hypot(dx, dy) < 5) return;
+      gridDragRef.current.hasMoved = true;
+      setGridDragState({ name: gridDragRef.current.name, mouseX: e.clientX, mouseY: e.clientY });
+      const container = gridContainerRef.current;
+      if (container) {
+        const rect = container.getBoundingClientRect();
+        const cols = parseInt((container as HTMLElement).dataset.cols || '8');
+        const cellSize = parseInt((container as HTMLElement).dataset.cellsize || '72');
+        const col = Math.floor((e.clientX - rect.left) / cellSize);
+        const row = Math.floor((e.clientY - rect.top) / cellSize);
+        if (col >= 0 && col < cols && row >= 0) {
+          setDropTargetCell({ col, row });
+        } else {
+          setDropTargetCell(null);
+        }
+      }
     }
 
     function onUp(e: MouseEvent) {
-      if (!freeDragRef.current) return;
-      if (freeDragRef.current.hasMoved) {
-        const rawX = e.clientX - freeDragRef.current.offsetX;
-        const rawY = e.clientY - freeDragRef.current.offsetY;
-        const { x, y } = clampToBounds(rawX, rawY);
-        const name = freeDragRef.current.name;
-        const iconSize = dragBoundsRef.current?.iconW ?? 60;
-        const savedBounds = dragBoundsRef.current
-          ? { left: dragBoundsRef.current.left, right: dragBoundsRef.current.right, top: dragBoundsRef.current.top, bottom: dragBoundsRef.current.bottom, mode: dragBoundsRef.current.mode }
-          : null;
-        setShortcutPositions(prev => {
-          const resolved = resolveCollisions({ x, y }, name, prev, iconSize, savedBounds);
-          const updated = { ...prev, [name]: resolved };
-          try { localStorage.setItem("rynzen-shortcut-positions", JSON.stringify(updated)); } catch { /* ignore */ }
+      if (!gridDragRef.current) return;
+      if (gridDragRef.current.hasMoved) {
+        const name = gridDragRef.current.name;
+        setGridPositions(prev => {
+          const container = gridContainerRef.current;
+          if (!container) return prev;
+          const rect = container.getBoundingClientRect();
+          const relX = e.clientX - rect.left;
+          const relY = e.clientY - rect.top;
+          const rawCols = parseInt((container as HTMLElement).dataset.cols || '8');
+          const rawCellSize = parseInt((container as HTMLElement).dataset.cellsize || '72');
+          const col = Math.max(0, Math.min(rawCols - 1, Math.floor(relX / rawCellSize)));
+          const row = Math.max(0, Math.floor(relY / rawCellSize));
+          const targetKey = `${col},${row}`;
+          const occupant = Object.entries(prev).find(([n, p]) => n !== name && `${p.col},${p.row}` === targetKey);
+          let updated = { ...prev, [name]: { col, row } };
+          if (occupant) {
+            const myOldPos = prev[name];
+            if (myOldPos) {
+              updated[occupant[0]] = myOldPos;
+            } else {
+              delete updated[occupant[0]];
+            }
+          }
+          try { localStorage.setItem("rynzen-shortcut-grid", JSON.stringify(updated)); } catch {}
           return updated;
         });
       }
-      freeDragRef.current = null;
-      dragBoundsRef.current = null;
-      setFreeDragState(null);
-      setBoundaryHit({ left: false, right: false });
+      gridDragRef.current = null;
+      setGridDragState(null);
+      setDropTargetCell(null);
     }
 
     window.addEventListener("mousemove", onMove);
@@ -1292,63 +1227,109 @@ export default function App() {
         </div>
         )}
 
-        {showShortcuts && (
-          <div ref={shortcutsSectionRef}
-            className={`shortcuts-section${layoutMode ? " layout-el" + (activeLayoutEl === "shortcuts" ? " layout-el-active" : "") : ""}`}
-            style={layoutElStyle("shortcuts")}
-            onMouseDown={layoutMode ? (e) => handleLayoutMouseDown("shortcuts", e) : undefined}
-            onClick={layoutMode ? (e) => e.stopPropagation() : undefined}>
-            {renderResizeHandles("shortcuts")}
-            {layoutMode && <div style={{ position: "absolute", inset: 0, zIndex: 10, cursor: "move", borderRadius: "inherit" }} onMouseDown={(e) => handleLayoutMouseDown("shortcuts", e)} onClick={(e) => e.stopPropagation()} />}
-            <h3 className="shortcuts-title" style={{ color: fontColor ? fontColor : (isDark ? "#667799" : "#9aa0b2") }}>{t.quickAccess}</h3>
-            <div className="shortcuts-grid" style={{ gap: quickLinksStyle === "text" ? "8px" : "12px", gridTemplateColumns: `repeat(${quickLinksPerRow}, max-content)` }}>
-              {shortcuts.filter(s => !shortcutPositions[s.name] && freeDragState?.name !== s.name).map((s) => (
-                <a key={s.name}
-                  className={`shortcut-card${quickLinksStyle === "text" ? " shortcut-card--text" : ""}`}
-                  onMouseDown={(e) => handleShortcutMouseDown(e, s.name)}
-                  onClick={(e) => e.preventDefault()}
-                  onDoubleClick={() => { window.open(s.url, quickLinksOpenNewTab ? "_blank" : "_self"); }}
-                  onContextMenu={(e) => handleIconRightClick(e, s.name)}
-                  style={{ cursor: "grab" }}
-                >
-                  {renderShortcutIcon(s)}
-                  {quickLinksStyle === "text" && (
-                    <span className="shortcut-label" style={{ color: fontColor ? fontColor : (isDark ? "#c8cce0" : "#444") }}>{s.name}</span>
-                  )}
-                </a>
-              ))}
+        {showShortcuts && (() => {
+          const CELL = qlFaviconSize + 32;
+          const COLS = quickLinksPerRow;
+          const allPos = getAssignedGridPositions(shortcuts, gridPositions, COLS);
+          const maxRow = Math.max(0, ...Object.values(allPos).map(p => p.row));
+          const totalRows = maxRow + 2;
+          const cardSize = qlFaviconSize + 20;
+          return (
+            <div ref={shortcutsSectionRef}
+              className={`shortcuts-section${layoutMode ? " layout-el" + (activeLayoutEl === "shortcuts" ? " layout-el-active" : "") : ""}`}
+              style={layoutElStyle("shortcuts")}
+              onMouseDown={layoutMode ? (e) => handleLayoutMouseDown("shortcuts", e) : undefined}
+              onClick={layoutMode ? (e) => e.stopPropagation() : undefined}>
+              {renderResizeHandles("shortcuts")}
+              {layoutMode && <div style={{ position: "absolute", inset: 0, zIndex: 10, cursor: "move", borderRadius: "inherit" }} onMouseDown={(e) => handleLayoutMouseDown("shortcuts", e)} onClick={(e) => e.stopPropagation()} />}
+              <h3 className="shortcuts-title" style={{ color: fontColor ? fontColor : (isDark ? "#667799" : "#9aa0b2") }}>{t.quickAccess}</h3>
+              <div
+                ref={gridContainerRef}
+                data-cols={COLS}
+                data-cellsize={CELL}
+                style={{ position: "relative", width: COLS * CELL, height: totalRows * CELL }}
+              >
+                {dropTargetCell && gridDragState && (
+                  <div style={{
+                    position: "absolute",
+                    left: dropTargetCell.col * CELL + (CELL - cardSize) / 2,
+                    top: dropTargetCell.row * CELL + (CELL - cardSize) / 2,
+                    width: cardSize,
+                    height: cardSize,
+                    background: "rgba(66,133,244,0.18)",
+                    border: "2px dashed rgba(66,133,244,0.7)",
+                    borderRadius: 16,
+                    pointerEvents: "none",
+                    zIndex: 50,
+                    transition: "left 0.08s, top 0.08s",
+                  }} />
+                )}
+                {shortcuts.map((s) => {
+                  const pos = allPos[s.name];
+                  if (!pos) return null;
+                  const isDraggingThis = gridDragState?.name === s.name;
+                  return (
+                    <a key={s.name}
+                      className={`shortcut-card${quickLinksStyle === "text" ? " shortcut-card--text" : ""}${isDraggingThis ? " free-dragging" : ""}`}
+                      style={{
+                        position: "absolute",
+                        left: pos.col * CELL + (CELL - cardSize) / 2,
+                        top: pos.row * CELL + (CELL - cardSize) / 2,
+                        width: cardSize,
+                        height: cardSize,
+                        cursor: isDraggingThis ? "grabbing" : "grab",
+                        opacity: isDraggingThis ? 0.35 : 1,
+                        transition: isDraggingThis ? "none" : "left 0.15s, top 0.15s, opacity 0.15s",
+                        zIndex: isDraggingThis ? 1 : 5,
+                        userSelect: "none",
+                      }}
+                      onMouseDown={(e) => handleShortcutMouseDown(e, s.name)}
+                      onClick={(e) => e.preventDefault()}
+                      onDoubleClick={() => { window.open(s.url, quickLinksOpenNewTab ? "_blank" : "_self"); }}
+                      onContextMenu={(e) => handleIconRightClick(e, s.name)}
+                    >
+                      {renderShortcutIcon(s)}
+                      {quickLinksStyle === "text" && (
+                        <span className="shortcut-label" style={{ color: fontColor ? fontColor : (isDark ? "#c8cce0" : "#444") }}>{s.name}</span>
+                      )}
+                    </a>
+                  );
+                })}
+              </div>
             </div>
-          </div>
-        )}
+          );
+        })()}
       </main>
 
-      {showShortcuts && shortcuts.filter(s => shortcutPositions[s.name] || freeDragState?.name === s.name).map((s) => {
-        const pos = freeDragState?.name === s.name ? freeDragState : shortcutPositions[s.name];
-        if (!pos) return null;
-        const isDraggingThis = freeDragState?.name === s.name;
+      {gridDragState && (() => {
+        const s = shortcuts.find(sh => sh.name === gridDragState.name);
+        if (!s) return null;
+        const cardSize = qlFaviconSize + 20;
         return (
-          <a key={`free-${s.name}`}
-            className={`shortcut-card shortcut-card-free${quickLinksStyle === "text" ? " shortcut-card--text" : ""}${isDraggingThis ? " free-dragging" : ""}`}
+          <a
             style={{
               position: "fixed",
-              left: pos.x,
-              top: pos.y,
-              zIndex: isDraggingThis ? 9999 : 100,
-              cursor: isDraggingThis ? "grabbing" : "grab",
-              userSelect: "none",
+              left: gridDragState.mouseX - cardSize / 2,
+              top: gridDragState.mouseY - cardSize / 2,
+              width: cardSize,
+              height: cardSize,
+              zIndex: 9999,
+              pointerEvents: "none",
+              opacity: 0.9,
+              cursor: "grabbing",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              borderRadius: 16,
+              background: isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)",
+              boxShadow: "0 8px 24px rgba(0,0,0,0.3)",
+              transform: "scale(1.12)",
             }}
-            onMouseDown={(e) => handleShortcutMouseDown(e, s.name)}
-            onClick={(e) => e.preventDefault()}
-            onDoubleClick={() => { window.open(s.url, quickLinksOpenNewTab ? "_blank" : "_self"); }}
-            onContextMenu={(e) => handleIconRightClick(e, s.name)}
           >
             {renderShortcutIcon(s)}
-            {quickLinksStyle === "text" && (
-              <span className="shortcut-label" style={{ color: fontColor ? fontColor : (isDark ? "#c8cce0" : "#444") }}>{s.name}</span>
-            )}
           </a>
         );
-      })}
+      })()}
 
       {iconContextMenu && iconEditForm && (
         <div
