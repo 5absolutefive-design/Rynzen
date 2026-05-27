@@ -2511,10 +2511,12 @@ body {
 .al-pool-search {
   border: 1.5px solid;
   border-radius: 7px;
-  padding: 4px 10px;
+  padding: 0 10px;
   font-size: 0.8rem;
   outline: none;
-  width: 110px;
+  width: 150px;
+  height: 40px;
+  box-sizing: border-box;
   transition: border-color 0.15s;
 }
 .al-pool-search:focus { border-color: #22d3ee !important; }
@@ -2569,13 +2571,16 @@ body {
 .al-add-category-btn {
   align-self: flex-start;
   border-radius: 8px;
-  padding: 5px 12px;
+  padding: 0 10px;
+  width: 60px;
+  height: 40px;
+  box-sizing: border-box;
   font-size: 0.76rem;
   font-weight: 600;
   cursor: pointer;
   transition: opacity 0.15s;
   letter-spacing: 0.02em;
-  margin-top: 2px;
+  white-space: nowrap;
 }
 .al-add-category-btn:hover { opacity: 0.7; }
 

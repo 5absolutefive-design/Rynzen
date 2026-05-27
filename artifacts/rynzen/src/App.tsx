@@ -2257,7 +2257,7 @@ export default function App() {
                         setEditingSetId(id);
                         setEditingSetName("New Category");
                       }}>
-                      + category
+                      +CTG
                     </button>
                   </div>
                 </div>
