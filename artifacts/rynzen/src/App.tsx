@@ -223,17 +223,43 @@ type AppSet = { id: string; name: string; apps: AppLibItem[] };
 
 function genId() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
 
+const DEFAULT_SOCIAL_APPS: AppLibItem[] = [
+  { id: "soc-fb",   name: "Facebook",  url: "https://www.facebook.com",  domain: "facebook.com" },
+  { id: "soc-ig",   name: "Instagram", url: "https://www.instagram.com", domain: "instagram.com" },
+  { id: "soc-tt",   name: "TikTok",    url: "https://www.tiktok.com",    domain: "tiktok.com" },
+  { id: "soc-tw",   name: "X (Twitter)", url: "https://twitter.com",     domain: "x.com" },
+  { id: "soc-sc",   name: "Snapchat",  url: "https://www.snapchat.com",  domain: "snapchat.com" },
+  { id: "soc-dc",   name: "Discord",   url: "https://discord.com",       domain: "discord.com" },
+  { id: "soc-rd",   name: "Reddit",    url: "https://www.reddit.com",    domain: "reddit.com" },
+  { id: "soc-pi",   name: "Pinterest", url: "https://www.pinterest.com", domain: "pinterest.com" },
+  { id: "soc-li",   name: "LinkedIn",  url: "https://www.linkedin.com",  domain: "linkedin.com" },
+  { id: "soc-tg",   name: "Telegram",  url: "https://web.telegram.org",  domain: "telegram.org" },
+  { id: "soc-wa",   name: "WhatsApp",  url: "https://web.whatsapp.com",  domain: "whatsapp.com" },
+  { id: "soc-th",   name: "Threads",   url: "https://www.threads.net",   domain: "threads.net" },
+];
+
+function seedSocialApps(sets: AppSet[]): AppSet[] {
+  return sets.map(s =>
+    s.name.toLowerCase() === "social" && s.apps.length === 0
+      ? { ...s, apps: DEFAULT_SOCIAL_APPS }
+      : s
+  );
+}
+
 function loadAppSets(): AppSet[] {
   try {
     const raw = localStorage.getItem("rynzen-app-sets");
-    if (raw) return JSON.parse(raw);
+    if (raw) return seedSocialApps(JSON.parse(raw));
     const oldRaw = localStorage.getItem("rynzen-app-library");
     if (oldRaw) {
       const apps: AppLibItem[] = JSON.parse(oldRaw);
       if (apps.length > 0) return [{ id: "default", name: "My Apps", apps }];
     }
   } catch {}
-  return [{ id: "default", name: "My Apps", apps: [] }];
+  return [
+    { id: "default", name: "My Apps", apps: [] },
+    { id: "social",  name: "social",  apps: DEFAULT_SOCIAL_APPS },
+  ];
 }
 
 export default function App() {
