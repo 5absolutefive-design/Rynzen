@@ -337,6 +337,7 @@ export default function App() {
   const [editingSetName, setEditingSetName] = useState("");
   const [draggingApp, setDraggingApp] = useState<AppLibItem | null>(null);
   const [qaDropActive, setQaDropActive] = useState(false);
+  const [confirmDeleteApp, setConfirmDeleteApp] = useState<{ setId: string; appId: string } | null>(null);
 
   const [bgType, setBgType] = useState<"none" | "images" | "color" | "gradient">("none");
   const [bgImageSelected, setBgImageSelected] = useState("");
@@ -2239,14 +2240,26 @@ export default function App() {
               <div className="al-pool-section" style={{ borderColor: isDark ? "rgba(34,197,94,0.55)" : "rgba(22,163,74,0.65)", background: isDark ? "rgba(255,255,255,0.02)" : "#fff" }}>
                 <div className="al-pool-header">
                   <span className="al-pool-title" style={{ color: themeColor }}>APP POOL</span>
-                  <input
-                    className="al-pool-search"
-                    type="text"
-                    placeholder="search"
-                    value={poolSearch}
-                    onChange={(e) => setPoolSearch(e.target.value)}
-                    style={{ background: isDark ? "#1c1c34" : "#fff", color: themeColor, borderColor: "#22d3ee" }}
-                  />
+                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <input
+                      className="al-pool-search"
+                      type="text"
+                      placeholder="search"
+                      value={poolSearch}
+                      onChange={(e) => setPoolSearch(e.target.value)}
+                      style={{ background: isDark ? "#1c1c34" : "#fff", color: themeColor, borderColor: "#22d3ee" }}
+                    />
+                    <button className="al-add-category-btn"
+                      style={{ border: `1px solid ${isDark ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.2)"}`, color: themeColor, background: "transparent", whiteSpace: "nowrap" }}
+                      onClick={() => {
+                        const id = genId();
+                        setAppSets(prev => [...prev, { id, name: "New Category", apps: [] }]);
+                        setEditingSetId(id);
+                        setEditingSetName("New Category");
+                      }}>
+                      + category
+                    </button>
+                  </div>
                 </div>
 
                 {appSets.map((set) => {
@@ -2281,12 +2294,13 @@ export default function App() {
                       <div className="al-app-grid">
                         {filteredApps.map((app) => {
                           const alreadyAdded = shortcuts.some(s => s.url === app.url);
+                          const isConfirming = confirmDeleteApp?.setId === set.id && confirmDeleteApp?.appId === app.id;
                           return (
                             <div
                               key={app.id}
                               className={`al-app-item${!alreadyAdded ? " al-app-draggable" : ""}${draggingApp?.id === app.id ? " al-app-dragging" : ""}`}
                               style={{ background: isDark ? "#252540" : "#e2e2e9", opacity: alreadyAdded ? 0.45 : 1 }}
-                              title={alreadyAdded ? `${app.name} (already in Quick Access)` : `${app.name} — drag or click + to add`}
+                              title={alreadyAdded ? `${app.name} (already in Quick Access)` : `${app.name} — drag to add`}
                               draggable={!alreadyAdded}
                               onDragStart={(e) => {
                                 setDraggingApp(app);
@@ -2295,14 +2309,26 @@ export default function App() {
                               }}
                               onDragEnd={() => { setDraggingApp(null); setQaDropActive(false); }}
                             >
-                              {!alreadyAdded && (
-                                <button className="al-pool-add-btn" title="Add to Quick Access"
-                                  onClick={(e) => { e.stopPropagation(); setShortcuts(prev => [...prev, { name: app.name, url: app.url, domain: app.domain }]); }}>+</button>
-                              )}
                               <button className="al-app-del" style={{ color: isDark ? "rgba(255,255,255,0.5)" : "rgba(0,0,0,0.4)" }}
-                                onClick={(e) => { e.stopPropagation(); setAppSets(prev => prev.map(s => s.id === set.id ? { ...s, apps: s.apps.filter(a => a.id !== app.id) } : s)); }}>×</button>
+                                onClick={(e) => { e.stopPropagation(); setConfirmDeleteApp({ setId: set.id, appId: app.id }); }}>×</button>
                               <img src={`https://www.google.com/s2/favicons?domain=${app.domain}&sz=64`} alt={app.name} className="al-app-icon" />
                               <span className="al-app-label" style={{ color: isDark ? "rgba(255,255,255,0.75)" : "rgba(0,0,0,0.65)" }}>{app.name}</span>
+                              {isConfirming && (
+                                <div className="al-confirm-card" style={{ background: isDark ? "#1e1e35" : "#fff", boxShadow: isDark ? "0 4px 18px rgba(0,0,0,0.6)" : "0 4px 18px rgba(0,0,0,0.18)" }}
+                                  onClick={(e) => e.stopPropagation()}>
+                                  <span className="al-confirm-text" style={{ color: themeColor }}>Remove?</span>
+                                  <div className="al-confirm-btns">
+                                    <button className="al-confirm-yes"
+                                      onClick={(e) => { e.stopPropagation(); setAppSets(prev => prev.map(s => s.id === set.id ? { ...s, apps: s.apps.filter(a => a.id !== app.id) } : s)); setConfirmDeleteApp(null); }}>
+                                      Yes
+                                    </button>
+                                    <button className="al-confirm-no" style={{ color: isDark ? "rgba(255,255,255,0.5)" : "rgba(0,0,0,0.45)" }}
+                                      onClick={(e) => { e.stopPropagation(); setConfirmDeleteApp(null); }}>
+                                      No
+                                    </button>
+                                  </div>
+                                </div>
+                              )}
                             </div>
                           );
                         })}
@@ -2315,16 +2341,6 @@ export default function App() {
                   );
                 })}
 
-                <button className="al-add-category-btn"
-                  style={{ border: `1px solid ${isDark ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.2)"}`, color: themeColor, background: "transparent" }}
-                  onClick={() => {
-                    const id = genId();
-                    setAppSets(prev => [...prev, { id, name: "New Category", apps: [] }]);
-                    setEditingSetId(id);
-                    setEditingSetName("New Category");
-                  }}>
-                  + category
-                </button>
               </div>
 
             </div>
