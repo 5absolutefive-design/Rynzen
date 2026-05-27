@@ -335,6 +335,8 @@ export default function App() {
   const [poolSearch, setPoolSearch] = useState("");
   const [editingSetId, setEditingSetId] = useState<string | null>(null);
   const [editingSetName, setEditingSetName] = useState("");
+  const [draggingApp, setDraggingApp] = useState<AppLibItem | null>(null);
+  const [qaDropActive, setQaDropActive] = useState(false);
 
   const [bgType, setBgType] = useState<"none" | "images" | "color" | "gradient">("none");
   const [bgImageSelected, setBgImageSelected] = useState("");
@@ -2196,8 +2198,25 @@ export default function App() {
             <div className="al-body">
 
               {/* ── Quick Access section ── */}
-              <div className="al-qa-section" style={{ borderColor: isDark ? "rgba(239,68,68,0.55)" : "rgba(220,38,38,0.65)", background: isDark ? "rgba(255,255,255,0.02)" : "#fff" }}>
-                <span className="al-qa-title" style={{ color: themeColor }}>Quick access</span>
+              <div
+                className={`al-qa-section${qaDropActive ? " al-qa-drop-active" : ""}`}
+                style={{ borderColor: qaDropActive ? "#22d3ee" : (isDark ? "rgba(239,68,68,0.55)" : "rgba(220,38,38,0.65)"), background: isDark ? "rgba(255,255,255,0.02)" : "#fff" }}
+                onDragOver={(e) => { e.preventDefault(); e.dataTransfer.dropEffect = "copy"; }}
+                onDragEnter={(e) => { e.preventDefault(); setQaDropActive(true); }}
+                onDragLeave={(e) => { if (!e.currentTarget.contains(e.relatedTarget as Node)) setQaDropActive(false); }}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  setQaDropActive(false);
+                  if (!draggingApp) return;
+                  const already = shortcuts.some(s => s.url === draggingApp.url);
+                  if (!already) setShortcuts(prev => [...prev, { name: draggingApp.name, url: draggingApp.url, domain: draggingApp.domain }]);
+                  setDraggingApp(null);
+                }}
+              >
+                <span className="al-qa-title" style={{ color: themeColor }}>
+                  Quick access
+                  {draggingApp && <span className="al-qa-drop-hint"> — drop here to add</span>}
+                </span>
                 <div className="al-app-grid" style={{ minHeight: 56 }}>
                   {shortcuts.map((sc, i) => (
                     <div key={i} className="al-app-item" style={{ background: isDark ? "#252540" : "#e2e2e9" }} title={sc.name}>
@@ -2207,8 +2226,11 @@ export default function App() {
                       <span className="al-app-label" style={{ color: isDark ? "rgba(255,255,255,0.75)" : "rgba(0,0,0,0.65)" }}>{sc.name}</span>
                     </div>
                   ))}
-                  {shortcuts.length === 0 && (
+                  {shortcuts.length === 0 && !draggingApp && (
                     <span style={{ fontSize: "0.78rem", opacity: 0.45, padding: "12px 4px", gridColumn: "1/-1" }}>Add apps from the pool below.</span>
+                  )}
+                  {shortcuts.length === 0 && draggingApp && (
+                    <span style={{ fontSize: "0.78rem", opacity: 0.6, padding: "12px 4px", gridColumn: "1/-1", color: "#22d3ee" }}>Drop to add here</span>
                   )}
                 </div>
               </div>
@@ -2260,7 +2282,19 @@ export default function App() {
                         {filteredApps.map((app) => {
                           const alreadyAdded = shortcuts.some(s => s.url === app.url);
                           return (
-                            <div key={app.id} className="al-app-item" style={{ background: isDark ? "#252540" : "#e2e2e9", opacity: alreadyAdded ? 0.45 : 1 }} title={app.name}>
+                            <div
+                              key={app.id}
+                              className={`al-app-item${!alreadyAdded ? " al-app-draggable" : ""}${draggingApp?.id === app.id ? " al-app-dragging" : ""}`}
+                              style={{ background: isDark ? "#252540" : "#e2e2e9", opacity: alreadyAdded ? 0.45 : 1 }}
+                              title={alreadyAdded ? `${app.name} (already in Quick Access)` : `${app.name} — drag or click + to add`}
+                              draggable={!alreadyAdded}
+                              onDragStart={(e) => {
+                                setDraggingApp(app);
+                                e.dataTransfer.effectAllowed = "copy";
+                                e.dataTransfer.setData("text/plain", app.url);
+                              }}
+                              onDragEnd={() => { setDraggingApp(null); setQaDropActive(false); }}
+                            >
                               {!alreadyAdded && (
                                 <button className="al-pool-add-btn" title="Add to Quick Access"
                                   onClick={(e) => { e.stopPropagation(); setShortcuts(prev => [...prev, { name: app.name, url: app.url, domain: app.domain }]); }}>+</button>
