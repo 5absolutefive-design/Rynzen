@@ -2136,8 +2136,7 @@ export default function App() {
                 }}
                 onClick={() => selectSlot(slot)}
               >
-                <span className="layout-slot-name">{slot === "main" ? "Main" : slot}</span>
-                {slot === "main" && <span className="layout-slot-badge">Default</span>}
+                <span className="layout-slot-name">{slot === "main" ? "M" : slot}</span>
               </button>
             ))}
           </div>
