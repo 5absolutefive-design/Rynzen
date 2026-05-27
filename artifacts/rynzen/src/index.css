@@ -2279,9 +2279,8 @@ body {
   justify-content: center;
   border-radius: 10px;
   border: 1.5px dashed;
-  aspect-ratio: 1;
-  width: 100%;
-  max-height: 42px;
+  width: 42px;
+  height: 42px;
   cursor: pointer;
   transition: opacity 0.15s, transform 0.1s;
   background: none;
