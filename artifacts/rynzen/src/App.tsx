@@ -338,6 +338,7 @@ export default function App() {
   const [draggingApp, setDraggingApp] = useState<AppLibItem | null>(null);
   const [qaDropActive, setQaDropActive] = useState(false);
   const [confirmDeleteApp, setConfirmDeleteApp] = useState<{ setId: string; appId: string } | null>(null);
+  const [confirmDeleteSet, setConfirmDeleteSet] = useState<string | null>(null);
 
   const [bgType, setBgType] = useState<"none" | "images" | "color" | "gradient">("none");
   const [bgImageSelected, setBgImageSelected] = useState("");
@@ -2285,9 +2286,25 @@ export default function App() {
                         )}
                         {appSets.length > 1 && (
                           <button className="al-set-del-btn" style={{ color: isDark ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.3)" }} title="Delete category"
-                            onClick={() => { setAppSets(prev => prev.filter(s => s.id !== set.id)); if (addingToSet === set.id) setAddingToSet(null); }}>
+                            onClick={(e) => { e.stopPropagation(); setConfirmDeleteSet(set.id); }}>
                             <svg viewBox="0 0 24 24" fill="currentColor" width="13" height="13"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
                           </button>
+                        )}
+                        {confirmDeleteSet === set.id && (
+                          <div className="al-confirm-card" style={{ background: isDark ? "#1e1e35" : "#fff", boxShadow: isDark ? "0 4px 18px rgba(0,0,0,0.6)" : "0 4px 18px rgba(0,0,0,0.18)" }}
+                            onClick={(e) => e.stopPropagation()}>
+                            <span className="al-confirm-text" style={{ color: themeColor }}>Are You Sure?</span>
+                            <div className="al-confirm-btns">
+                              <button className="al-confirm-yes"
+                                onClick={(e) => { e.stopPropagation(); setAppSets(prev => prev.filter(s => s.id !== set.id)); if (addingToSet === set.id) setAddingToSet(null); setConfirmDeleteSet(null); }}>
+                                Yes
+                              </button>
+                              <button className="al-confirm-no" style={{ color: isDark ? "rgba(255,255,255,0.5)" : "rgba(0,0,0,0.45)" }}
+                                onClick={(e) => { e.stopPropagation(); setConfirmDeleteSet(null); }}>
+                                No
+                              </button>
+                            </div>
+                          </div>
                         )}
                       </div>
 
