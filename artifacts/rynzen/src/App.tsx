@@ -1724,21 +1724,6 @@ export default function App() {
 
         </div>
 
-        {/* ── App Library Card ── */}
-        <p className="settings-section-label" style={{ marginTop: 12 }}>App Library</p>
-        <div className="settings-card" style={{ background: cardBg }}>
-          <div className="settings-row">
-            <span className="settings-row-label">Quick Access</span>
-            <button
-              className="layout-open-btn"
-              style={{ background: "#4285F4", color: "#fff" }}
-              onClick={() => { setPoolSearch(""); setShowLibraryModal(true); }}
-            >
-              Open
-            </button>
-          </div>
-        </div>
-
         {/* ── Search Bar Card ── */}
         <p className="settings-section-label" style={{ marginTop: 12 }}>Search bar</p>
         <div className="settings-card" style={{ background: cardBg }}>
@@ -2145,6 +2130,21 @@ export default function App() {
                 ? "Select A1, B2 or C3 to create a custom layout."
                 : "Click any element on the page to select it, then drag to reposition."}
             </span>
+          </div>
+        </div>
+
+        {/* ── App Library Card ── */}
+        <p className="settings-section-label" style={{ marginTop: 12 }}>App Library</p>
+        <div className="settings-card" style={{ background: cardBg }}>
+          <div className="settings-row">
+            <span className="settings-row-label">Quick Access</span>
+            <button
+              className="layout-open-btn"
+              style={{ background: "#4285F4", color: "#fff" }}
+              onClick={() => { setPoolSearch(""); setShowLibraryModal(true); }}
+            >
+              Open
+            </button>
           </div>
         </div>
 
