@@ -2571,16 +2571,21 @@ body {
 .al-add-category-btn {
   align-self: flex-start;
   border-radius: 8px;
-  padding: 0 10px;
+  padding: 0 4px;
   width: 40px;
   height: 30px;
   box-sizing: border-box;
-  font-size: 0.76rem;
-  font-weight: 600;
+  font-size: 0.58rem;
+  font-weight: 700;
   cursor: pointer;
   transition: opacity 0.15s;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.01em;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: clip;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .al-add-category-btn:hover { opacity: 0.7; }
 
