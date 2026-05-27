@@ -2273,6 +2273,7 @@ export default function App() {
                   </div>
                 </div>
 
+                <div className="al-pool-categories">
                 {appSets.map((set) => {
                   const filteredApps = poolSearch.trim()
                     ? set.apps.filter(a => a.name.toLowerCase().includes(poolSearch.toLowerCase()) || a.domain.toLowerCase().includes(poolSearch.toLowerCase()))
@@ -2367,6 +2368,7 @@ export default function App() {
                     </div>
                   );
                 })}
+                </div>
 
               </div>
 
