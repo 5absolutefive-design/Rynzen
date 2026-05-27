@@ -2268,7 +2268,7 @@ export default function App() {
                     : set.apps;
                   if (poolSearch.trim() && filteredApps.length === 0) return null;
                   return (
-                    <div key={set.id} className="al-pool-category">
+                    <div key={set.id} className="al-pool-category" style={{ borderColor: isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)", background: isDark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.025)" }}>
                       <div className="al-pool-cat-header">
                         {editingSetId === set.id ? (
                           <input

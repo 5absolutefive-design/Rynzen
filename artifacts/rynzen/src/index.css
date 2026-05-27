@@ -2520,12 +2520,16 @@ body {
 .al-pool-category {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
+  border-radius: 12px;
+  border: 1.5px solid;
+  padding: 8px 8px 10px;
 }
 .al-pool-cat-header {
   display: flex;
   align-items: center;
   gap: 6px;
+  padding: 0 2px;
 }
 .al-pool-cat-name {
   font-size: 0.82rem;
