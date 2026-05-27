@@ -305,6 +305,7 @@ export default function App() {
   const [selectingSet, setSelectingSet] = useState<string | null>(null);
   const [selectedInSet, setSelectedInSet] = useState<Set<string>>(new Set());
   const [selectedLibIds, setSelectedLibIds] = useState<Set<string>>(new Set());
+  const [poolSearch, setPoolSearch] = useState("");
   const [editingSetId, setEditingSetId] = useState<string | null>(null);
   const [editingSetName, setEditingSetName] = useState("");
 
@@ -1721,18 +1722,21 @@ export default function App() {
             </div>
           </div>
 
-          {/* App Library */}
-          <div className="settings-row" style={{ borderTop: `1px solid ${rowBorder}` }}>
-            <span className="settings-row-label">APP Set name</span>
+        </div>
+
+        {/* ── App Library Card ── */}
+        <p className="settings-section-label" style={{ marginTop: 12 }}>App Library</p>
+        <div className="settings-card" style={{ background: cardBg }}>
+          <div className="settings-row">
+            <span className="settings-row-label">Quick Access</span>
             <button
-              className="import-bm-btn"
-              style={{ background: isDark ? "#3a3a6a" : "#4285F4", color: "#fff" }}
-              onClick={() => { setSelectedLibIds(new Set()); setShowLibraryModal(true); }}
+              className="layout-open-btn"
+              style={{ background: "#4285F4", color: "#fff" }}
+              onClick={() => { setPoolSearch(""); setShowLibraryModal(true); }}
             >
-              {t.importBtn}
+              Open
             </button>
           </div>
-
         </div>
 
         {/* ── Search Bar Card ── */}
@@ -2146,144 +2150,126 @@ export default function App() {
 
       {/* ── App Library Modal ── */}
       {showLibraryModal && (
-        <div className="al-overlay" onClick={() => { setShowLibraryModal(false); setAddingToSet(null); setSelectingSet(null); setSelectedInSet(new Set()); setEditingSetId(null); }}>
-          <div className="al-modal" style={{ background: isDark ? "#16162a" : "#efefef", color: themeColor }} onClick={(e) => e.stopPropagation()}>
+        <div className="al-overlay" onClick={() => { setShowLibraryModal(false); setAddingToSet(null); setEditingSetId(null); setPoolSearch(""); }}>
+          <div className="al-modal" style={{ background: isDark ? "#16162a" : "#f4f4f4", color: themeColor }} onClick={(e) => e.stopPropagation()}>
 
-            {/* ── Header ── */}
+            {/* Header */}
             <div className="al-header">
               <span className="al-title" style={{ color: themeColor }}>App Library</span>
-              <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                <button
-                  className="al-add-set-btn"
-                  onClick={() => {
-                    const id = genId();
-                    setAppSets(prev => [...prev, { id, name: "New Set", apps: [] }]);
-                    setEditingSetId(id);
-                    setEditingSetName("New Set");
-                  }}
-                >
-                  + APP SET
-                </button>
-                <button className="bm-close-btn" style={{ color: themeColor }} onClick={() => setShowLibraryModal(false)}>
-                  <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
-                </button>
-              </div>
+              <button className="bm-close-btn" style={{ color: themeColor }} onClick={() => setShowLibraryModal(false)}>
+                <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+              </button>
             </div>
 
-            {/* ── Sets body ── */}
             <div className="al-body">
-              {appSets.map((set) => (
-                <div key={set.id} className="al-set-card" style={{ borderColor: isDark ? "rgba(34,211,238,0.45)" : "rgba(6,182,212,0.6)", background: isDark ? "rgba(255,255,255,0.03)" : "rgba(255,255,255,0.7)" }}>
 
-                  {/* Set name row */}
-                  <div className="al-set-header">
-                    {editingSetId === set.id ? (
-                      <input
-                        className="al-set-name-input"
-                        style={{ color: themeColor, background: "transparent", borderColor: isDark ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.15)" }}
-                        value={editingSetName}
-                        autoFocus
-                        onChange={(e) => setEditingSetName(e.target.value)}
-                        onBlur={() => { setAppSets(prev => prev.map(s => s.id === set.id ? { ...s, name: editingSetName.trim() || "Set" } : s)); setEditingSetId(null); }}
-                        onKeyDown={(e) => { if (e.key === "Enter" || e.key === "Escape") (e.target as HTMLInputElement).blur(); }}
-                      />
-                    ) : (
-                      <span
-                        className="al-set-name"
-                        style={{ color: themeColor }}
-                        title="Click to rename"
-                        onClick={() => { setEditingSetId(set.id); setEditingSetName(set.name); }}
-                      >{set.name}</span>
-                    )}
-                    <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
-                      {appSets.length > 1 && (
-                        <button
-                          className="al-set-del-btn"
-                          style={{ color: isDark ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.3)" }}
-                          title="Delete set"
-                          onClick={() => { setAppSets(prev => prev.filter(s => s.id !== set.id)); if (selectingSet === set.id) { setSelectingSet(null); setSelectedInSet(new Set()); } if (addingToSet === set.id) setAddingToSet(null); }}
-                        >
-                          <svg viewBox="0 0 24 24" fill="currentColor" width="13" height="13"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
-                        </button>
-                      )}
-                      <button
-                        className="al-select-btn"
-                        style={{
-                          borderColor: selectingSet === set.id ? "#22d3ee" : (isDark ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.18)"),
-                          color: selectingSet === set.id ? "#22d3ee" : themeColor,
-                          background: selectingSet === set.id ? (isDark ? "rgba(34,211,238,0.1)" : "rgba(6,182,212,0.08)") : "transparent",
-                        }}
-                        onClick={() => { if (selectingSet === set.id) { setSelectingSet(null); setSelectedInSet(new Set()); } else { setSelectingSet(set.id); setSelectedInSet(new Set()); } }}
-                      >
-                        {selectingSet === set.id ? "Cancel" : "Select"}
-                      </button>
+              {/* ── Quick Access section ── */}
+              <div className="al-qa-section" style={{ borderColor: isDark ? "rgba(239,68,68,0.55)" : "rgba(220,38,38,0.65)", background: isDark ? "rgba(255,255,255,0.02)" : "#fff" }}>
+                <span className="al-qa-title" style={{ color: themeColor }}>Quick access</span>
+                <div className="al-app-grid" style={{ minHeight: 56 }}>
+                  {shortcuts.map((sc, i) => (
+                    <div key={i} className="al-app-item" style={{ background: isDark ? "#252540" : "#e2e2e9" }} title={sc.name}>
+                      <button className="al-app-del" style={{ color: isDark ? "rgba(255,255,255,0.5)" : "rgba(0,0,0,0.4)" }}
+                        onClick={(e) => { e.stopPropagation(); setShortcuts(prev => prev.filter((_, idx) => idx !== i)); }}>×</button>
+                      <img src={`https://www.google.com/s2/favicons?domain=${sc.domain}&sz=64`} alt={sc.name} className="al-app-icon" />
+                      <span className="al-app-label" style={{ color: isDark ? "rgba(255,255,255,0.75)" : "rgba(0,0,0,0.65)" }}>{sc.name}</span>
                     </div>
-                  </div>
+                  ))}
+                  {shortcuts.length === 0 && (
+                    <span style={{ fontSize: "0.78rem", opacity: 0.45, padding: "12px 4px", gridColumn: "1/-1" }}>Add apps from the pool below.</span>
+                  )}
+                </div>
+              </div>
 
-                  {/* App icon grid */}
-                  <div className="al-app-grid">
-                    {set.apps.map((app) => {
-                      const isSel = selectingSet === set.id && selectedInSet.has(app.id);
-                      return (
-                        <div
-                          key={app.id}
-                          className={`al-app-item${isSel ? " al-app-sel" : ""}`}
-                          style={{ background: isDark ? "#252540" : "#e2e2e9", borderColor: isSel ? "#22d3ee" : "transparent" }}
-                          title={app.name}
-                          onClick={() => {
-                            if (selectingSet === set.id) {
-                              setSelectedInSet(prev => { const n = new Set(prev); if (n.has(app.id)) n.delete(app.id); else n.add(app.id); return n; });
-                            }
-                          }}
-                        >
-                          {isSel && (
-                            <div className="al-check">
-                              <svg viewBox="0 0 24 24" fill="#fff" width="10" height="10"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
-                            </div>
-                          )}
-                          {selectingSet !== set.id && (
-                            <button
-                              className="al-app-del"
-                              style={{ color: isDark ? "rgba(255,255,255,0.5)" : "rgba(0,0,0,0.4)" }}
-                              onClick={(e) => { e.stopPropagation(); setAppSets(prev => prev.map(s => s.id === set.id ? { ...s, apps: s.apps.filter(a => a.id !== app.id) } : s)); }}
-                            >×</button>
-                          )}
-                          <img
-                            src={`https://www.google.com/s2/favicons?domain=${app.domain}&sz=64`}
-                            alt={app.name}
-                            className="al-app-icon"
+              {/* ── APP POOL section ── */}
+              <div className="al-pool-section" style={{ borderColor: isDark ? "rgba(34,197,94,0.55)" : "rgba(22,163,74,0.65)", background: isDark ? "rgba(255,255,255,0.02)" : "#fff" }}>
+                <div className="al-pool-header">
+                  <span className="al-pool-title" style={{ color: themeColor }}>APP POOL</span>
+                  <input
+                    className="al-pool-search"
+                    type="text"
+                    placeholder="search"
+                    value={poolSearch}
+                    onChange={(e) => setPoolSearch(e.target.value)}
+                    style={{ background: isDark ? "#1c1c34" : "#fff", color: themeColor, borderColor: "#22d3ee" }}
+                  />
+                </div>
+
+                {appSets.map((set) => {
+                  const filteredApps = poolSearch.trim()
+                    ? set.apps.filter(a => a.name.toLowerCase().includes(poolSearch.toLowerCase()) || a.domain.toLowerCase().includes(poolSearch.toLowerCase()))
+                    : set.apps;
+                  if (poolSearch.trim() && filteredApps.length === 0) return null;
+                  return (
+                    <div key={set.id} className="al-pool-category">
+                      <div className="al-pool-cat-header">
+                        {editingSetId === set.id ? (
+                          <input
+                            className="al-set-name-input"
+                            style={{ color: themeColor, background: "transparent", borderColor: isDark ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.15)" }}
+                            value={editingSetName}
+                            autoFocus
+                            onChange={(e) => setEditingSetName(e.target.value)}
+                            onBlur={() => { setAppSets(prev => prev.map(s => s.id === set.id ? { ...s, name: editingSetName.trim() || "Category" } : s)); setEditingSetId(null); }}
+                            onKeyDown={(e) => { if (e.key === "Enter" || e.key === "Escape") (e.target as HTMLInputElement).blur(); }}
                           />
-                          <span className="al-app-label" style={{ color: isDark ? "rgba(255,255,255,0.75)" : "rgba(0,0,0,0.65)" }}>{app.name}</span>
-                        </div>
-                      );
-                    })}
+                        ) : (
+                          <span className="al-pool-cat-name" style={{ color: themeColor }} title="Click to rename" onClick={() => { setEditingSetId(set.id); setEditingSetName(set.name); }}>{set.name}</span>
+                        )}
+                        {appSets.length > 1 && (
+                          <button className="al-set-del-btn" style={{ color: isDark ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.3)" }} title="Delete category"
+                            onClick={() => { setAppSets(prev => prev.filter(s => s.id !== set.id)); if (addingToSet === set.id) setAddingToSet(null); }}>
+                            <svg viewBox="0 0 24 24" fill="currentColor" width="13" height="13"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+                          </button>
+                        )}
+                      </div>
 
-                    {/* + Add button (only when not in select mode) */}
-                    {selectingSet !== set.id && addingToSet !== set.id && (
-                      <button
-                        className="al-add-app-tile"
-                        style={{ background: isDark ? "#252540" : "#e2e2e9", borderColor: isDark ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.1)" }}
-                        onClick={() => { setAddingToSet(set.id); setAddUrlValue(""); setAddUrlError(""); }}
-                      >
-                        <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22" style={{ opacity: 0.5 }}><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
-                      </button>
-                    )}
-                  </div>
+                      <div className="al-app-grid">
+                        {filteredApps.map((app) => {
+                          const alreadyAdded = shortcuts.some(s => s.url === app.url);
+                          return (
+                            <div key={app.id} className="al-app-item" style={{ background: isDark ? "#252540" : "#e2e2e9", opacity: alreadyAdded ? 0.45 : 1 }} title={app.name}>
+                              {!alreadyAdded && (
+                                <button className="al-pool-add-btn" title="Add to Quick Access"
+                                  onClick={(e) => { e.stopPropagation(); setShortcuts(prev => [...prev, { name: app.name, url: app.url, domain: app.domain }]); }}>+</button>
+                              )}
+                              <button className="al-app-del" style={{ color: isDark ? "rgba(255,255,255,0.5)" : "rgba(0,0,0,0.4)" }}
+                                onClick={(e) => { e.stopPropagation(); setAppSets(prev => prev.map(s => s.id === set.id ? { ...s, apps: s.apps.filter(a => a.id !== app.id) } : s)); }}>×</button>
+                              <img src={`https://www.google.com/s2/favicons?domain=${app.domain}&sz=64`} alt={app.name} className="al-app-icon" />
+                              <span className="al-app-label" style={{ color: isDark ? "rgba(255,255,255,0.75)" : "rgba(0,0,0,0.65)" }}>{app.name}</span>
+                            </div>
+                          );
+                        })}
+                        {addingToSet !== set.id && (
+                          <button className="al-add-app-tile" style={{ background: isDark ? "#252540" : "#e2e2e9", borderColor: isDark ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.1)" }}
+                            onClick={() => { setAddingToSet(set.id); setAddUrlValue(""); setAddUrlError(""); }}>
+                            <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22" style={{ opacity: 0.5 }}><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+                          </button>
+                        )}
+                      </div>
 
-                  {/* Inline URL input (shown when + clicked) */}
-                  {addingToSet === set.id && (
-                    <div className="al-inline-add" style={{ borderTop: `1px solid ${isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.07)"}` }}>
-                      <input
-                        type="text"
-                        className="al-inline-input"
-                        placeholder="Paste app URL, e.g. youtube.com"
-                        value={addUrlValue}
-                        autoFocus
-                        style={{ background: isDark ? "#1c1c34" : "#fff", color: themeColor, borderColor: addUrlError ? "#e74c3c" : (isDark ? "#3a3a5c" : "#d0d3de") }}
-                        onChange={(e) => { setAddUrlValue(e.target.value); setAddUrlError(""); }}
-                        onKeyDown={(e) => {
-                          if (e.key === "Escape") { setAddingToSet(null); }
-                          if (e.key === "Enter") {
+                      {addingToSet === set.id && (
+                        <div className="al-inline-add" style={{ borderTop: `1px solid ${isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.07)"}` }}>
+                          <input type="text" className="al-inline-input" placeholder="Paste app URL, e.g. youtube.com"
+                            value={addUrlValue} autoFocus
+                            style={{ background: isDark ? "#1c1c34" : "#fff", color: themeColor, borderColor: addUrlError ? "#e74c3c" : (isDark ? "#3a3a5c" : "#d0d3de") }}
+                            onChange={(e) => { setAddUrlValue(e.target.value); setAddUrlError(""); }}
+                            onKeyDown={(e) => {
+                              if (e.key === "Escape") { setAddingToSet(null); }
+                              if (e.key === "Enter") {
+                                let url = addUrlValue.trim();
+                                if (!url) { setAddUrlError("Enter a URL"); return; }
+                                if (!/^https?:\/\//i.test(url)) url = "https://" + url;
+                                let domain = "";
+                                try { domain = new URL(url).hostname.replace(/^www\./, ""); } catch { setAddUrlError("Invalid URL"); return; }
+                                const name = domain.split(".")[0].replace(/-/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+                                const id = genId();
+                                setAppSets(prev => prev.map(s => s.id === set.id ? { ...s, apps: [...s.apps, { id, name, url, domain }] } : s));
+                                setAddingToSet(null); setAddUrlValue("");
+                              }
+                            }}
+                          />
+                          <button className="al-inline-save" onClick={() => {
                             let url = addUrlValue.trim();
                             if (!url) { setAddUrlError("Enter a URL"); return; }
                             if (!/^https?:\/\//i.test(url)) url = "https://" + url;
@@ -2293,55 +2279,30 @@ export default function App() {
                             const id = genId();
                             setAppSets(prev => prev.map(s => s.id === set.id ? { ...s, apps: [...s.apps, { id, name, url, domain }] } : s));
                             setAddingToSet(null); setAddUrlValue("");
-                          }
-                        }}
-                      />
-                      <button
-                        className="al-inline-save"
-                        onClick={() => {
-                          let url = addUrlValue.trim();
-                          if (!url) { setAddUrlError("Enter a URL"); return; }
-                          if (!/^https?:\/\//i.test(url)) url = "https://" + url;
-                          let domain = "";
-                          try { domain = new URL(url).hostname.replace(/^www\./, ""); } catch { setAddUrlError("Invalid URL"); return; }
-                          const name = domain.split(".")[0].replace(/-/g, " ").replace(/\b\w/g, c => c.toUpperCase());
-                          const id = genId();
-                          setAppSets(prev => prev.map(s => s.id === set.id ? { ...s, apps: [...s.apps, { id, name, url, domain }] } : s));
-                          setAddingToSet(null); setAddUrlValue("");
-                        }}
-                      >Save</button>
-                      <button className="al-inline-cancel" style={{ color: isDark ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.35)" }} onClick={() => setAddingToSet(null)}>Cancel</button>
-                      {addUrlError && <span className="al-url-error">{addUrlError}</span>}
+                          }}>Save</button>
+                          <button className="al-inline-cancel" style={{ color: isDark ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.35)" }} onClick={() => setAddingToSet(null)}>Cancel</button>
+                          {addUrlError && <span className="al-url-error">{addUrlError}</span>}
+                        </div>
+                      )}
                     </div>
-                  )}
+                  );
+                })}
 
-                  {/* Select mode footer */}
-                  {selectingSet === set.id && (
-                    <div className="al-sel-footer" style={{ borderTop: `1px solid ${isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.07)"}` }}>
-                      <span style={{ fontSize: "0.75rem", color: isDark ? "rgba(255,255,255,0.5)" : "rgba(0,0,0,0.45)" }}>
-                        {selectedInSet.size > 0 ? `${selectedInSet.size} selected` : "Tap apps to select"}
-                      </span>
-                      <button
-                        className="al-sel-add-btn"
-                        style={{ background: selectedInSet.size === 0 ? (isDark ? "#2a2a44" : "#d8d8e0") : "#22d3ee", color: selectedInSet.size === 0 ? (isDark ? "rgba(255,255,255,0.25)" : "#aaa") : "#fff" }}
-                        disabled={selectedInSet.size === 0}
-                        onClick={() => {
-                          const toAdd = set.apps.filter(a => selectedInSet.has(a.id));
-                          setShortcuts(prev => {
-                            const existingUrls = new Set(prev.map(s => s.url));
-                            return [...prev, ...toAdd.filter(a => !existingUrls.has(a.url)).map(a => ({ name: a.name, url: a.url, domain: a.domain }))];
-                          });
-                          setSelectingSet(null); setSelectedInSet(new Set()); setShowLibraryModal(false);
-                        }}
-                      >Add to Quick Access</button>
-                    </div>
-                  )}
+                <button className="al-add-category-btn"
+                  style={{ border: `1px solid ${isDark ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.2)"}`, color: themeColor, background: "transparent" }}
+                  onClick={() => {
+                    const id = genId();
+                    setAppSets(prev => [...prev, { id, name: "New Category", apps: [] }]);
+                    setEditingSetId(id);
+                    setEditingSetName("New Category");
+                  }}>
+                  + category
+                </button>
+              </div>
 
-                </div>
-              ))}
             </div>
 
-            {/* ── Footer ── */}
+            {/* Footer */}
             <div className="al-footer" style={{ borderTop: `1px solid ${rowBorder}` }}>
               <button className="al-done-btn" style={{ background: isDark ? "#2a2a44" : "#e0e0ea", color: themeColor }} onClick={() => setShowLibraryModal(false)}>
                 Done
