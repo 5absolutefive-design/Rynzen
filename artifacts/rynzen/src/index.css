@@ -2097,6 +2097,7 @@ body {
   animation: bm-fade-in 0.15s ease;
 }
 .al-modal {
+  position: relative;
   width: 100%;
   max-width: 860px;
   max-height: 95vh;
@@ -2334,6 +2335,79 @@ body {
   color: #e74c3c;
   padding: 0 2px;
 }
+
+/* Add App Mini Popup */
+.al-popup-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.38);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 20;
+  border-radius: inherit;
+}
+.al-popup-card {
+  width: 320px;
+  border-radius: 14px;
+  padding: 22px 20px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.al-popup-title {
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+.al-popup-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.al-popup-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.al-popup-input {
+  border: 1.5px solid;
+  border-radius: 9px;
+  padding: 9px 12px;
+  font-size: 0.88rem;
+  outline: none;
+  transition: border-color 0.15s;
+  width: 100%;
+  box-sizing: border-box;
+}
+.al-popup-input:focus { border-color: #22d3ee !important; }
+.al-popup-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 2px;
+}
+.al-popup-cancel {
+  border: none;
+  border-radius: 9px;
+  padding: 8px 18px;
+  font-size: 0.83rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.al-popup-cancel:hover { opacity: 0.75; }
+.al-popup-save {
+  border: none;
+  border-radius: 9px;
+  padding: 8px 20px;
+  font-size: 0.83rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.al-popup-save:hover { opacity: 0.85; }
 
 /* Select-mode footer inside set card */
 .al-sel-footer {

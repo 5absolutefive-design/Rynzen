@@ -301,6 +301,7 @@ export default function App() {
   const [appSets, setAppSets] = useState<AppSet[]>(() => loadAppSets());
   const [addingToSet, setAddingToSet] = useState<string | null>(null);
   const [addUrlValue, setAddUrlValue] = useState("");
+  const [addNameValue, setAddNameValue] = useState("");
   const [addUrlError, setAddUrlError] = useState("");
   const [selectingSet, setSelectingSet] = useState<string | null>(null);
   const [selectedInSet, setSelectedInSet] = useState<Set<string>>(new Set());
@@ -2245,50 +2246,11 @@ export default function App() {
                             </div>
                           );
                         })}
-                        {addingToSet !== set.id && (
-                          <button className="al-add-app-tile" style={{ background: isDark ? "#252540" : "#e2e2e9", borderColor: isDark ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.1)" }}
-                            onClick={() => { setAddingToSet(set.id); setAddUrlValue(""); setAddUrlError(""); }}>
-                            <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22" style={{ opacity: 0.5 }}><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
-                          </button>
-                        )}
+                        <button className="al-add-app-tile" style={{ background: isDark ? "#252540" : "#e2e2e9", borderColor: isDark ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.1)" }}
+                          onClick={() => { setAddingToSet(set.id); setAddUrlValue(""); setAddNameValue(""); setAddUrlError(""); }}>
+                          <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22" style={{ opacity: 0.5 }}><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+                        </button>
                       </div>
-
-                      {addingToSet === set.id && (
-                        <div className="al-inline-add" style={{ borderTop: `1px solid ${isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.07)"}` }}>
-                          <input type="text" className="al-inline-input" placeholder="Paste app URL, e.g. youtube.com"
-                            value={addUrlValue} autoFocus
-                            style={{ background: isDark ? "#1c1c34" : "#fff", color: themeColor, borderColor: addUrlError ? "#e74c3c" : (isDark ? "#3a3a5c" : "#d0d3de") }}
-                            onChange={(e) => { setAddUrlValue(e.target.value); setAddUrlError(""); }}
-                            onKeyDown={(e) => {
-                              if (e.key === "Escape") { setAddingToSet(null); }
-                              if (e.key === "Enter") {
-                                let url = addUrlValue.trim();
-                                if (!url) { setAddUrlError("Enter a URL"); return; }
-                                if (!/^https?:\/\//i.test(url)) url = "https://" + url;
-                                let domain = "";
-                                try { domain = new URL(url).hostname.replace(/^www\./, ""); } catch { setAddUrlError("Invalid URL"); return; }
-                                const name = domain.split(".")[0].replace(/-/g, " ").replace(/\b\w/g, c => c.toUpperCase());
-                                const id = genId();
-                                setAppSets(prev => prev.map(s => s.id === set.id ? { ...s, apps: [...s.apps, { id, name, url, domain }] } : s));
-                                setAddingToSet(null); setAddUrlValue("");
-                              }
-                            }}
-                          />
-                          <button className="al-inline-save" onClick={() => {
-                            let url = addUrlValue.trim();
-                            if (!url) { setAddUrlError("Enter a URL"); return; }
-                            if (!/^https?:\/\//i.test(url)) url = "https://" + url;
-                            let domain = "";
-                            try { domain = new URL(url).hostname.replace(/^www\./, ""); } catch { setAddUrlError("Invalid URL"); return; }
-                            const name = domain.split(".")[0].replace(/-/g, " ").replace(/\b\w/g, c => c.toUpperCase());
-                            const id = genId();
-                            setAppSets(prev => prev.map(s => s.id === set.id ? { ...s, apps: [...s.apps, { id, name, url, domain }] } : s));
-                            setAddingToSet(null); setAddUrlValue("");
-                          }}>Save</button>
-                          <button className="al-inline-cancel" style={{ color: isDark ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.35)" }} onClick={() => setAddingToSet(null)}>Cancel</button>
-                          {addUrlError && <span className="al-url-error">{addUrlError}</span>}
-                        </div>
-                      )}
                     </div>
                   );
                 })}
@@ -2307,6 +2269,60 @@ export default function App() {
 
             </div>
 
+            {/* ── Add App Mini Popup ── */}
+            {addingToSet !== null && (() => {
+              const saveApp = () => {
+                let url = addUrlValue.trim();
+                if (!url) { setAddUrlError("Enter a URL"); return; }
+                if (!/^https?:\/\//i.test(url)) url = "https://" + url;
+                let domain = "";
+                try { domain = new URL(url).hostname.replace(/^www\./, ""); } catch { setAddUrlError("Invalid URL"); return; }
+                const autoName = domain.split(".")[0].replace(/-/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+                const name = addNameValue.trim() || autoName;
+                const id = genId();
+                setAppSets(prev => prev.map(s => s.id === addingToSet ? { ...s, apps: [...s.apps, { id, name, url, domain }] } : s));
+                setAddingToSet(null); setAddUrlValue(""); setAddNameValue(""); setAddUrlError("");
+              };
+              return (
+                <div className="al-popup-overlay" onClick={() => { setAddingToSet(null); setAddUrlValue(""); setAddNameValue(""); setAddUrlError(""); }}>
+                  <div className="al-popup-card" style={{ background: isDark ? "#1e1e35" : "#fff", color: themeColor, boxShadow: isDark ? "0 8px 32px rgba(0,0,0,0.55)" : "0 8px 32px rgba(0,0,0,0.18)" }}
+                    onClick={(e) => e.stopPropagation()}>
+                    <span className="al-popup-title" style={{ color: themeColor }}>Add shortcut</span>
+                    <div className="al-popup-field">
+                      <label className="al-popup-label" style={{ color: isDark ? "rgba(255,255,255,0.55)" : "rgba(0,0,0,0.5)" }}>Name</label>
+                      <input
+                        type="text"
+                        className="al-popup-input"
+                        placeholder=""
+                        autoFocus
+                        value={addNameValue}
+                        style={{ background: isDark ? "#2a2a44" : "#f0f0f6", color: themeColor, borderColor: isDark ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.1)" }}
+                        onChange={(e) => setAddNameValue(e.target.value)}
+                        onKeyDown={(e) => { if (e.key === "Enter") (e.currentTarget.nextElementSibling as HTMLInputElement | null)?.focus(); if (e.key === "Escape") { setAddingToSet(null); setAddUrlValue(""); setAddNameValue(""); setAddUrlError(""); } }}
+                      />
+                    </div>
+                    <div className="al-popup-field">
+                      <label className="al-popup-label" style={{ color: isDark ? "rgba(255,255,255,0.55)" : "rgba(0,0,0,0.5)" }}>URL</label>
+                      <input
+                        type="text"
+                        className="al-popup-input"
+                        placeholder="https://"
+                        value={addUrlValue}
+                        style={{ background: isDark ? "#2a2a44" : "#f0f0f6", color: themeColor, borderColor: addUrlError ? "#e74c3c" : (isDark ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.1)") }}
+                        onChange={(e) => { setAddUrlValue(e.target.value); setAddUrlError(""); }}
+                        onKeyDown={(e) => { if (e.key === "Enter") saveApp(); if (e.key === "Escape") { setAddingToSet(null); setAddUrlValue(""); setAddNameValue(""); setAddUrlError(""); } }}
+                      />
+                      {addUrlError && <span className="al-url-error">{addUrlError}</span>}
+                    </div>
+                    <div className="al-popup-actions">
+                      <button className="al-popup-cancel" style={{ background: isDark ? "#2a2a44" : "#e8e8f0", color: isDark ? "rgba(255,255,255,0.6)" : "rgba(0,0,0,0.55)" }}
+                        onClick={() => { setAddingToSet(null); setAddUrlValue(""); setAddNameValue(""); setAddUrlError(""); }}>Cancel</button>
+                      <button className="al-popup-save" style={{ background: themeColor, color: "#fff" }} onClick={saveApp}>Done</button>
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
 
           </div>
         </div>
