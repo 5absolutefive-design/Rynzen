@@ -289,7 +289,7 @@ export default function App() {
 
   // General settings
   const [language, setLanguage] = useState("en");
-  const [darkModeOption, setDarkModeOption] = useState<"system" | "light" | "dark">("system");
+  const [darkModeOption, setDarkModeOption] = useState<"system" | "light" | "dark">("light");
   const [systemIsDark, setSystemIsDark] = useState(() =>
     typeof window !== "undefined" ? window.matchMedia("(prefers-color-scheme: dark)").matches : false
   );
