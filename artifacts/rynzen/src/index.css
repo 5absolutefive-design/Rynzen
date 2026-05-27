@@ -2098,7 +2098,7 @@ body {
 }
 .al-modal {
   width: 100%;
-  max-width: 660px;
+  max-width: 860px;
   max-height: 82vh;
   border-radius: 20px;
   box-shadow: 0 28px 72px rgba(0,0,0,0.38);
@@ -2204,8 +2204,8 @@ body {
 /* App icon grid */
 .al-app-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(68px, 1fr));
-  gap: 8px;
+  grid-template-columns: repeat(auto-fill, minmax(54px, 1fr));
+  gap: 6px;
   padding: 4px 10px 12px;
 }
 
@@ -2215,20 +2215,21 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 5px;
-  padding: 10px 6px 8px;
-  border-radius: 12px;
+  gap: 4px;
+  padding: 7px 4px 6px;
+  border-radius: 10px;
   border: 2px solid transparent;
   cursor: pointer;
   transition: transform 0.1s, border-color 0.12s;
   user-select: none;
+  background: transparent !important;
 }
 .al-app-item:hover { transform: translateY(-2px); }
 .al-app-sel { border-color: #22d3ee !important; }
 .al-app-icon {
-  width: 36px;
-  height: 36px;
-  border-radius: 8px;
+  width: 29px;
+  height: 29px;
+  border-radius: 6px;
   object-fit: contain;
 }
 .al-app-label {
