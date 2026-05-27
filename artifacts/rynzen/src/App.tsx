@@ -2241,14 +2241,25 @@ export default function App() {
                 <div className="al-pool-header">
                   <span className="al-pool-title" style={{ color: themeColor }}>APP POOL</span>
                   <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                    <input
-                      className="al-pool-search"
-                      type="text"
-                      placeholder="search"
-                      value={poolSearch}
-                      onChange={(e) => setPoolSearch(e.target.value)}
-                      style={{ background: isDark ? "#1c1c34" : "#fff", color: themeColor, borderColor: "#22d3ee" }}
-                    />
+                    <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
+                      <input
+                        className="al-pool-search"
+                        type="text"
+                        placeholder="search"
+                        value={poolSearch}
+                        onChange={(e) => setPoolSearch(e.target.value)}
+                        style={{ background: isDark ? "#1c1c34" : "#fff", color: themeColor, borderColor: "#22d3ee", paddingRight: poolSearch ? 24 : undefined }}
+                      />
+                      {poolSearch && (
+                        <button
+                          onClick={() => setPoolSearch("")}
+                          title="Clear"
+                          style={{ position: "absolute", right: 5, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", padding: 0, display: "flex", alignItems: "center", color: isDark ? "rgba(255,255,255,0.5)" : "rgba(0,0,0,0.4)" }}
+                        >
+                          <svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+                        </button>
+                      )}
+                    </div>
                     <button className="al-add-category-btn"
                       style={{ border: `1px solid ${isDark ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.2)"}`, color: themeColor, background: "transparent", whiteSpace: "nowrap" }}
                       onClick={() => {
