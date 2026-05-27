@@ -2504,10 +2504,8 @@ body {
   flex: 1;
   min-height: 0;
 }
-.al-pool-categories::-webkit-scrollbar { width: 4px; }
-.al-pool-categories::-webkit-scrollbar-track { background: transparent; }
-.al-pool-categories::-webkit-scrollbar-thumb { background: rgba(128,128,128,0.35); border-radius: 4px; }
-.al-pool-categories::-webkit-scrollbar-thumb:hover { background: rgba(128,128,128,0.55); }
+.al-pool-categories::-webkit-scrollbar { display: none; }
+.al-pool-categories { -ms-overflow-style: none; scrollbar-width: none; }
 .al-pool-header {
   display: flex;
   align-items: center;
