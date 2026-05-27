@@ -2156,9 +2156,14 @@ export default function App() {
             {/* Header */}
             <div className="al-header">
               <span className="al-title" style={{ color: themeColor }}>App Library</span>
-              <button className="bm-close-btn" style={{ color: themeColor }} onClick={() => setShowLibraryModal(false)}>
-                <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
-              </button>
+              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <button className="al-done-btn" style={{ background: isDark ? "#2a2a44" : "#e0e0ea", color: themeColor }} onClick={() => setShowLibraryModal(false)}>
+                  Done
+                </button>
+                <button className="bm-close-btn" style={{ color: themeColor }} onClick={() => setShowLibraryModal(false)}>
+                  <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+                </button>
+              </div>
             </div>
 
             <div className="al-body">
@@ -2302,12 +2307,6 @@ export default function App() {
 
             </div>
 
-            {/* Footer */}
-            <div className="al-footer" style={{ borderTop: `1px solid ${rowBorder}` }}>
-              <button className="al-done-btn" style={{ background: isDark ? "#2a2a44" : "#e0e0ea", color: themeColor }} onClick={() => setShowLibraryModal(false)}>
-                Done
-              </button>
-            </div>
 
           </div>
         </div>
