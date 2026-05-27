@@ -392,7 +392,7 @@ export default function App() {
 
   // Page Layout mode
   type LayoutPos = { x: number; y: number; w?: number; h?: number };
-  type LayoutSlotKey = "main" | "A1" | "B2" | "C3";
+  type LayoutSlotKey = "main" | "A1" | "B2" | "C3" | "D4";
   type SlotData = Record<string, LayoutPos | null>;
   const emptySlotData = (): SlotData => ({ clock: null, search: null, shortcuts: null, pomodoro: null });
 
@@ -403,16 +403,16 @@ export default function App() {
   const [activeSlot, setActiveSlot] = useState<LayoutSlotKey>(() => {
     try { return (localStorage.getItem("rynzen-active-slot") as LayoutSlotKey) || "main"; } catch { return "main"; }
   });
-  const [layoutSlots, setLayoutSlots] = useState<Record<"A1"|"B2"|"C3", SlotData>>(() => {
+  const [layoutSlots, setLayoutSlots] = useState<Record<"A1"|"B2"|"C3"|"D4", SlotData>>(() => {
     try {
       const saved = localStorage.getItem("rynzen-layout-slots");
-      return saved ? JSON.parse(saved) : { A1: emptySlotData(), B2: emptySlotData(), C3: emptySlotData() };
-    } catch { return { A1: emptySlotData(), B2: emptySlotData(), C3: emptySlotData() }; }
+      return saved ? JSON.parse(saved) : { A1: emptySlotData(), B2: emptySlotData(), C3: emptySlotData(), D4: emptySlotData() };
+    } catch { return { A1: emptySlotData(), B2: emptySlotData(), C3: emptySlotData(), D4: emptySlotData() }; }
   });
 
   const persistedPositions: SlotData = activeSlot === "main"
     ? emptySlotData()
-    : (layoutSlots[activeSlot as "A1"|"B2"|"C3"] ?? emptySlotData());
+    : (layoutSlots[activeSlot as "A1"|"B2"|"C3"|"D4"] ?? emptySlotData());
   const [activeLayoutEl, setActiveLayoutEl] = useState<string | null>(null);
   const layoutDragRef = useRef<{ el: string; startMX: number; startMY: number; startElX: number; startElY: number } | null>(null);
   const resizeDragRef = useRef<{ el: string; handle: string; startMX: number; startMY: number; startX: number; startY: number; startW: number; startH: number } | null>(null);
@@ -747,7 +747,7 @@ export default function App() {
     const timer = setTimeout(() => {
       const mainRect = mainRef.current?.getBoundingClientRect();
       if (!mainRect) { setPendingLayoutMode(false); return; }
-      const slotData = activeSlot === "main" ? emptySlotData() : (layoutSlots[activeSlot as "A1"|"B2"|"C3"] ?? emptySlotData());
+      const slotData = activeSlot === "main" ? emptySlotData() : (layoutSlots[activeSlot as "A1"|"B2"|"C3"|"D4"] ?? emptySlotData());
       const getPos = (el: HTMLElement | null, key: string): LayoutPos | null => {
         const existing = slotData[key];
         if (!el) return existing ?? null;
@@ -771,7 +771,7 @@ export default function App() {
   function exitLayoutMode() {
     if (activeSlot !== "main") {
       const saved = { ...layoutPositions };
-      const updated = { ...layoutSlots, [activeSlot]: saved } as Record<"A1"|"B2"|"C3", SlotData>;
+      const updated = { ...layoutSlots, [activeSlot]: saved } as Record<"A1"|"B2"|"C3"|"D4", SlotData>;
       setLayoutSlots(updated);
       try { localStorage.setItem("rynzen-layout-slots", JSON.stringify(updated)); } catch { /* ignore */ }
     }
@@ -782,7 +782,7 @@ export default function App() {
 
   function resetLayout() {
     if (activeSlot === "main") return;
-    const updated = { ...layoutSlots, [activeSlot]: emptySlotData() } as Record<"A1"|"B2"|"C3", SlotData>;
+    const updated = { ...layoutSlots, [activeSlot]: emptySlotData() } as Record<"A1"|"B2"|"C3"|"D4", SlotData>;
     setLayoutSlots(updated);
     setLayoutPositions(emptySlotData());
     try { localStorage.setItem("rynzen-layout-slots", JSON.stringify(updated)); } catch { /* ignore */ }
@@ -2125,7 +2125,7 @@ export default function App() {
         <p className="settings-section-label" style={{ marginTop: 12 }}>Page layout</p>
         <div className="settings-card" style={{ background: cardBg }}>
           <div className="layout-slot-grid">
-            {(["main", "A1", "B2", "C3"] as LayoutSlotKey[]).map(slot => (
+            {(["main", "A1", "B2", "C3", "D4"] as LayoutSlotKey[]).map(slot => (
               <button
                 key={slot}
                 className={`layout-slot-box${activeSlot === slot ? " layout-slot-active" : ""}`}
@@ -2158,7 +2158,7 @@ export default function App() {
           <div className="settings-row" style={{ borderTop: `1px solid ${rowBorder}`, opacity: 0.55 }}>
             <span className="settings-row-label" style={{ fontSize: "0.78rem", lineHeight: 1.4 }}>
               {activeSlot === "main"
-                ? "Select A1, B2 or C3 to create a custom layout."
+                ? "Select A1, B2, C3 or D4 to create a custom layout."
                 : "Click any element on the page to select it, then drag to reposition."}
             </span>
           </div>

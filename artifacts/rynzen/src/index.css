@@ -1776,8 +1776,8 @@ body {
 /* Layout slot selector grid */
 .layout-slot-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 8px;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
   padding: 10px 12px;
 }
 
@@ -1788,12 +1788,13 @@ body {
   justify-content: center;
   gap: 2px;
   border: 2px solid;
-  border-radius: 7px;
-  padding: 5px 4px 4px;
+  border-radius: 6px;
+  padding: 4px 2px;
   cursor: pointer;
   transition: border-color 0.15s, background 0.15s, transform 0.1s;
   background: none;
-  min-height: 28px;
+  aspect-ratio: 1;
+  min-height: 0;
 }
 .layout-slot-box:hover {
   transform: translateY(-1px);
