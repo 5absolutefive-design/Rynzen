@@ -426,6 +426,7 @@ export default function App() {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const settingsRef = useRef<HTMLDivElement>(null);
   const bookmarkInputRef = useRef<HTMLInputElement>(null);
+  const prevColsRef = useRef(quickLinksPerRow);
 
   const t = T[language] ?? T["en"];
 
@@ -433,6 +434,14 @@ export default function App() {
     const timer = setInterval(() => setNow(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
+
+  useEffect(() => {
+    if (prevColsRef.current !== quickLinksPerRow) {
+      prevColsRef.current = quickLinksPerRow;
+      setGridPositions({});
+      try { localStorage.setItem("rynzen-shortcut-grid", "{}"); } catch {}
+    }
+  }, [quickLinksPerRow]);
 
   useEffect(() => {
     if (!pomodoroRunning) return;
@@ -1263,8 +1272,7 @@ export default function App() {
           const CELL = qlFaviconSize + 32;
           const COLS = quickLinksPerRow;
           const allPos = getAssignedGridPositions(shortcuts, gridPositions, COLS);
-          const maxRow = Math.max(0, ...Object.values(allPos).map(p => p.row));
-          const totalRows = maxRow + 1;
+          const totalRows = 7;
           const cardSize = qlFaviconSize + 20;
           return (
             <div ref={shortcutsSectionRef}
