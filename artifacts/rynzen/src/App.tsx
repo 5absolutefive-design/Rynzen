@@ -1264,7 +1264,7 @@ export default function App() {
           const COLS = quickLinksPerRow;
           const allPos = getAssignedGridPositions(shortcuts, gridPositions, COLS);
           const maxRow = Math.max(0, ...Object.values(allPos).map(p => p.row));
-          const totalRows = maxRow + 2;
+          const totalRows = maxRow + 1;
           const cardSize = qlFaviconSize + 20;
           return (
             <div ref={shortcutsSectionRef}
