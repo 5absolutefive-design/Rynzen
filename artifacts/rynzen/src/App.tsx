@@ -278,7 +278,12 @@ export default function App() {
   const [iconContextMenu, setIconContextMenu] = useState<{ name: string; x: number; y: number } | null>(null);
   const [iconEditForm, setIconEditForm] = useState<{ name: string; title: string; url: string; iconType: 'favicon' | 'emoji' | 'custom'; iconValue: string } | null>(null);
   const [gridPositions, setGridPositions] = useState<Record<string, {col: number, row: number}>>(() => {
-    try { return JSON.parse(localStorage.getItem("rynzen-shortcut-grid") || "{}"); } catch { return {}; }
+    try {
+      const savedCols = Number(localStorage.getItem("rynzen-grid-cols") || "0");
+      const positions = JSON.parse(localStorage.getItem("rynzen-shortcut-grid") || "{}");
+      if (savedCols !== 8) return {};
+      return positions;
+    } catch { return {}; }
   });
   const gridDragRef = useRef<{name: string; startMouseX: number; startMouseY: number; hasMoved: boolean} | null>(null);
   const [gridDragState, setGridDragState] = useState<{name: string; mouseX: number; mouseY: number} | null>(null);
@@ -569,13 +574,21 @@ export default function App() {
     else if (e.key === "Escape") setShowSuggestions(false);
   }
 
+  const MAX_GRID_ROWS = 7;
+
   function getAssignedGridPositions(
     list: Shortcut[],
     saved: Record<string, {col: number, row: number}>,
     cols: number,
   ): Record<string, {col: number, row: number}> {
     const result: Record<string, {col: number, row: number}> = {};
-    const occupied = new Set(Object.entries(saved).filter(([n]) => list.some(s => s.name === n)).map(([, p]) => `${p.col},${p.row}`));
+    const validSaved: Record<string, {col: number, row: number}> = {};
+    for (const [n, p] of Object.entries(saved)) {
+      if (p.col >= 0 && p.col < cols && p.row >= 0 && p.row < MAX_GRID_ROWS) {
+        validSaved[n] = p;
+      }
+    }
+    const occupied = new Set(Object.entries(validSaved).filter(([n]) => list.some(s => s.name === n)).map(([, p]) => `${p.col},${p.row}`));
     let nc = 0, nr = 0;
     function nextEmpty() {
       while (occupied.has(`${nc},${nr}`)) {
@@ -589,7 +602,7 @@ export default function App() {
       return p;
     }
     for (const s of list) {
-      result[s.name] = saved[s.name] ?? nextEmpty();
+      result[s.name] = validSaved[s.name] ?? nextEmpty();
     }
     return result;
   }
@@ -625,7 +638,7 @@ export default function App() {
         if (!prev[oldName]) return prev;
         const { [oldName]: pos, ...rest } = prev;
         const updated = { ...rest, [newName]: pos };
-        try { localStorage.setItem("rynzen-shortcut-grid", JSON.stringify(updated)); } catch {}
+        try { localStorage.setItem("rynzen-shortcut-grid", JSON.stringify(updated)); localStorage.setItem("rynzen-grid-cols", String(8)); } catch {}
         return updated;
       });
     }
@@ -641,7 +654,7 @@ export default function App() {
     });
     setGridPositions(prev => {
       const { [name]: _removed, ...rest } = prev;
-      try { localStorage.setItem("rynzen-shortcut-grid", JSON.stringify(rest)); } catch {}
+      try { localStorage.setItem("rynzen-shortcut-grid", JSON.stringify(rest)); localStorage.setItem("rynzen-grid-cols", String(8)); } catch {}
       return rest;
     });
     setIconContextMenu(null);
@@ -727,7 +740,7 @@ export default function App() {
               delete updated[occupant[0]];
             }
           }
-          try { localStorage.setItem("rynzen-shortcut-grid", JSON.stringify(updated)); } catch {}
+          try { localStorage.setItem("rynzen-shortcut-grid", JSON.stringify(updated)); localStorage.setItem("rynzen-grid-cols", String(rawCols)); } catch {}
           return updated;
         });
       }
