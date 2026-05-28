@@ -2621,7 +2621,11 @@ body {
   justify-content: center;
   gap: 8px;
   padding: 12px 18px;
-  animation: al-confirm-pop 0.12s ease;
+  animation: al-cat-confirm-pop 0.15s ease;
+}
+@keyframes al-cat-confirm-pop {
+  from { transform: scale(0.88); opacity: 0; }
+  to   { transform: scale(1);    opacity: 1; }
 }
 
 /* Delete confirmation mini card (used on individual app items) */
