@@ -2686,3 +2686,236 @@ body {
   white-space: nowrap;
 }
 .al-confirm-no:hover { opacity: 0.6; }
+
+/* ── Bookmark Panel ── */
+.bm-dismiss {
+  position: fixed;
+  inset: 0;
+  z-index: 49;
+}
+.bm-widget {
+  position: fixed;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 50;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+.bm-folder-col {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.bm-folder-card {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+  width: 148px;
+  border-radius: 12px;
+  border: 1.5px solid;
+  cursor: pointer;
+  text-align: left;
+  transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s, background 0.15s;
+  backdrop-filter: blur(16px);
+  box-shadow: 0 1px 6px rgba(0,0,0,0.08);
+}
+.bm-folder-card--active {
+  transform: translateX(4px);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.13);
+}
+.bm-folder-icon { font-size: 15px; line-height: 1; flex-shrink: 0; }
+.bm-folder-name {
+  font-size: 12.5px;
+  font-weight: 500;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.bm-folder-arrow {
+  flex-shrink: 0;
+  transition: transform 0.15s, color 0.15s;
+}
+.bm-add-folder-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 148px;
+  border-radius: 12px;
+  border: 1.5px dashed;
+  background: transparent;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  backdrop-filter: blur(12px);
+  transition: opacity 0.15s;
+}
+.bm-add-folder-btn:hover { opacity: 0.75; }
+.bm-new-folder-form {
+  width: 148px;
+  border-radius: 12px;
+  border: 1.5px solid;
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+}
+.bm-emoji-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  padding: 8px 8px 6px;
+  border-bottom: 1px solid rgba(128,128,128,0.1);
+}
+.bm-emoji-btn {
+  width: 24px;
+  height: 24px;
+  font-size: 13px;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.1s, border-color 0.1s;
+}
+.bm-link-panel {
+  position: absolute;
+  left: 156px;
+  width: 204px;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1.5px solid;
+  backdrop-filter: blur(20px);
+  transition: opacity 0.2s, transform 0.22s cubic-bezier(0.34,1.1,0.64,1), top 0.18s ease;
+}
+.bm-links {
+  padding: 6px 0;
+  max-height: 280px;
+  overflow-y: auto;
+}
+.bm-links::-webkit-scrollbar { width: 3px; }
+.bm-links::-webkit-scrollbar-thumb { background: rgba(128,128,128,0.2); border-radius: 2px; }
+.bm-empty {
+  text-align: center;
+  padding: 16px 0;
+  font-size: 11px;
+}
+.bm-link-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 14px;
+  cursor: pointer;
+  text-decoration: none;
+  animation: bm-fade-in 0.16s ease both;
+  transition: background 0.12s;
+}
+.bm-link-row:hover { background: rgba(99,102,241,0.07); }
+@keyframes bm-fade-in {
+  from { opacity: 0; transform: translateX(-5px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+.bm-link-favicon {
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.bm-link-favicon img { width: 16px; height: 16px; object-fit: contain; }
+.bm-link-info { flex: 1; min-width: 0; }
+.bm-link-title {
+  font-size: 12px;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.bm-link-url {
+  font-size: 10px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.bm-add-link-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  width: 100%;
+  padding: 8px 0;
+  border-top: 1px solid;
+  background: transparent;
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.bm-add-link-btn:hover { opacity: 0.7; }
+.bm-new-link-form, .bm-new-folder-form .bm-form-area {
+  padding: 8px 10px 10px;
+  border-top: 1px solid;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.bm-new-link-form {
+  padding: 8px 10px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.bm-input {
+  width: 100%;
+  font-size: 11px;
+  padding: 6px 8px;
+  border-radius: 8px;
+  border: 1px solid;
+  outline: none;
+  font-family: inherit;
+}
+.bm-form-btns {
+  display: flex;
+  gap: 5px;
+  margin-top: 2px;
+}
+.bm-btn-add {
+  flex: 1;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 5px 0;
+  border-radius: 8px;
+  border: none;
+  color: white;
+  background: linear-gradient(135deg,#6366f1,#8b5cf6);
+  cursor: pointer;
+}
+.bm-btn-cancel {
+  flex: 1;
+  font-size: 10px;
+  font-weight: 500;
+  padding: 5px 0;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+}
+.bm-new-folder-form .bm-input,
+.bm-new-folder-form .bm-form-btns {
+  padding-left: 8px;
+  padding-right: 8px;
+  margin: 0 0 0 0;
+}
+.bm-new-folder-form > .bm-input {
+  margin: 6px 8px 4px;
+  width: calc(100% - 16px);
+}
+.bm-new-folder-form > .bm-form-btns {
+  margin: 0 8px 8px;
+}

@@ -388,6 +388,29 @@ export default function App() {
 
   const [engineColorEffect] = useState(true);
 
+  // Bookmark panel
+  type BmLink = { title: string; url: string };
+  type BmFolder = { name: string; icon: string; links: BmLink[] };
+  const DEFAULT_BM_FOLDERS: BmFolder[] = [
+    { name: "AI Tools", icon: "🤖", links: [{ title: "ChatGPT", url: "https://chatgpt.com" }, { title: "Claude", url: "https://claude.ai" }] },
+    { name: "Social", icon: "💬", links: [{ title: "YouTube", url: "https://youtube.com" }, { title: "Twitter", url: "https://twitter.com" }] },
+  ];
+  const [showBookmarks, setShowBookmarks] = useState(true);
+  const [bmFolders, setBmFolders] = useState<BmFolder[]>(() => {
+    try { const s = localStorage.getItem("rynzen-bookmarks"); return s ? JSON.parse(s) : DEFAULT_BM_FOLDERS; } catch { return DEFAULT_BM_FOLDERS; }
+  });
+  const [bmActive, setBmActive] = useState<string | null>(null);
+  const [bmShowAddFolder, setBmShowAddFolder] = useState(false);
+  const [bmNewFolderName, setBmNewFolderName] = useState("");
+  const [bmNewFolderIcon, setBmNewFolderIcon] = useState("📁");
+  const [bmShowAddLink, setBmShowAddLink] = useState(false);
+  const [bmNewLinkTitle, setBmNewLinkTitle] = useState("");
+  const [bmNewLinkUrl, setBmNewLinkUrl] = useState("");
+
+  useEffect(() => {
+    try { localStorage.setItem("rynzen-bookmarks", JSON.stringify(bmFolders)); } catch {}
+  }, [bmFolders]);
+
   // Search bar settings
   const [searchBarEnabled, setSearchBarEnabled] = useState(true);
   const [searchSuggestionsEnabled, setSearchSuggestionsEnabled] = useState(true);
@@ -1354,6 +1377,125 @@ export default function App() {
         })()}
       </main>
 
+      {/* ── Bookmark Panel ── */}
+      {showBookmarks && (() => {
+        const BM_CARD_H = 44;
+        const BM_CARD_GAP = 6;
+        const BM_EMOJI_LIST = ["📁","🤖","💻","🎬","🛍️","📰","🎮","🎵","📚","💡","🌍","❤️","⭐","🔥","🏠","💼"];
+        const activeIdx = bmFolders.findIndex(f => f.name === bmActive);
+        const activeFolder = activeIdx >= 0 ? bmFolders[activeIdx] : null;
+        const activeCenterY = activeIdx >= 0 ? activeIdx * (BM_CARD_H + BM_CARD_GAP) + BM_CARD_H / 2 : 0;
+
+        function bmAddFolder() {
+          const name = bmNewFolderName.trim();
+          if (!name) return;
+          setBmFolders(prev => [...prev, { name, icon: bmNewFolderIcon, links: [] }]);
+          setBmNewFolderName(""); setBmNewFolderIcon("📁"); setBmShowAddFolder(false); setBmActive(name);
+        }
+        function bmAddLink() {
+          const title = bmNewLinkTitle.trim();
+          const url = bmNewLinkUrl.trim();
+          if (!title || !url || !bmActive) return;
+          setBmFolders(prev => prev.map(f => f.name === bmActive ? { ...f, links: [...f.links, { title, url: url.startsWith("http") ? url : "https://" + url }] } : f));
+          setBmNewLinkTitle(""); setBmNewLinkUrl(""); setBmShowAddLink(false);
+        }
+
+        return (
+          <>
+            {(bmActive || bmShowAddFolder) && (
+              <div className="bm-dismiss" onClick={() => { setBmActive(null); setBmShowAddFolder(false); setBmShowAddLink(false); }} />
+            )}
+            <div className="bm-widget">
+              {/* Folder column */}
+              <div className="bm-folder-col">
+                {bmFolders.map((folder) => {
+                  const isActive = bmActive === folder.name;
+                  return (
+                    <button key={folder.name} className={`bm-folder-card${isActive ? " bm-folder-card--active" : ""}`}
+                      style={{ height: BM_CARD_H, borderColor: isActive ? (isDark ? "rgba(139,143,240,0.5)" : "rgba(99,102,241,0.35)") : (isDark ? "rgba(255,255,255,0.12)" : "rgba(255,255,255,0.6)"), background: isActive ? (isDark ? "rgba(255,255,255,0.12)" : "rgba(255,255,255,0.98)") : (isDark ? "rgba(255,255,255,0.06)" : "rgba(255,255,255,0.80)") }}
+                      onClick={(e) => { e.stopPropagation(); setBmShowAddFolder(false); setBmShowAddLink(false); setBmActive(isActive ? null : folder.name); }}
+                    >
+                      <span className="bm-folder-icon">{folder.icon}</span>
+                      <span className="bm-folder-name" style={{ color: isActive ? (isDark ? "#a5b4fc" : "#3730a3") : (isDark ? "#c8cce0" : "#555") }}>{folder.name}</span>
+                      <svg viewBox="0 0 16 16" width="10" height="10" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="bm-folder-arrow" style={{ color: isActive ? (isDark ? "#8b8ff0" : "#6366f1") : (isDark ? "#555" : "#ccc"), transform: isActive ? "rotate(-90deg)" : "rotate(0deg)" }}><path d="M4 6l4 4 4-4"/></svg>
+                    </button>
+                  );
+                })}
+
+                {/* + New Folder */}
+                {!bmShowAddFolder ? (
+                  <button className="bm-add-folder-btn" style={{ height: BM_CARD_H, borderColor: isDark ? "rgba(139,143,240,0.3)" : "rgba(99,102,241,0.35)", color: isDark ? "#8b8ff0" : "#8b8ff0" }}
+                    onClick={(e) => { e.stopPropagation(); setBmActive(null); setBmShowAddLink(false); setBmShowAddFolder(true); }}>
+                    <svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><path d="M8 3v10M3 8h10"/></svg>
+                    <span>New Folder</span>
+                  </button>
+                ) : (
+                  <div className="bm-new-folder-form" onClick={(e) => e.stopPropagation()} style={{ background: isDark ? "rgba(30,30,50,0.98)" : "rgba(255,255,255,0.98)", borderColor: isDark ? "rgba(139,143,240,0.5)" : "rgba(99,102,241,0.4)" }}>
+                    <div className="bm-emoji-grid">
+                      {BM_EMOJI_LIST.map(em => (
+                        <button key={em} className="bm-emoji-btn" onClick={() => setBmNewFolderIcon(em)}
+                          style={{ background: bmNewFolderIcon === em ? (isDark ? "rgba(139,143,240,0.25)" : "rgba(99,102,241,0.15)") : "transparent", borderColor: bmNewFolderIcon === em ? (isDark ? "rgba(139,143,240,0.5)" : "rgba(99,102,241,0.4)") : "transparent" }}>
+                          {em}
+                        </button>
+                      ))}
+                    </div>
+                    <input autoFocus value={bmNewFolderName} onChange={e => setBmNewFolderName(e.target.value)}
+                      onKeyDown={e => { if (e.key === "Enter") bmAddFolder(); if (e.key === "Escape") setBmShowAddFolder(false); }}
+                      placeholder="Folder name..." className="bm-input" style={{ background: isDark ? "#252540" : "#f5f5fa", color: isDark ? "#e8e8f0" : "#333", borderColor: isDark ? "#3a3a5c" : "#e0e0f0" }} />
+                    <div className="bm-form-btns">
+                      <button className="bm-btn-add" onClick={bmAddFolder}>Add</button>
+                      <button className="bm-btn-cancel" onClick={() => setBmShowAddFolder(false)} style={{ background: isDark ? "#2a2a44" : "#f0f0f5", color: isDark ? "#aab" : "#888" }}>Cancel</button>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Link panel */}
+              <div className="bm-link-panel" onClick={(e) => e.stopPropagation()}
+                style={{ top: activeCenterY, opacity: activeFolder ? 1 : 0, pointerEvents: activeFolder ? "auto" : "none", transform: `translateY(-50%) ${activeFolder ? "scale(1) translateX(0)" : "scale(0.96) translateX(-8px)"}`, background: isDark ? "rgba(25,25,42,0.96)" : "rgba(255,255,255,0.96)", borderColor: isDark ? "rgba(255,255,255,0.1)" : "rgba(255,255,255,0.7)", boxShadow: isDark ? "0 8px 32px rgba(0,0,0,0.5)" : "0 8px 32px rgba(0,0,0,0.14)" }}>
+                {activeFolder && (
+                  <>
+                    <div className="bm-links">
+                      {activeFolder.links.length === 0 && <div className="bm-empty" style={{ color: isDark ? "#666" : "#bbb" }}>No bookmarks yet</div>}
+                      {activeFolder.links.map((link, i) => (
+                        <a key={link.title + i} href={link.url} target="_blank" rel="noreferrer" className="bm-link-row"
+                          style={{ animationDelay: `${i * 28}ms` }}>
+                          <div className="bm-link-favicon" style={{ background: `hsl(${(link.title.charCodeAt(0) * 37) % 360},55%,60%)` }}>
+                            <img src={`https://www.google.com/s2/favicons?sz=32&domain=${link.url}`} alt="" onError={e => { (e.target as HTMLImageElement).style.display = "none"; }} />
+                          </div>
+                          <div className="bm-link-info">
+                            <div className="bm-link-title" style={{ color: isDark ? "#c8cce0" : "#333" }}>{link.title}</div>
+                            <div className="bm-link-url" style={{ color: isDark ? "#555" : "#aaa" }}>{link.url.replace(/^https?:\/\//, "")}</div>
+                          </div>
+                        </a>
+                      ))}
+                    </div>
+
+                    {!bmShowAddLink ? (
+                      <button className="bm-add-link-btn" onClick={() => setBmShowAddLink(true)} style={{ borderTopColor: isDark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.06)", color: isDark ? "#8b8ff0" : "#8b8ff0" }}>
+                        <svg viewBox="0 0 16 16" width="10" height="10" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round"><path d="M8 3v10M3 8h10"/></svg>
+                        <span>Add bookmark</span>
+                      </button>
+                    ) : (
+                      <div className="bm-new-link-form" onClick={(e) => e.stopPropagation()} style={{ borderTopColor: isDark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.06)" }}>
+                        <input autoFocus value={bmNewLinkTitle} onChange={e => setBmNewLinkTitle(e.target.value)} placeholder="Name..." className="bm-input" style={{ background: isDark ? "#252540" : "#f5f5fa", color: isDark ? "#e8e8f0" : "#333", borderColor: isDark ? "#3a3a5c" : "#e0e0f0" }} />
+                        <input value={bmNewLinkUrl} onChange={e => setBmNewLinkUrl(e.target.value)}
+                          onKeyDown={e => { if (e.key === "Enter") bmAddLink(); if (e.key === "Escape") setBmShowAddLink(false); }}
+                          placeholder="https://..." className="bm-input" style={{ background: isDark ? "#252540" : "#f5f5fa", color: isDark ? "#e8e8f0" : "#333", borderColor: isDark ? "#3a3a5c" : "#e0e0f0" }} />
+                        <div className="bm-form-btns">
+                          <button className="bm-btn-add" onClick={bmAddLink}>Add</button>
+                          <button className="bm-btn-cancel" onClick={() => setBmShowAddLink(false)} style={{ background: isDark ? "#2a2a44" : "#f0f0f5", color: isDark ? "#aab" : "#888" }}>Cancel</button>
+                        </div>
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+            </div>
+          </>
+        );
+      })()}
+
       {gridDragState && (() => {
         const s = shortcuts.find(sh => sh.name === gridDragState.name);
         if (!s) return null;
@@ -1659,6 +1801,14 @@ export default function App() {
         </div>
 
         {/* ── Quick Links Card ── */}
+        <p className="settings-section-label" style={{ marginTop: 12 }}>Bookmarks</p>
+        <div className="settings-card" style={{ background: cardBg }}>
+          <div className="settings-row">
+            <span className="settings-row-label">Show bookmark panel</span>
+            <button className={`toggle${showBookmarks ? " on" : ""}`} onClick={() => setShowBookmarks(!showBookmarks)} aria-label="Show bookmark panel" />
+          </div>
+        </div>
+
         <p className="settings-section-label" style={{ marginTop: 12 }}>{t.quickLinks}</p>
         <div className="settings-card" style={{ background: cardBg }}>
 
