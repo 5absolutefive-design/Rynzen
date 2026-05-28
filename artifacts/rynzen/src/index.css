@@ -2598,7 +2598,33 @@ body {
 }
 .al-add-category-btn:hover { opacity: 0.7; }
 
-/* Delete confirmation mini card */
+/* Category delete confirmation overlay — covers the whole category card */
+.al-category-confirm-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: al-confirm-fade 0.12s ease;
+}
+@keyframes al-confirm-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+.al-category-confirm-card {
+  border-radius: 11px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 18px;
+  animation: al-confirm-pop 0.12s ease;
+}
+
+/* Delete confirmation mini card (used on individual app items) */
 .al-confirm-card {
   position: absolute;
   top: 50%;

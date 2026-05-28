@@ -2280,7 +2280,7 @@ export default function App() {
                     : set.apps;
                   if (poolSearch.trim() && filteredApps.length === 0) return null;
                   return (
-                    <div key={set.id} className="al-pool-category" style={{ borderColor: isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)", background: isDark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.025)" }}>
+                    <div key={set.id} className="al-pool-category" style={{ borderColor: isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)", background: isDark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.025)", position: "relative" }}>
                       <div className="al-pool-cat-header">
                         {editingSetId === set.id ? (
                           <input
@@ -2301,10 +2301,13 @@ export default function App() {
                             <svg viewBox="0 0 24 24" fill="currentColor" width="13" height="13"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
                           </button>
                         )}
-                        {confirmDeleteSet === set.id && (
-                          <div className="al-confirm-card" style={{ background: isDark ? "#1e1e35" : "#fff", boxShadow: isDark ? "0 4px 18px rgba(0,0,0,0.6)" : "0 4px 18px rgba(0,0,0,0.18)" }}
+                      </div>
+                      {confirmDeleteSet === set.id && (
+                        <div className="al-category-confirm-overlay" style={{ background: isDark ? "rgba(18,18,30,0.82)" : "rgba(240,240,248,0.85)" }}
+                          onClick={(e) => { e.stopPropagation(); setConfirmDeleteSet(null); }}>
+                          <div className="al-category-confirm-card" style={{ background: isDark ? "#1e1e35" : "#fff", boxShadow: isDark ? "0 4px 24px rgba(0,0,0,0.7)" : "0 4px 24px rgba(0,0,0,0.18)" }}
                             onClick={(e) => e.stopPropagation()}>
-                            <span className="al-confirm-text" style={{ color: themeColor }}>Are You Sure?</span>
+                            <span className="al-confirm-text" style={{ color: themeColor, fontSize: "0.78rem" }}>Delete this category?</span>
                             <div className="al-confirm-btns">
                               <button className="al-confirm-yes"
                                 onClick={(e) => { e.stopPropagation(); setAppSets(prev => prev.filter(s => s.id !== set.id)); if (addingToSet === set.id) setAddingToSet(null); setConfirmDeleteSet(null); }}>
@@ -2316,8 +2319,8 @@ export default function App() {
                               </button>
                             </div>
                           </div>
-                        )}
-                      </div>
+                        </div>
+                      )}
 
                       <div className="al-app-grid">
                         {filteredApps.map((app) => {
