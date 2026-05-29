@@ -2056,17 +2056,17 @@ export default function App() {
             </div>
           </div>
 
-          {/* Size picker */}
-          <div className={`settings-row${!showShortcuts ? " settings-row-dimmed" : ""}`} style={{ borderTop: `1px solid ${rowBorder}` }}>
+          {/* Size slider */}
+          <div className={`settings-row settings-row-col${!showShortcuts ? " settings-row-dimmed" : ""}`} style={{ borderTop: `1px solid ${rowBorder}` }}>
             <span className="settings-row-label">{t.linkStyle} / Size</span>
-            <div className="ql-size-picker">
-              {(["small", "medium", "large"] as const).map((s) => (
-                <button key={s} onClick={() => setQuickLinksSize(s)} disabled={!showShortcuts}
-                  className={`ql-size-btn${quickLinksSize === s ? " active" : ""}`}
-                  style={{ background: quickLinksSize === s ? (isDark ? "#4a4a8a" : "#d0d4f0") : (isDark ? "#2a2a44" : "#e8eaf0"), color: themeColor }}>
-                  {t[s]}
-                </button>
-              ))}
+            <div className="settings-slider-row">
+              <input type="range" className="settings-slider" min={1} max={3} step={1}
+                value={quickLinksSize === "small" ? 1 : quickLinksSize === "large" ? 3 : 2}
+                onChange={(e) => { const v = Number(e.target.value); setQuickLinksSize(v === 1 ? "small" : v === 3 ? "large" : "medium"); }}
+                disabled={!showShortcuts} />
+              <span style={{ fontSize: 11, opacity: 0.6, minWidth: 38, textAlign: "right" }}>
+                {quickLinksSize === "small" ? t.small : quickLinksSize === "large" ? t.large : t.medium}
+              </span>
             </div>
           </div>
 
