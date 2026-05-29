@@ -2698,8 +2698,7 @@ body {
 .bm-widget {
   position: fixed;
   left: 16px;
-  top: 50%;
-  transform: translateY(-50%);
+  top: calc(50% - 16px);
   z-index: 50;
   display: flex;
   flex-direction: column;
@@ -2795,12 +2794,25 @@ body {
   max-height: 0;
   opacity: 0;
   pointer-events: none;
-  transition: max-height 0.25s cubic-bezier(0.4,0,0.2,1), opacity 0.2s ease;
+  transition: max-height 0.3s cubic-bezier(0.4,0,0.2,1), opacity 0.22s ease;
 }
 .bm-folder-col-wrap.open {
   max-height: 600px;
   opacity: 1;
   pointer-events: auto;
+}
+.bm-folder-col-wrap.open .bm-folder-col {
+  animation: bm-slide-down 0.28s cubic-bezier(0.22,1,0.36,1) both;
+}
+@keyframes bm-slide-down {
+  from {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 .bm-folder-col {
   display: flex;
