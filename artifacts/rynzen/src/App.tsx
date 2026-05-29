@@ -1446,10 +1446,10 @@ export default function App() {
       {showBookmarks && (() => {
         const BM_CARD_H = 44;
         const BM_CARD_GAP = 6;
-        const BM_HEADER_H = 22;
-        const BM_HEADER_GAP = 4;
-        const BM_SEARCH_H = 36;
-        const BM_SEARCH_GAP = 6;
+        const BM_HEADER_H = 32;
+        const BM_HEADER_GAP = 6;
+        const BM_SEARCH_H = 0;
+        const BM_SEARCH_GAP = 0;
         const BM_EMOJI_LIST = ["📁","🤖","💻","🎬","🛍️","📰","🎮","🎵","📚","💡","🌍","❤️","⭐","🔥","🏠","💼"];
         const bmSearchTerm = bmSearch.toLowerCase();
         const searchResults = bmSearch
