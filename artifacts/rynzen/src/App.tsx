@@ -392,8 +392,13 @@ export default function App() {
   type BmLink = { title: string; url: string };
   type BmFolder = { name: string; icon: string; links: BmLink[] };
   const DEFAULT_BM_FOLDERS: BmFolder[] = [
-    { name: "AI Tools", icon: "🤖", links: [{ title: "ChatGPT", url: "https://chatgpt.com" }, { title: "Claude", url: "https://claude.ai" }] },
-    { name: "Social", icon: "💬", links: [{ title: "YouTube", url: "https://youtube.com" }, { title: "Twitter", url: "https://twitter.com" }] },
+    { name: "Productivity", icon: "💻", links: [{ title: "Notion", url: "https://notion.so" }, { title: "Trello", url: "https://trello.com" }, { title: "Slack", url: "https://slack.com" }] },
+    { name: "AI Tools", icon: "🤖", links: [{ title: "ChatGPT", url: "https://chatgpt.com" }, { title: "Gemini", url: "https://gemini.google.com" }, { title: "Claude", url: "https://claude.ai" }] },
+    { name: "Cloud", icon: "☁️", links: [{ title: "Google Drive", url: "https://drive.google.com" }, { title: "Dropbox", url: "https://dropbox.com" }, { title: "MEGA", url: "https://mega.nz" }] },
+    { name: "Developer", icon: "🛠️", links: [{ title: "GitHub", url: "https://github.com" }, { title: "Stack Overflow", url: "https://stackoverflow.com" }, { title: "CodePen", url: "https://codepen.io" }] },
+    { name: "Gaming", icon: "🎮", links: [{ title: "Steam", url: "https://store.steampowered.com" }, { title: "Epic Games", url: "https://epicgames.com" }, { title: "Discord", url: "https://discord.com" }] },
+    { name: "Shopping", icon: "🛒", links: [{ title: "Amazon", url: "https://amazon.com" }, { title: "AliExpress", url: "https://aliexpress.com" }, { title: "eBay", url: "https://ebay.com" }] },
+    { name: "Learning", icon: "📚", links: [{ title: "Coursera", url: "https://coursera.org" }, { title: "Udemy", url: "https://udemy.com" }, { title: "Duolingo", url: "https://duolingo.com" }] },
   ];
   const [showBookmarks, setShowBookmarks] = useState(true);
   const [bmPanelOpen, setBmPanelOpen] = useState(false);
