@@ -711,6 +711,7 @@ export default function App() {
 
   function handleShortcutMouseDown(e: React.MouseEvent, name: string) {
     if (e.button !== 0) return;
+    if (layoutMode) return;
     e.preventDefault();
     gridDragRef.current = { name, startMouseX: e.clientX, startMouseY: e.clientY, hasMoved: false };
   }
@@ -842,8 +843,21 @@ export default function App() {
     e.preventDefault();
     e.stopPropagation();
     setActiveLayoutEl(el);
-    const pos = layoutPositions[el];
-    if (!pos) return;
+    let pos = layoutPositions[el];
+    if (!pos) {
+      const refs: Record<string, React.RefObject<HTMLElement | null>> = {
+        clock: clockRef, search: searchSectionRef, shortcuts: shortcutsSectionRef, pomodoro: pomodoroRef,
+      };
+      const domEl = refs[el]?.current;
+      const mainRect = mainRef.current?.getBoundingClientRect();
+      if (domEl && mainRect) {
+        const r = domEl.getBoundingClientRect();
+        pos = { x: r.left - mainRect.left, y: r.top - mainRect.top, w: r.width, h: r.height };
+        setLayoutPositions(prev => ({ ...prev, [el]: pos! }));
+      } else {
+        return;
+      }
+    }
     layoutDragRef.current = { el, startMX: e.clientX, startMY: e.clientY, startElX: pos.x, startElY: pos.y };
     const onMove = (ev: MouseEvent) => {
       const d = layoutDragRef.current;
