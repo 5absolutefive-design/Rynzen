@@ -2707,7 +2707,7 @@ body {
   gap: 4px;
 }
 .bm-header-card {
-  width: 148px;
+  width: 200px;
   height: 22px;
   display: flex;
   align-items: center;
@@ -2747,7 +2747,7 @@ body {
   align-items: center;
   gap: 8px;
   padding: 0 12px;
-  width: 148px;
+  width: 200px;
   border-radius: 12px;
   border: 1.5px solid;
   cursor: pointer;
@@ -2778,7 +2778,7 @@ body {
   align-items: center;
   justify-content: center;
   gap: 6px;
-  width: 148px;
+  width: 200px;
   border-radius: 12px;
   border: 1.5px dashed;
   background: transparent;
@@ -2790,7 +2790,7 @@ body {
 }
 .bm-add-folder-btn:hover { opacity: 0.75; }
 .bm-new-folder-form {
-  width: 148px;
+  width: 200px;
   border-radius: 12px;
   border: 1.5px solid;
   overflow: hidden;
@@ -2816,9 +2816,65 @@ body {
   justify-content: center;
   transition: background 0.1s, border-color 0.1s;
 }
+.bm-search-wrap {
+  width: 200px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 10px;
+  border-radius: 10px;
+  border: 1.5px solid rgba(128,128,128,0.18);
+  background: rgba(128,128,128,0.08);
+  backdrop-filter: blur(12px);
+  margin-bottom: 2px;
+  box-sizing: border-box;
+}
+.bm-search-icon { flex-shrink: 0; }
+.bm-search-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 11.5px;
+  background: transparent;
+  min-width: 0;
+}
+.bm-search-input::placeholder { color: rgba(128,128,128,0.5); }
+.bm-search-clear {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 15px;
+  line-height: 1;
+  padding: 0;
+  opacity: 0.6;
+  flex-shrink: 0;
+}
+.bm-search-clear:hover { opacity: 1; }
+.bm-search-result {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 10px;
+  border: 1.5px solid;
+  cursor: pointer;
+  text-decoration: none;
+  width: 200px;
+  box-sizing: border-box;
+  backdrop-filter: blur(12px);
+  transition: opacity 0.15s;
+}
+.bm-search-result:hover { opacity: 0.82; }
+.bm-search-empty {
+  font-size: 11px;
+  padding: 10px 4px;
+  text-align: center;
+  opacity: 0.6;
+}
 .bm-link-panel {
   position: absolute;
-  left: 156px;
+  left: 208px;
   width: 204px;
   border-radius: 16px;
   overflow: hidden;
