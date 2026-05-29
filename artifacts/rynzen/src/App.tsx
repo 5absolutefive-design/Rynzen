@@ -396,6 +396,7 @@ export default function App() {
     { name: "Social", icon: "💬", links: [{ title: "YouTube", url: "https://youtube.com" }, { title: "Twitter", url: "https://twitter.com" }] },
   ];
   const [showBookmarks, setShowBookmarks] = useState(true);
+  const [bmPanelOpen, setBmPanelOpen] = useState(false);
   const [bmFolders, setBmFolders] = useState<BmFolder[]>(() => {
     try { const s = localStorage.getItem("rynzen-bookmarks"); return s ? JSON.parse(s) : DEFAULT_BM_FOLDERS; } catch { return DEFAULT_BM_FOLDERS; }
   });
@@ -1404,10 +1405,14 @@ export default function App() {
       {showBookmarks && (() => {
         const BM_CARD_H = 44;
         const BM_CARD_GAP = 6;
+        const BM_HEADER_H = 22;
+        const BM_HEADER_GAP = 4;
         const BM_EMOJI_LIST = ["📁","🤖","💻","🎬","🛍️","📰","🎮","🎵","📚","💡","🌍","❤️","⭐","🔥","🏠","💼"];
         const activeIdx = bmFolders.findIndex(f => f.name === bmActive);
         const activeFolder = activeIdx >= 0 ? bmFolders[activeIdx] : null;
-        const activeCenterY = activeIdx >= 0 ? activeIdx * (BM_CARD_H + BM_CARD_GAP) + BM_CARD_H / 2 : 0;
+        const activeCenterY = bmPanelOpen && activeIdx >= 0
+          ? BM_HEADER_H + BM_HEADER_GAP + activeIdx * (BM_CARD_H + BM_CARD_GAP) + BM_CARD_H / 2
+          : 0;
 
         function bmAddFolder() {
           const name = bmNewFolderName.trim();
@@ -1429,7 +1434,17 @@ export default function App() {
               <div className="bm-dismiss" onClick={() => { setBmActive(null); setBmShowAddFolder(false); setBmShowAddLink(false); }} />
             )}
             <div className="bm-widget">
-              {/* Folder column */}
+              {/* Header toggle card */}
+              <button className="bm-header-card"
+                style={{ background: isDark ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.88)", borderColor: isDark ? "rgba(255,255,255,0.14)" : "rgba(255,255,255,0.7)", color: isDark ? "#c8cce0" : "#555" }}
+                onClick={(e) => { e.stopPropagation(); const next = !bmPanelOpen; setBmPanelOpen(next); if (!next) { setBmActive(null); setBmShowAddFolder(false); setBmShowAddLink(false); } }}>
+                <span style={{ fontSize: 11 }}>📑</span>
+                <span>Bookmarks</span>
+                <svg viewBox="0 0 16 16" width="8" height="8" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" style={{ marginLeft: "auto", transition: "transform 0.2s", transform: bmPanelOpen ? "rotate(-90deg)" : "rotate(0deg)" }}><path d="M4 6l4 4 4-4"/></svg>
+              </button>
+
+              {/* Collapsible folder column */}
+              <div className={`bm-folder-col-wrap${bmPanelOpen ? " open" : ""}`}>
               <div className="bm-folder-col">
                 {bmFolders.map((folder) => {
                   const isActive = bmActive === folder.name;
@@ -1472,6 +1487,7 @@ export default function App() {
                   </div>
                 )}
               </div>
+              </div>{/* /bm-folder-col-wrap */}
 
               {/* Link panel */}
               <div className="bm-link-panel" onClick={(e) => e.stopPropagation()}
