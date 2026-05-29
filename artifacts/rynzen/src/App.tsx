@@ -280,35 +280,40 @@ const DEFAULT_LEARNING_APPS: AppLibItem[] = [
   { id: "lrn-dl",  name: "Duolingo", url: "https://duolingo.com", domain: "duolingo.com" },
 ];
 
-function seedSocialApps(sets: AppSet[]): AppSet[] {
-  return sets.map(s =>
+const ALL_DEFAULT_SETS: AppSet[] = [
+  { id: "default",     name: "My Apps",        apps: [] },
+  { id: "social",      name: "social",          apps: DEFAULT_SOCIAL_APPS },
+  { id: "productivity",name: "💻 Productivity", apps: DEFAULT_PRODUCTIVITY_APPS },
+  { id: "ai",          name: "🤖 AI Tools",     apps: DEFAULT_AI_APPS },
+  { id: "cloud",       name: "☁️ Cloud",         apps: DEFAULT_CLOUD_APPS },
+  { id: "developer",   name: "🛠️ Developer",    apps: DEFAULT_DEV_APPS },
+  { id: "gaming",      name: "🎮 Gaming",        apps: DEFAULT_GAMING_APPS },
+  { id: "shopping",    name: "🛒 Shopping",      apps: DEFAULT_SHOPPING_APPS },
+  { id: "learning",    name: "📚 Learning",      apps: DEFAULT_LEARNING_APPS },
+];
+
+function seedAllDefaultSets(sets: AppSet[]): AppSet[] {
+  const existingIds = new Set(sets.map(s => s.id));
+  const missing = ALL_DEFAULT_SETS.filter(d => !existingIds.has(d.id));
+  const seeded = sets.map(s =>
     s.name.toLowerCase() === "social" && s.apps.length === 0
       ? { ...s, apps: DEFAULT_SOCIAL_APPS }
       : s
   );
+  return [...seeded, ...missing];
 }
 
 function loadAppSets(): AppSet[] {
   try {
     const raw = localStorage.getItem("rynzen-app-sets");
-    if (raw) return seedSocialApps(JSON.parse(raw));
+    if (raw) return seedAllDefaultSets(JSON.parse(raw));
     const oldRaw = localStorage.getItem("rynzen-app-library");
     if (oldRaw) {
       const apps: AppLibItem[] = JSON.parse(oldRaw);
-      if (apps.length > 0) return [{ id: "default", name: "My Apps", apps }];
+      if (apps.length > 0) return seedAllDefaultSets([{ id: "default", name: "My Apps", apps }]);
     }
   } catch {}
-  return [
-    { id: "default",     name: "My Apps",      apps: [] },
-    { id: "social",      name: "social",        apps: DEFAULT_SOCIAL_APPS },
-    { id: "productivity",name: "💻 Productivity",apps: DEFAULT_PRODUCTIVITY_APPS },
-    { id: "ai",          name: "🤖 AI Tools",   apps: DEFAULT_AI_APPS },
-    { id: "cloud",       name: "☁️ Cloud",       apps: DEFAULT_CLOUD_APPS },
-    { id: "developer",   name: "🛠️ Developer",  apps: DEFAULT_DEV_APPS },
-    { id: "gaming",      name: "🎮 Gaming",      apps: DEFAULT_GAMING_APPS },
-    { id: "shopping",    name: "🛒 Shopping",    apps: DEFAULT_SHOPPING_APPS },
-    { id: "learning",    name: "📚 Learning",    apps: DEFAULT_LEARNING_APPS },
-  ];
+  return ALL_DEFAULT_SETS;
 }
 
 export default function App() {
