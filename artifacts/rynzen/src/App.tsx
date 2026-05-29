@@ -1526,6 +1526,12 @@ export default function App() {
                     <svg viewBox="0 0 16 16" width="8" height="8" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" style={{ marginLeft: "auto", transition: "transform 0.2s", transform: bmPanelOpen ? "rotate(-90deg)" : "rotate(0deg)" }}><path d="M4 6l4 4 4-4"/></svg>
                   </button>
                   <button className="bm-header-search-icon"
+                    title="New folder"
+                    onClick={(e) => { e.stopPropagation(); setBmPanelOpen(true); setBmActive(null); setBmShowAddLink(false); setBmShowAddFolder(true); }}
+                    style={{ borderLeftColor: isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.08)", color: isDark ? "#8b8ff0" : "#6366f1" }}>
+                    <svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><path d="M8 3v10M3 8h10"/></svg>
+                  </button>
+                  <button className="bm-header-search-icon"
                     title="Search bookmarks"
                     onClick={(e) => { e.stopPropagation(); setBmHeaderSearchMode(true); setBmPanelOpen(true); setBmActive(null); setBmShowAddFolder(false); setBmShowAddLink(false); }}
                     style={{ borderLeftColor: isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.08)", color: isDark ? "#8b8ff0" : "#6366f1" }}>
@@ -1566,7 +1572,7 @@ export default function App() {
                       const isActive = bmActive === folder.name;
                       return (
                         <button key={folder.name} className={`bm-folder-card${isActive ? " bm-folder-card--active" : ""}`}
-                          style={{ height: BM_CARD_H, borderColor: isActive ? (isDark ? "rgba(139,143,240,0.5)" : "rgba(99,102,241,0.35)") : (isDark ? "rgba(255,255,255,0.12)" : "rgba(255,255,255,0.6)"), background: isActive ? (isDark ? "rgba(255,255,255,0.12)" : "rgba(255,255,255,0.98)") : (isDark ? "rgba(255,255,255,0.06)" : "rgba(255,255,255,0.80)"), animationDelay: `${idx * 400}ms` }}
+                          style={{ height: BM_CARD_H, borderColor: isActive ? (isDark ? "rgba(139,143,240,0.5)" : "rgba(99,102,241,0.35)") : (isDark ? "rgba(255,255,255,0.12)" : "rgba(255,255,255,0.6)"), background: isActive ? (isDark ? "rgba(255,255,255,0.12)" : "rgba(255,255,255,0.98)") : (isDark ? "rgba(255,255,255,0.06)" : "rgba(255,255,255,0.80)"), animationDelay: `${idx * 200}ms` }}
                           onClick={(e) => { e.stopPropagation(); setBmShowAddFolder(false); setBmShowAddLink(false); setBmActive(isActive ? null : folder.name); }}
                         >
                           <span className="bm-folder-icon">{folder.icon}</span>
@@ -1576,14 +1582,8 @@ export default function App() {
                       );
                     })}
 
-                    {/* + New Folder */}
-                    {!bmShowAddFolder ? (
-                      <button className="bm-add-folder-btn" style={{ height: BM_CARD_H, borderColor: isDark ? "rgba(139,143,240,0.3)" : "rgba(99,102,241,0.35)", color: isDark ? "#8b8ff0" : "#8b8ff0" }}
-                        onClick={(e) => { e.stopPropagation(); setBmActive(null); setBmShowAddLink(false); setBmShowAddFolder(true); }}>
-                        <svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><path d="M8 3v10M3 8h10"/></svg>
-                        <span>New Folder</span>
-                      </button>
-                    ) : (
+                    {/* New Folder form (triggered from header + button) */}
+                    {bmShowAddFolder && (
                       <div className="bm-new-folder-form" onClick={(e) => e.stopPropagation()} style={{ background: isDark ? "rgba(30,30,50,0.98)" : "rgba(255,255,255,0.98)", borderColor: isDark ? "rgba(139,143,240,0.5)" : "rgba(99,102,241,0.4)" }}>
                         <div className="bm-emoji-grid">
                           {BM_EMOJI_LIST.map(em => (
