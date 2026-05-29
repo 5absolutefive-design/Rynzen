@@ -2753,7 +2753,7 @@ body {
 }
 .bm-header-search-icon:hover { opacity: 0.65; }
 .bm-header-search-mode {
-  width: 200px;
+  width: 232px;
   height: 32px;
   display: flex;
   align-items: center;
@@ -2825,7 +2825,7 @@ body {
   align-items: center;
   gap: 8px;
   padding: 0 12px;
-  width: 200px;
+  width: 232px;
   border-radius: 12px;
   border: 1.5px solid;
   cursor: pointer;
@@ -2879,7 +2879,7 @@ body {
 }
 .bm-add-folder-btn:hover { opacity: 0.75; }
 .bm-new-folder-form {
-  width: 200px;
+  width: 232px;
   border-radius: 12px;
   border: 1.5px solid;
   overflow: hidden;
@@ -2906,7 +2906,7 @@ body {
   transition: background 0.1s, border-color 0.1s;
 }
 .bm-search-wrap {
-  width: 200px;
+  width: 232px;
   height: 34px;
   display: flex;
   align-items: center;
@@ -2949,7 +2949,7 @@ body {
   border: 1.5px solid;
   cursor: pointer;
   text-decoration: none;
-  width: 200px;
+  width: 232px;
   box-sizing: border-box;
   backdrop-filter: blur(12px);
   transition: opacity 0.15s;
