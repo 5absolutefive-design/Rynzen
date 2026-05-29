@@ -2027,7 +2027,7 @@ export default function App() {
           <div className={`settings-row settings-row-col${!showShortcuts ? " settings-row-dimmed" : ""}`} style={{ borderTop: `1px solid ${rowBorder}` }}>
             <span className="settings-row-label">{t.linksPerRow}</span>
             <div className="settings-slider-row">
-              <input type="range" className="settings-slider" min={3} max={12} value={quickLinksPerRow}
+              <input type="range" className="settings-slider" min={4} max={8} value={quickLinksPerRow}
                 onChange={(e) => setQuickLinksPerRow(Number(e.target.value))} disabled={!showShortcuts} />
               <span style={{ fontSize: 11, opacity: 0.6, minWidth: 22, textAlign: "right" }}>{quickLinksPerRow}</span>
             </div>
