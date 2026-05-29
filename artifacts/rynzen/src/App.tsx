@@ -1955,15 +1955,6 @@ export default function App() {
 
         </div>
 
-        {/* ── Quick Links Card ── */}
-        <p className="settings-section-label" style={{ marginTop: 12 }}>Bookmarks</p>
-        <div className="settings-card" style={{ background: cardBg }}>
-          <div className="settings-row">
-            <span className="settings-row-label">Show bookmark panel</span>
-            <button className={`toggle${showBookmarks ? " on" : ""}`} onClick={() => setShowBookmarks(!showBookmarks)} aria-label="Show bookmark panel" />
-          </div>
-        </div>
-
         <p className="settings-section-label" style={{ marginTop: 12 }}>{t.quickLinks}</p>
         <div className="settings-card" style={{ background: cardBg }}>
 
@@ -2079,6 +2070,15 @@ export default function App() {
             </div>
           </div>
 
+        </div>
+
+        {/* ── Bookmarks Card ── */}
+        <p className="settings-section-label" style={{ marginTop: 12 }}>Bookmarks</p>
+        <div className="settings-card" style={{ background: cardBg }}>
+          <div className="settings-row">
+            <span className="settings-row-label">Show bookmark panel</span>
+            <button className={`toggle${showBookmarks ? " on" : ""}`} onClick={() => setShowBookmarks(!showBookmarks)} aria-label="Show bookmark panel" />
+          </div>
         </div>
 
         {/* ── Search Bar Card ── */}
