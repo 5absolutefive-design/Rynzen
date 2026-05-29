@@ -693,9 +693,10 @@ export default function App() {
   }
 
   function renderShortcutIcon(s: Shortcut) {
+    const iconTransition = "width 0.2s ease, height 0.2s ease, font-size 0.2s ease";
     if (s.iconType === 'emoji' && s.iconValue) {
       return (
-        <span style={{ fontSize: qlFaviconSize * 0.85, lineHeight: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', width: qlFaviconSize, height: qlFaviconSize, flexShrink: 0 }}>
+        <span style={{ fontSize: qlFaviconSize * 0.85, lineHeight: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', width: qlFaviconSize, height: qlFaviconSize, flexShrink: 0, transition: iconTransition }}>
           {s.iconValue}
         </span>
       );
@@ -703,7 +704,7 @@ export default function App() {
     if (s.iconType === 'custom' && s.iconValue) {
       return (
         <img src={s.iconValue} alt={s.name} title={s.name}
-          style={{ width: qlFaviconSize, height: qlFaviconSize, objectFit: "contain", borderRadius: quickLinksIconRadius, flexShrink: 0 }}
+          style={{ width: qlFaviconSize, height: qlFaviconSize, objectFit: "contain", borderRadius: quickLinksIconRadius, flexShrink: 0, transition: iconTransition }}
           draggable={false}
         />
       );
@@ -711,7 +712,7 @@ export default function App() {
     return (
       <img src={`https://www.google.com/s2/favicons?domain=${s.domain}&sz=${qlSzParam}`}
         alt={s.name} title={s.name}
-        style={{ width: qlFaviconSize, height: qlFaviconSize, objectFit: "contain", borderRadius: quickLinksIconRadius, flexShrink: 0 }}
+        style={{ width: qlFaviconSize, height: qlFaviconSize, objectFit: "contain", borderRadius: quickLinksIconRadius, flexShrink: 0, transition: iconTransition }}
         draggable={false}
       />
     );
@@ -1388,7 +1389,7 @@ export default function App() {
                 ref={gridContainerRef}
                 data-cols={COLS}
                 data-cellsize={CELL}
-                style={{ position: "relative", width: COLS * CELL, height: totalRows * CELL }}
+                style={{ position: "relative", width: COLS * CELL, height: totalRows * CELL, transition: "width 0.2s ease, height 0.2s ease" }}
               >
                 {dropTargetCell && gridDragState && (
                   <div style={{
@@ -1420,7 +1421,7 @@ export default function App() {
                         height: cardSize,
                         cursor: isDraggingThis ? "grabbing" : "grab",
                         opacity: isDraggingThis ? 0.35 : 1,
-                        transition: isDraggingThis ? "none" : "left 0.15s, top 0.15s, opacity 0.15s",
+                        transition: isDraggingThis ? "none" : "left 0.2s ease, top 0.2s ease, width 0.2s ease, height 0.2s ease, opacity 0.15s",
                         zIndex: isDraggingThis ? 1 : 5,
                         userSelect: "none",
                       }}
