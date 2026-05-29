@@ -408,6 +408,7 @@ export default function App() {
   const [bmNewLinkTitle, setBmNewLinkTitle] = useState("");
   const [bmNewLinkUrl, setBmNewLinkUrl] = useState("");
   const [bmSearch, setBmSearch] = useState("");
+  const [bmHeaderSearchMode, setBmHeaderSearchMode] = useState(false);
 
   useEffect(() => {
     try { localStorage.setItem("rynzen-bookmarks", JSON.stringify(bmFolders)); } catch {}
@@ -1496,13 +1497,41 @@ export default function App() {
                   onMouseDown={handleBmMouseDown} onClick={e => e.stopPropagation()} />
               )}
               {/* Header toggle card */}
-              <button className="bm-header-card"
-                style={{ background: isDark ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.88)", borderColor: isDark ? "rgba(255,255,255,0.14)" : "rgba(255,255,255,0.7)", color: isDark ? "#c8cce0" : "#555" }}
-                onClick={(e) => { e.stopPropagation(); const next = !bmPanelOpen; setBmPanelOpen(next); if (!next) { setBmActive(null); setBmShowAddFolder(false); setBmShowAddLink(false); } }}>
-                <span style={{ fontSize: 11 }}>📑</span>
-                <span>Bookmarks</span>
-                <svg viewBox="0 0 16 16" width="8" height="8" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" style={{ marginLeft: "auto", transition: "transform 0.2s", transform: bmPanelOpen ? "rotate(-90deg)" : "rotate(0deg)" }}><path d="M4 6l4 4 4-4"/></svg>
-              </button>
+              {bmHeaderSearchMode ? (
+                <div className="bm-header-search-mode" style={{ background: isDark ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.88)", borderColor: isDark ? "rgba(139,143,240,0.5)" : "rgba(99,102,241,0.4)", color: isDark ? "#c8cce0" : "#555" }} onClick={e => e.stopPropagation()}>
+                  <button className="bm-header-search-back" onClick={(e) => { e.stopPropagation(); setBmHeaderSearchMode(false); setBmSearch(""); }} style={{ color: isDark ? "#8b8ff0" : "#6366f1" }}>
+                    <svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round"><path d="M10 4L6 8l4 4"/></svg>
+                  </button>
+                  <input
+                    className="bm-header-search-input"
+                    autoFocus
+                    placeholder="Search bookmarks..."
+                    value={bmSearch}
+                    onChange={e => { setBmSearch(e.target.value); setBmActive(null); }}
+                    onKeyDown={e => { if (e.key === "Escape") { setBmHeaderSearchMode(false); setBmSearch(""); } }}
+                    style={{ color: isDark ? "#e8e8f0" : "#333" }}
+                  />
+                  {bmSearch && (
+                    <button className="bm-search-clear" onClick={() => setBmSearch("")} style={{ color: isDark ? "#888" : "#bbb" }}>×</button>
+                  )}
+                </div>
+              ) : (
+                <div className="bm-header-row">
+                  <button className="bm-header-card"
+                    style={{ background: isDark ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.88)", borderColor: isDark ? "rgba(255,255,255,0.14)" : "rgba(255,255,255,0.7)", color: isDark ? "#c8cce0" : "#555" }}
+                    onClick={(e) => { e.stopPropagation(); const next = !bmPanelOpen; setBmPanelOpen(next); if (!next) { setBmActive(null); setBmShowAddFolder(false); setBmShowAddLink(false); } }}>
+                    <span style={{ fontSize: 11 }}>📑</span>
+                    <span>Bookmarks</span>
+                    <svg viewBox="0 0 16 16" width="8" height="8" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" style={{ marginLeft: "auto", transition: "transform 0.2s", transform: bmPanelOpen ? "rotate(-90deg)" : "rotate(0deg)" }}><path d="M4 6l4 4 4-4"/></svg>
+                  </button>
+                  <button className="bm-header-search-btn"
+                    title="Search bookmarks"
+                    onClick={(e) => { e.stopPropagation(); setBmHeaderSearchMode(true); setBmPanelOpen(true); setBmActive(null); setBmShowAddFolder(false); setBmShowAddLink(false); }}
+                    style={{ background: isDark ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.88)", borderColor: isDark ? "rgba(255,255,255,0.14)" : "rgba(255,255,255,0.7)", color: isDark ? "#8b8ff0" : "#6366f1" }}>
+                    <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="6.5" cy="6.5" r="4"/><path d="M10.5 10.5l2.5 2.5"/></svg>
+                  </button>
+                </div>
+              )}
 
               {/* Collapsible folder column */}
               <div className={`bm-folder-col-wrap${bmPanelOpen ? " open" : ""}`}>

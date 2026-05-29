@@ -2724,6 +2724,64 @@ body {
   transition: opacity 0.15s;
 }
 .bm-header-card:hover { opacity: 0.8; }
+.bm-header-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.bm-header-search-btn {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  border: 1.5px solid;
+  cursor: pointer;
+  padding: 0;
+  flex-shrink: 0;
+  backdrop-filter: blur(16px);
+  box-shadow: 0 1px 6px rgba(0,0,0,0.08);
+  transition: opacity 0.15s;
+}
+.bm-header-search-btn:hover { opacity: 0.75; }
+.bm-header-search-mode {
+  width: 236px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 6px;
+  border-radius: 8px;
+  border: 1.5px solid;
+  backdrop-filter: blur(16px);
+  box-shadow: 0 1px 6px rgba(0,0,0,0.08);
+}
+.bm-header-search-back {
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+  flex-shrink: 0;
+  border-radius: 4px;
+  transition: opacity 0.15s;
+}
+.bm-header-search-back:hover { opacity: 0.7; }
+.bm-header-search-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.015em;
+  min-width: 0;
+}
 .bm-folder-col-wrap {
   overflow: hidden;
   max-height: 0;
