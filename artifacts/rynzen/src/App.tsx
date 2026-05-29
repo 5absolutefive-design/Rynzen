@@ -1445,7 +1445,7 @@ export default function App() {
 
       {/* ── Bookmark Panel ── */}
       {showBookmarks && (() => {
-        const BM_CARD_H = 44;
+        const BM_CARD_H = 38;
         const BM_CARD_GAP = 6;
         const BM_HEADER_H = 32;
         const BM_HEADER_GAP = 6;
