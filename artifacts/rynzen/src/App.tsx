@@ -1650,7 +1650,7 @@ export default function App() {
                       {activeFolder.links.length === 0 && <div className="bm-empty" style={{ color: isDark ? "#666" : "#bbb" }}>No bookmarks yet</div>}
                       {activeFolder.links.map((link, i) => (
                         <a key={link.title + i} href={link.url} target="_blank" rel="noreferrer" className={`bm-link-row bm-link-row--${bmLinkAnim}`}
-                          style={{ animationDelay: `${i * 40}ms` }}>
+                          style={{ animationDelay: `${i * 80}ms` }}>
                           <div className="bm-link-favicon" style={{ background: `hsl(${(link.title.charCodeAt(0) * 37) % 360},55%,60%)` }}>
                             <img src={`https://www.google.com/s2/favicons?sz=32&domain=${link.url}`} alt="" onError={e => { (e.target as HTMLImageElement).style.display = "none"; }} />
                           </div>
