@@ -976,6 +976,11 @@ export default function App() {
 
   function layoutElStyle(key: string): React.CSSProperties {
     const base = BASE_Z[key] ?? 5;
+    const SIDEBAR_W = 300;
+    const xScale = showSettings
+      ? Math.max(0, (window.innerWidth - SIDEBAR_W) / window.innerWidth)
+      : 1;
+
     if (layoutMode) {
       const pos = layoutPositions[key];
       if (!pos) return {};
@@ -990,7 +995,11 @@ export default function App() {
     const pos = persistedPositions[key];
     if (!pos) return {};
     return {
-      position: "absolute", left: pos.x, top: pos.y, zIndex: base,
+      position: "absolute",
+      left: Math.round(pos.x * xScale),
+      top: pos.y,
+      zIndex: base,
+      transition: "left 0.32s cubic-bezier(0.4, 0, 0.2, 1)",
       ...(pos.w !== undefined ? { width: pos.w } : {}),
       ...(pos.h !== undefined ? { height: pos.h } : {}),
     };
