@@ -409,6 +409,7 @@ export default function App() {
   const [bmNewLinkUrl, setBmNewLinkUrl] = useState("");
   const [bmSearch, setBmSearch] = useState("");
   const [bmHeaderSearchMode, setBmHeaderSearchMode] = useState(false);
+  const [bmDeleteConfirm, setBmDeleteConfirm] = useState<string | null>(null);
 
   useEffect(() => {
     try { localStorage.setItem("rynzen-bookmarks", JSON.stringify(bmFolders)); } catch {}
@@ -1570,15 +1571,46 @@ export default function App() {
                   <div className="bm-folder-col" key={bmPanelOpen ? "open" : "closed"}>
                     {bmFolders.map((folder, idx) => {
                       const isActive = bmActive === folder.name;
+                      const isPendingDelete = bmDeleteConfirm === folder.name;
                       return (
-                        <button key={folder.name} className={`bm-folder-card${isActive ? " bm-folder-card--active" : ""}`}
-                          style={{ height: BM_CARD_H, borderColor: isActive ? (isDark ? "rgba(139,143,240,0.5)" : "rgba(99,102,241,0.35)") : (isDark ? "rgba(255,255,255,0.12)" : "rgba(255,255,255,0.6)"), background: isActive ? (isDark ? "rgba(255,255,255,0.12)" : "rgba(255,255,255,0.98)") : (isDark ? "rgba(255,255,255,0.06)" : "rgba(255,255,255,0.80)"), animationDelay: `${idx * 200}ms` }}
-                          onClick={(e) => { e.stopPropagation(); setBmShowAddFolder(false); setBmShowAddLink(false); setBmActive(isActive ? null : folder.name); }}
-                        >
-                          <span className="bm-folder-icon">{folder.icon}</span>
-                          <span className="bm-folder-name" style={{ color: isActive ? (isDark ? "#a5b4fc" : "#3730a3") : (isDark ? "#c8cce0" : "#555") }}>{folder.name}</span>
-                          <svg viewBox="0 0 16 16" width="10" height="10" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="bm-folder-arrow" style={{ color: isActive ? (isDark ? "#8b8ff0" : "#6366f1") : (isDark ? "#555" : "#ccc"), transform: isActive ? "rotate(-90deg)" : "rotate(0deg)" }}><path d="M4 6l4 4 4-4"/></svg>
-                        </button>
+                        <div key={folder.name} style={{ position: "relative", display: "flex", alignItems: "center", gap: 4 }}>
+                          {isPendingDelete ? (
+                            <div className={`bm-folder-card`}
+                              style={{ height: BM_CARD_H, borderColor: isDark ? "rgba(255,100,100,0.5)" : "rgba(220,50,50,0.35)", background: isDark ? "rgba(255,80,80,0.10)" : "rgba(255,230,230,0.98)", animationDelay: `${idx * 200}ms`, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 10px", gap: 6 }}
+                            >
+                              <span style={{ fontSize: 11, fontWeight: 600, color: isDark ? "#f87171" : "#b91c1c", whiteSpace: "nowrap" }}>Remove?</span>
+                              <div style={{ display: "flex", gap: 4 }}>
+                                <button onClick={(e) => { e.stopPropagation(); setBmFolders(prev => prev.filter(f => f.name !== folder.name)); if (bmActive === folder.name) setBmActive(null); setBmDeleteConfirm(null); }}
+                                  style={{ fontSize: 11, fontWeight: 700, padding: "2px 8px", borderRadius: 6, border: "none", background: isDark ? "#ef4444" : "#dc2626", color: "#fff", cursor: "pointer" }}>
+                                  Yes
+                                </button>
+                                <button onClick={(e) => { e.stopPropagation(); setBmDeleteConfirm(null); }}
+                                  style={{ fontSize: 11, fontWeight: 600, padding: "2px 8px", borderRadius: 6, border: "none", background: isDark ? "#2a2a44" : "#e5e7eb", color: isDark ? "#aab" : "#555", cursor: "pointer" }}>
+                                  No
+                                </button>
+                              </div>
+                            </div>
+                          ) : (
+                            <button className={`bm-folder-card${isActive ? " bm-folder-card--active" : ""}`}
+                              style={{ height: BM_CARD_H, borderColor: isActive ? (isDark ? "rgba(139,143,240,0.5)" : "rgba(99,102,241,0.35)") : (isDark ? "rgba(255,255,255,0.12)" : "rgba(255,255,255,0.6)"), background: isActive ? (isDark ? "rgba(255,255,255,0.12)" : "rgba(255,255,255,0.98)") : (isDark ? "rgba(255,255,255,0.06)" : "rgba(255,255,255,0.80)"), animationDelay: `${idx * 200}ms` }}
+                              onClick={(e) => { e.stopPropagation(); setBmShowAddFolder(false); setBmShowAddLink(false); setBmActive(isActive ? null : folder.name); }}
+                            >
+                              <span className="bm-folder-icon">{folder.icon}</span>
+                              <span className="bm-folder-name" style={{ color: isActive ? (isDark ? "#a5b4fc" : "#3730a3") : (isDark ? "#c8cce0" : "#555") }}>{folder.name}</span>
+                              <svg viewBox="0 0 16 16" width="10" height="10" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="bm-folder-arrow" style={{ color: isActive ? (isDark ? "#8b8ff0" : "#6366f1") : (isDark ? "#555" : "#ccc"), transform: isActive ? "rotate(-90deg)" : "rotate(0deg)" }}><path d="M4 6l4 4 4-4"/></svg>
+                            </button>
+                          )}
+                          {!isPendingDelete && (
+                            <button onClick={(e) => { e.stopPropagation(); setBmDeleteConfirm(folder.name); }}
+                              style={{ flexShrink: 0, width: 32, height: 32, borderRadius: 8, border: "none", background: isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.05)", color: isDark ? "#666" : "#bbb", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", transition: "background 0.15s, color 0.15s" }}
+                              onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = isDark ? "rgba(255,80,80,0.18)" : "rgba(220,50,50,0.10)"; (e.currentTarget as HTMLButtonElement).style.color = "#ef4444"; }}
+                              onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.05)"; (e.currentTarget as HTMLButtonElement).style.color = isDark ? "#666" : "#bbb"; }}
+                              title="Delete folder"
+                            >
+                              <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+                            </button>
+                          )}
+                        </div>
                       );
                     })}
 
