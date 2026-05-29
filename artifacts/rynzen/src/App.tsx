@@ -1536,20 +1536,6 @@ export default function App() {
               {/* Collapsible folder column */}
               <div className={`bm-folder-col-wrap${bmPanelOpen ? " open" : ""}`}>
 
-                {/* Search box */}
-                <div className="bm-search-wrap" onClick={e => e.stopPropagation()}>
-                  <svg viewBox="0 0 16 16" width="11" height="11" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="bm-search-icon" style={{ color: isDark ? "#666" : "#aaa" }}><circle cx="6.5" cy="6.5" r="4"/><path d="M10.5 10.5l2.5 2.5"/></svg>
-                  <input className="bm-search-input"
-                    placeholder="Search bookmarks..."
-                    value={bmSearch}
-                    onChange={e => { setBmSearch(e.target.value); setBmActive(null); }}
-                    onKeyDown={e => { if (e.key === "Escape") setBmSearch(""); }}
-                    style={{ background: "transparent", color: isDark ? "#e8e8f0" : "#333" }} />
-                  {bmSearch && (
-                    <button className="bm-search-clear" onClick={() => setBmSearch("")} style={{ color: isDark ? "#888" : "#bbb" }}>×</button>
-                  )}
-                </div>
-
                 {bmSearch ? (
                   /* ── Search results ── */
                   <div className="bm-folder-col">
