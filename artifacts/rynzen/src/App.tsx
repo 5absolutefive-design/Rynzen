@@ -1566,7 +1566,7 @@ export default function App() {
                       const isActive = bmActive === folder.name;
                       return (
                         <button key={folder.name} className={`bm-folder-card${isActive ? " bm-folder-card--active" : ""}`}
-                          style={{ height: BM_CARD_H, borderColor: isActive ? (isDark ? "rgba(139,143,240,0.5)" : "rgba(99,102,241,0.35)") : (isDark ? "rgba(255,255,255,0.12)" : "rgba(255,255,255,0.6)"), background: isActive ? (isDark ? "rgba(255,255,255,0.12)" : "rgba(255,255,255,0.98)") : (isDark ? "rgba(255,255,255,0.06)" : "rgba(255,255,255,0.80)"), animationDelay: `${idx * 45}ms` }}
+                          style={{ height: BM_CARD_H, borderColor: isActive ? (isDark ? "rgba(139,143,240,0.5)" : "rgba(99,102,241,0.35)") : (isDark ? "rgba(255,255,255,0.12)" : "rgba(255,255,255,0.6)"), background: isActive ? (isDark ? "rgba(255,255,255,0.12)" : "rgba(255,255,255,0.98)") : (isDark ? "rgba(255,255,255,0.06)" : "rgba(255,255,255,0.80)"), animationDelay: `${idx * 400}ms` }}
                           onClick={(e) => { e.stopPropagation(); setBmShowAddFolder(false); setBmShowAddLink(false); setBmActive(isActive ? null : folder.name); }}
                         >
                           <span className="bm-folder-icon">{folder.icon}</span>
