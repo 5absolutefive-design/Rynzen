@@ -238,6 +238,48 @@ const DEFAULT_SOCIAL_APPS: AppLibItem[] = [
   { id: "soc-th",   name: "Threads",   url: "https://www.threads.net",   domain: "threads.net" },
 ];
 
+const DEFAULT_PRODUCTIVITY_APPS: AppLibItem[] = [
+  { id: "prd-no",  name: "Notion",  url: "https://www.notion.so",   domain: "notion.so" },
+  { id: "prd-tr",  name: "Trello",  url: "https://trello.com",      domain: "trello.com" },
+  { id: "prd-sl",  name: "Slack",   url: "https://slack.com",       domain: "slack.com" },
+];
+
+const DEFAULT_AI_APPS: AppLibItem[] = [
+  { id: "ai-gpt",  name: "ChatGPT", url: "https://chatgpt.com",          domain: "chatgpt.com" },
+  { id: "ai-gem",  name: "Gemini",  url: "https://gemini.google.com",    domain: "gemini.google.com" },
+  { id: "ai-cld",  name: "Claude",  url: "https://claude.ai",            domain: "claude.ai" },
+];
+
+const DEFAULT_CLOUD_APPS: AppLibItem[] = [
+  { id: "cld-gd",  name: "Google Drive", url: "https://drive.google.com", domain: "drive.google.com" },
+  { id: "cld-db",  name: "Dropbox",      url: "https://dropbox.com",      domain: "dropbox.com" },
+  { id: "cld-mg",  name: "MEGA",         url: "https://mega.nz",          domain: "mega.nz" },
+];
+
+const DEFAULT_DEV_APPS: AppLibItem[] = [
+  { id: "dev-gh",  name: "GitHub",         url: "https://github.com",           domain: "github.com" },
+  { id: "dev-so",  name: "Stack Overflow", url: "https://stackoverflow.com",    domain: "stackoverflow.com" },
+  { id: "dev-cp",  name: "CodePen",        url: "https://codepen.io",           domain: "codepen.io" },
+];
+
+const DEFAULT_GAMING_APPS: AppLibItem[] = [
+  { id: "gam-st",  name: "Steam",      url: "https://store.steampowered.com", domain: "steampowered.com" },
+  { id: "gam-ep",  name: "Epic Games", url: "https://epicgames.com",          domain: "epicgames.com" },
+  { id: "gam-dc",  name: "Discord",    url: "https://discord.com",            domain: "discord.com" },
+];
+
+const DEFAULT_SHOPPING_APPS: AppLibItem[] = [
+  { id: "shp-az",  name: "Amazon",     url: "https://amazon.com",     domain: "amazon.com" },
+  { id: "shp-ae",  name: "AliExpress", url: "https://aliexpress.com", domain: "aliexpress.com" },
+  { id: "shp-eb",  name: "eBay",       url: "https://ebay.com",       domain: "ebay.com" },
+];
+
+const DEFAULT_LEARNING_APPS: AppLibItem[] = [
+  { id: "lrn-co",  name: "Coursera", url: "https://coursera.org", domain: "coursera.org" },
+  { id: "lrn-ud",  name: "Udemy",    url: "https://udemy.com",    domain: "udemy.com" },
+  { id: "lrn-dl",  name: "Duolingo", url: "https://duolingo.com", domain: "duolingo.com" },
+];
+
 function seedSocialApps(sets: AppSet[]): AppSet[] {
   return sets.map(s =>
     s.name.toLowerCase() === "social" && s.apps.length === 0
@@ -257,8 +299,15 @@ function loadAppSets(): AppSet[] {
     }
   } catch {}
   return [
-    { id: "default", name: "My Apps", apps: [] },
-    { id: "social",  name: "social",  apps: DEFAULT_SOCIAL_APPS },
+    { id: "default",     name: "My Apps",      apps: [] },
+    { id: "social",      name: "social",        apps: DEFAULT_SOCIAL_APPS },
+    { id: "productivity",name: "💻 Productivity",apps: DEFAULT_PRODUCTIVITY_APPS },
+    { id: "ai",          name: "🤖 AI Tools",   apps: DEFAULT_AI_APPS },
+    { id: "cloud",       name: "☁️ Cloud",       apps: DEFAULT_CLOUD_APPS },
+    { id: "developer",   name: "🛠️ Developer",  apps: DEFAULT_DEV_APPS },
+    { id: "gaming",      name: "🎮 Gaming",      apps: DEFAULT_GAMING_APPS },
+    { id: "shopping",    name: "🛒 Shopping",    apps: DEFAULT_SHOPPING_APPS },
+    { id: "learning",    name: "📚 Learning",    apps: DEFAULT_LEARNING_APPS },
   ];
 }
 
