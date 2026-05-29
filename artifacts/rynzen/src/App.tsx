@@ -450,6 +450,11 @@ export default function App() {
   const searchSectionRef = useRef<HTMLDivElement>(null);
   const shortcutsSectionRef = useRef<HTMLDivElement>(null);
   const pomodoroRef = useRef<HTMLDivElement>(null);
+  const bmWidgetRef = useRef<HTMLDivElement>(null);
+  const bmDragRef = useRef<{ startMX: number; startMY: number; startX: number; startY: number } | null>(null);
+  const [bmPosition, setBmPosition] = useState<{ x: number; y: number } | null>(() => {
+    try { const s = localStorage.getItem("rynzen-bm-position"); return s ? JSON.parse(s) : null; } catch { return null; }
+  });
 
   const inputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -906,6 +911,40 @@ export default function App() {
     document.addEventListener("mousemove", onMove);
     document.addEventListener("mouseup", onUp);
   }, [layoutPositions]);
+
+  const handleBmMouseDown = useCallback((e: React.MouseEvent) => {
+    if (!layoutMode) return;
+    e.preventDefault();
+    e.stopPropagation();
+    setActiveLayoutEl("bookmarks");
+    const widget = bmWidgetRef.current;
+    if (!widget) return;
+    const rect = widget.getBoundingClientRect();
+    const startX = rect.left;
+    const startY = rect.top;
+    if (!bmPosition) setBmPosition({ x: startX, y: startY });
+    const sx = bmPosition ? bmPosition.x : startX;
+    const sy = bmPosition ? bmPosition.y : startY;
+    bmDragRef.current = { startMX: e.clientX, startMY: e.clientY, startX: sx, startY: sy };
+    const onMove = (ev: MouseEvent) => {
+      const d = bmDragRef.current;
+      if (!d) return;
+      const nx = d.startX + (ev.clientX - d.startMX);
+      const ny = d.startY + (ev.clientY - d.startMY);
+      setBmPosition({ x: nx, y: ny });
+    };
+    const onUp = () => {
+      bmDragRef.current = null;
+      document.removeEventListener("mousemove", onMove);
+      document.removeEventListener("mouseup", onUp);
+      setBmPosition(prev => {
+        if (prev) localStorage.setItem("rynzen-bm-position", JSON.stringify(prev));
+        return prev;
+      });
+    };
+    document.addEventListener("mousemove", onMove);
+    document.addEventListener("mouseup", onUp);
+  }, [layoutMode, bmPosition]);
 
   function handleAddLink() {
     if (!newLinkUrl.trim()) return;
@@ -1433,7 +1472,17 @@ export default function App() {
             {(bmActive || bmShowAddFolder) && (
               <div className="bm-dismiss" onClick={() => { setBmActive(null); setBmShowAddFolder(false); setBmShowAddLink(false); }} />
             )}
-            <div className="bm-widget">
+            <div
+              ref={bmWidgetRef}
+              className={`bm-widget${layoutMode ? " layout-el" + (activeLayoutEl === "bookmarks" ? " layout-el-active" : "") : ""}`}
+              style={bmPosition ? { left: bmPosition.x, top: bmPosition.y, transform: "none" } : {}}
+              onMouseDown={layoutMode ? handleBmMouseDown : undefined}
+              onClick={layoutMode ? (e) => e.stopPropagation() : undefined}
+            >
+              {layoutMode && (
+                <div style={{ position: "absolute", inset: 0, zIndex: 100, cursor: "move", borderRadius: 10 }}
+                  onMouseDown={handleBmMouseDown} onClick={e => e.stopPropagation()} />
+              )}
               {/* Header toggle card */}
               <button className="bm-header-card"
                 style={{ background: isDark ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.88)", borderColor: isDark ? "rgba(255,255,255,0.14)" : "rgba(255,255,255,0.7)", color: isDark ? "#c8cce0" : "#555" }}
