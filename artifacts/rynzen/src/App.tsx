@@ -325,7 +325,7 @@ export default function App() {
   const [quickLinksIconRadius, setQuickLinksIconRadius] = useState(10);
   const [quickLinksPerRow, setQuickLinksPerRow] = useState(8);
   const [quickLinksStyle, setQuickLinksStyle] = useState<"icon" | "text">("icon");
-  const [quickLinksSize, setQuickLinksSize] = useState<"small" | "medium" | "large">("medium");
+  const [quickLinksSize, setQuickLinksSize] = useState(40);
   const [newLinkTitle, setNewLinkTitle] = useState("");
   const [newLinkUrl, setNewLinkUrl] = useState("");
   const [showLibraryModal, setShowLibraryModal] = useState(false);
@@ -986,8 +986,8 @@ export default function App() {
     e.target.value = "";
   }
 
-  const qlFaviconSize = quickLinksSize === "small" ? 28 : quickLinksSize === "large" ? 52 : 40;
-  const qlSzParam = quickLinksSize === "small" ? 32 : quickLinksSize === "large" ? 64 : 64;
+  const qlFaviconSize = quickLinksSize;
+  const qlSzParam = 64;
 
   // Clock computed values
   const clockFontSize = `${40 + (clockSizeNum / 100) * 56}px`;
@@ -2060,13 +2060,11 @@ export default function App() {
           <div className={`settings-row settings-row-col${!showShortcuts ? " settings-row-dimmed" : ""}`} style={{ borderTop: `1px solid ${rowBorder}` }}>
             <span className="settings-row-label">{t.linkStyle} / Size</span>
             <div className="settings-slider-row">
-              <input type="range" className="settings-slider" min={1} max={3} step={1}
-                value={quickLinksSize === "small" ? 1 : quickLinksSize === "large" ? 3 : 2}
-                onChange={(e) => { const v = Number(e.target.value); setQuickLinksSize(v === 1 ? "small" : v === 3 ? "large" : "medium"); }}
+              <input type="range" className="settings-slider" min={20} max={64} step={1}
+                value={quickLinksSize}
+                onChange={(e) => setQuickLinksSize(Number(e.target.value))}
                 disabled={!showShortcuts} />
-              <span style={{ fontSize: 11, opacity: 0.6, minWidth: 38, textAlign: "right" }}>
-                {quickLinksSize === "small" ? t.small : quickLinksSize === "large" ? t.large : t.medium}
-              </span>
+              <span style={{ fontSize: 11, opacity: 0.6, minWidth: 28, textAlign: "right" }}>{quickLinksSize}</span>
             </div>
           </div>
 
