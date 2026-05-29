@@ -1561,7 +1561,7 @@ export default function App() {
                   </div>
                 ) : (
                   /* ── Normal folder list ── */
-                  <div className="bm-folder-col">
+                  <div className="bm-folder-col" key={bmPanelOpen ? "open" : "closed"}>
                     {bmFolders.map((folder, idx) => {
                       const isActive = bmActive === folder.name;
                       return (
