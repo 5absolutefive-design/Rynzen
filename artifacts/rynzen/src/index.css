@@ -2708,7 +2708,7 @@ body {
 }
 .bm-header-card {
   width: 200px;
-  height: 22px;
+  height: 32px;
   display: flex;
   align-items: center;
   gap: 5px;
