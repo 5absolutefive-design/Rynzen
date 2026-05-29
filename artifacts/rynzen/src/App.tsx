@@ -410,6 +410,10 @@ export default function App() {
   const [bmSearch, setBmSearch] = useState("");
   const [bmHeaderSearchMode, setBmHeaderSearchMode] = useState(false);
   const [bmDeleteConfirm, setBmDeleteConfirm] = useState<string | null>(null);
+  const [bmLinkAnim, setBmLinkAnim] = useState<"slide" | "drop" | "pop">(() => {
+    try { return (localStorage.getItem("rynzen-bm-link-anim") as "slide" | "drop" | "pop") || "slide"; } catch { return "slide"; }
+  });
+  useEffect(() => { try { localStorage.setItem("rynzen-bm-link-anim", bmLinkAnim); } catch {} }, [bmLinkAnim]);
 
   useEffect(() => {
     try { localStorage.setItem("rynzen-bookmarks", JSON.stringify(bmFolders)); } catch {}
@@ -1645,8 +1649,8 @@ export default function App() {
                     <div className="bm-links">
                       {activeFolder.links.length === 0 && <div className="bm-empty" style={{ color: isDark ? "#666" : "#bbb" }}>No bookmarks yet</div>}
                       {activeFolder.links.map((link, i) => (
-                        <a key={link.title + i} href={link.url} target="_blank" rel="noreferrer" className="bm-link-row"
-                          style={{ animationDelay: `${i * 28}ms` }}>
+                        <a key={link.title + i} href={link.url} target="_blank" rel="noreferrer" className={`bm-link-row bm-link-row--${bmLinkAnim}`}
+                          style={{ animationDelay: `${i * 40}ms` }}>
                           <div className="bm-link-favicon" style={{ background: `hsl(${(link.title.charCodeAt(0) * 37) % 360},55%,60%)` }}>
                             <img src={`https://www.google.com/s2/favicons?sz=32&domain=${link.url}`} alt="" onError={e => { (e.target as HTMLImageElement).style.display = "none"; }} />
                           </div>
@@ -2108,6 +2112,22 @@ export default function App() {
           <div className="settings-row">
             <span className="settings-row-label">Show bookmark panel</span>
             <button className={`toggle${showBookmarks ? " on" : ""}`} onClick={() => setShowBookmarks(!showBookmarks)} aria-label="Show bookmark panel" />
+          </div>
+          <div className="settings-row" style={{ borderTop: `1px solid ${rowBorder}` }}>
+            <span className="settings-row-label">Link animation</span>
+            <div style={{ display: "flex", gap: 5 }}>
+              {(["slide", "drop", "pop"] as const).map((anim) => {
+                const labels: Record<string, string> = { slide: "→", drop: "↓", pop: "⬡" };
+                const titles: Record<string, string> = { slide: "Slide in", drop: "Drop in", pop: "Pop in" };
+                const isOn = bmLinkAnim === anim;
+                return (
+                  <button key={anim} onClick={() => setBmLinkAnim(anim)} title={titles[anim]}
+                    style={{ width: 36, height: 26, borderRadius: 7, border: `1.5px solid ${isOn ? (isDark ? "rgba(139,143,240,0.6)" : "rgba(99,102,241,0.5)") : (isDark ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.1)")}`, background: isOn ? (isDark ? "rgba(139,143,240,0.2)" : "rgba(99,102,241,0.12)") : "transparent", color: isOn ? (isDark ? "#a5b4fc" : "#4338ca") : (isDark ? "#666" : "#aaa"), fontSize: 14, cursor: "pointer", fontWeight: isOn ? 700 : 400, transition: "all 0.15s" }}>
+                    {labels[anim]}
+                  </button>
+                );
+              })}
+            </div>
           </div>
         </div>
 

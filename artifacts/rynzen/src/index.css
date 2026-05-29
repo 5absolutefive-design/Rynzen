@@ -2990,13 +2990,35 @@ body {
   padding: 6px 14px;
   cursor: pointer;
   text-decoration: none;
-  animation: bm-fade-in 0.16s ease both;
   transition: background 0.12s;
 }
 .bm-link-row:hover { background: rgba(99,102,241,0.07); }
-@keyframes bm-fade-in {
-  from { opacity: 0; transform: translateX(-5px); }
+
+/* Animation: Slide (→) */
+.bm-link-row--slide {
+  animation: bm-anim-slide 0.22s cubic-bezier(0.22,1,0.36,1) both;
+}
+@keyframes bm-anim-slide {
+  from { opacity: 0; transform: translateX(-14px); }
   to   { opacity: 1; transform: translateX(0); }
+}
+
+/* Animation: Drop (↓) */
+.bm-link-row--drop {
+  animation: bm-anim-drop 0.26s cubic-bezier(0.34,1.2,0.64,1) both;
+}
+@keyframes bm-anim-drop {
+  from { opacity: 0; transform: translateY(-14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Animation: Pop (⬡) */
+.bm-link-row--pop {
+  animation: bm-anim-pop 0.28s cubic-bezier(0.34,1.56,0.64,1) both;
+}
+@keyframes bm-anim-pop {
+  from { opacity: 0; transform: scale(0.72); }
+  to   { opacity: 1; transform: scale(1); }
 }
 .bm-link-favicon {
   width: 20px;
